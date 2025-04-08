@@ -22,6 +22,7 @@ import Inventory from './pages/Inventory';
 import StockMovements from './pages/StockMovements';
 import Reports from './pages/Reports';
 import Customers from './pages/Customers';
+import ManageCustomer from './pages/ManageCustomer';
 import Settings from './pages/Settings';
 
 const queryClient = new QueryClient();
@@ -46,6 +47,8 @@ const App = () => (
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/users" element={<Users />} />
                     <Route path="/customers" element={<Customers />} />
+                    <Route path="/customers/manage" element={<ManageCustomer />} />
+                    <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
                     <Route path="/notifications" element={<Notifications />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/unauthorized" element={<Unauthorized />} />

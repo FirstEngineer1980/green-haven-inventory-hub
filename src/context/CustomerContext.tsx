@@ -16,7 +16,8 @@ const mockCustomers: Customer[] = [
     createdAt: '2023-03-15T10:30:00Z',
     updatedAt: '2023-07-22T14:45:00Z',
     totalOrders: 12,
-    totalSpent: 4350.75
+    totalSpent: 4350.75,
+    status: 'active'
   },
   {
     id: '2',
@@ -28,7 +29,8 @@ const mockCustomers: Customer[] = [
     createdAt: '2023-04-20T09:15:00Z',
     updatedAt: '2023-06-18T11:20:00Z',
     totalOrders: 8,
-    totalSpent: 2890.50
+    totalSpent: 2890.50,
+    status: 'active'
   },
   {
     id: '3',
@@ -41,7 +43,8 @@ const mockCustomers: Customer[] = [
     createdAt: '2023-02-10T08:45:00Z',
     updatedAt: '2023-08-05T16:30:00Z',
     totalOrders: 24,
-    totalSpent: 18750.25
+    totalSpent: 18750.25,
+    status: 'active'
   },
   {
     id: '4',
@@ -52,7 +55,8 @@ const mockCustomers: Customer[] = [
     createdAt: '2023-05-05T13:20:00Z',
     updatedAt: '2023-07-30T10:15:00Z',
     totalOrders: 5,
-    totalSpent: 1240.80
+    totalSpent: 1240.80,
+    status: 'paused'
   },
   {
     id: '5',
@@ -65,15 +69,17 @@ const mockCustomers: Customer[] = [
     createdAt: '2023-01-25T11:10:00Z',
     updatedAt: '2023-08-12T09:45:00Z',
     totalOrders: 15,
-    totalSpent: 6780.40
+    totalSpent: 6780.40,
+    status: 'active'
   }
 ];
 
 interface CustomerContextType {
   customers: Customer[];
-  addCustomer: (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'totalOrders' | 'totalSpent'>) => void;
+  addCustomer: (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'totalOrders' | 'totalSpent' | 'status'>) => void;
   updateCustomer: (id: string, updates: Partial<Customer>) => void;
   deleteCustomer: (id: string) => void;
+  toggleCustomerStatus: (id: string, status: 'active' | 'paused' | 'inactive') => void;
 }
 
 const CustomerContext = createContext<CustomerContextType>({} as CustomerContextType);
@@ -84,7 +90,7 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
   const { addNotification } = useNotifications();
 
-  const addCustomer = (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'totalOrders' | 'totalSpent'>) => {
+  const addCustomer = (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'totalOrders' | 'totalSpent' | 'status'>) => {
     const now = new Date().toISOString();
     const newCustomer: Customer = {
       ...customer,
@@ -92,7 +98,8 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       createdAt: now,
       updatedAt: now,
       totalOrders: 0,
-      totalSpent: 0
+      totalSpent: 0,
+      status: 'active'
     };
     
     setCustomers(prev => [...prev, newCustomer]);
@@ -144,12 +151,51 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const toggleCustomerStatus = (id: string, status: 'active' | 'paused' | 'inactive') => {
+    setCustomers(prev =>
+      prev.map(customer =>
+        customer.id === id
+          ? { ...customer, status, updatedAt: new Date().toISOString() }
+          : customer
+      )
+    );
+
+    const customer = customers.find(c => c.id === id);
+    if (customer) {
+      let statusMessage = '';
+      let notificationType: 'info' | 'warning' | 'success' | 'error' = 'info';
+      
+      switch (status) {
+        case 'active':
+          statusMessage = 'activated';
+          notificationType = 'success';
+          break;
+        case 'paused':
+          statusMessage = 'paused';
+          notificationType = 'warning';
+          break;
+        case 'inactive':
+          statusMessage = 'deactivated';
+          notificationType = 'warning';
+          break;
+      }
+
+      addNotification({
+        title: 'Customer Status Changed',
+        message: `${customer.name} has been ${statusMessage}`,
+        type: notificationType,
+        for: ['1', '2'], // Admin, Manager
+      });
+    }
+  };
+
   return (
     <CustomerContext.Provider value={{ 
       customers, 
       addCustomer, 
       updateCustomer, 
-      deleteCustomer
+      deleteCustomer,
+      toggleCustomerStatus
     }}>
       {children}
     </CustomerContext.Provider>

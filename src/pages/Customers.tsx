@@ -1,32 +1,41 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useCustomers } from '@/context/CustomerContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Filter, PlusCircle, User, Phone, Mail, MapPin, Building, Clock } from 'lucide-react';
+import { Search, Filter, PlusCircle, User, Phone, Mail, MapPin, Building, Clock, MoreHorizontal, Edit, Trash2, Pause, Play, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import { Customer } from '@/types';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const Customers = () => {
-  const { customers } = useCustomers();
+  const { customers, toggleCustomerStatus, deleteCustomer } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused' | 'inactive'>('all');
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const itemsPerPage = 10;
 
-  // Filter customers based on search term
+  // Filter customers based on search term and status
   const filteredCustomers = customers
     .filter(customer => 
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (statusFilter === 'all' || customer.status === statusFilter) &&
+      (customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (customer.company && customer.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      customer.phone.includes(searchTerm)
+      customer.phone.includes(searchTerm))
     );
 
   // Calculate pagination
@@ -36,33 +45,59 @@ const Customers = () => {
     currentPage * itemsPerPage
   );
 
+  const handleEditCustomer = (customerId: string) => {
+    navigate(`/customers/manage/${customerId}`);
+  };
+
+  const handleViewCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+  };
+
+  const handleDeleteCustomer = (customerId: string) => {
+    deleteCustomer(customerId);
+    toast({
+      title: "Customer Deleted",
+      description: "The customer has been removed from the system.",
+      variant: "default"
+    });
+  };
+
+  const handleToggleStatus = (customerId: string, newStatus: 'active' | 'paused' | 'inactive') => {
+    toggleCustomerStatus(customerId, newStatus);
+    toast({
+      title: "Customer Status Updated",
+      description: `Customer status has been changed to ${newStatus}.`,
+      variant: "default"
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch(status) {
+      case 'active':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Active</Badge>;
+      case 'paused':
+        return <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">Paused</Badge>;
+      case 'inactive':
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300">Inactive</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
           <div className="flex gap-3">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Customer
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Add New Customer</SheetTitle>
-                </SheetHeader>
-                <div className="py-4">
-                  {/* Add customer form would go here */}
-                  <p className="text-gray-500">Customer creation form would be implemented here</p>
-                </div>
-              </SheetContent>
-            </Sheet>
+            <Button variant="outline" onClick={() => navigate('/customers/manage')}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Customer
+            </Button>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="relative flex-grow">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -73,10 +108,30 @@ const Customers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Filter className="h-4 w-4" />
+                {statusFilter === 'all' ? 'All Statuses' : 
+                  statusFilter === 'active' ? 'Active' : 
+                  statusFilter === 'paused' ? 'Paused' : 'Inactive'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-40">
+              <DropdownMenuItem onClick={() => setStatusFilter('all')}>
+                All Statuses
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('active')}>
+                Active
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('paused')}>
+                Paused
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('inactive')}>
+                Inactive
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <Card>
@@ -91,26 +146,91 @@ const Customers = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Company</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Orders</TableHead>
                   <TableHead>Total Spent</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedCustomers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
                       No customers found
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedCustomers.map(customer => (
-                    <TableRow key={customer.id} onClick={() => setSelectedCustomer(customer)} className="cursor-pointer">
+                    <TableRow key={customer.id}>
                       <TableCell className="font-medium">{customer.name}</TableCell>
                       <TableCell>{customer.email}</TableCell>
                       <TableCell>{customer.phone}</TableCell>
                       <TableCell>{customer.company || '-'}</TableCell>
+                      <TableCell>{getStatusBadge(customer.status)}</TableCell>
                       <TableCell>{customer.totalOrders}</TableCell>
                       <TableCell>${customer.totalSpent.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleViewCustomer(customer)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEditCustomer(customer.id)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            {customer.status === 'active' ? (
+                              <DropdownMenuItem onClick={() => handleToggleStatus(customer.id, 'paused')}>
+                                <Pause className="mr-2 h-4 w-4" />
+                                Pause
+                              </DropdownMenuItem>
+                            ) : customer.status === 'paused' || customer.status === 'inactive' ? (
+                              <DropdownMenuItem onClick={() => handleToggleStatus(customer.id, 'active')}>
+                                <Play className="mr-2 h-4 w-4" />
+                                Activate
+                              </DropdownMenuItem>
+                            ) : null}
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Confirm Deletion</DialogTitle>
+                                  <DialogDescription>
+                                    Are you sure you want to delete {customer.name}? This action cannot be undone.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                  </DialogClose>
+                                  <Button 
+                                    variant="destructive" 
+                                    onClick={() => {
+                                      handleDeleteCustomer(customer.id);
+                                      document.querySelector("[data-state='open']")?.dispatchEvent(
+                                        new Event('close', { bubbles: true })
+                                      );
+                                    }}
+                                  >
+                                    Delete
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -166,9 +286,12 @@ const Customers = () => {
                   <div className="h-16 w-16 rounded-full bg-gh-green text-white flex items-center justify-center text-2xl">
                     {selectedCustomer.name.charAt(0)}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h2 className="text-xl font-bold">{selectedCustomer.name}</h2>
                     <p className="text-muted-foreground text-sm">{selectedCustomer.company || 'Individual Customer'}</p>
+                  </div>
+                  <div>
+                    {getStatusBadge(selectedCustomer.status)}
                   </div>
                 </div>
                 
@@ -262,8 +385,35 @@ const Customers = () => {
               </div>
               
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1">Edit Customer</Button>
-                <Button variant="secondary" className="flex-1">New Order</Button>
+                <Button variant="outline" className="flex-1" onClick={() => handleEditCustomer(selectedCustomer.id)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
+                {selectedCustomer.status === 'active' ? (
+                  <Button 
+                    variant="secondary" 
+                    className="flex-1"
+                    onClick={() => {
+                      handleToggleStatus(selectedCustomer.id, 'paused');
+                      setSelectedCustomer(null);
+                    }}
+                  >
+                    <Pause className="mr-2 h-4 w-4" />
+                    Pause
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="secondary" 
+                    className="flex-1"
+                    onClick={() => {
+                      handleToggleStatus(selectedCustomer.id, 'active');
+                      setSelectedCustomer(null);
+                    }}
+                  >
+                    <Play className="mr-2 h-4 w-4" />
+                    Activate
+                  </Button>
+                )}
               </div>
             </div>
           </SheetContent>
