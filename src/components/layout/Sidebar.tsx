@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, Package, Users, Bell, BarChart3, Settings, Warehouse, 
-  LogOut, ShoppingCart, User, FileText, FolderDot, FolderOpen
+  LogOut, ShoppingCart, User, FileText, FolderDot
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -73,53 +73,13 @@ const Sidebar = () => {
           <span>Stock Movements</span>
         </NavLink>
         
-        {/* Updated Customer section with dropdown */}
-        <div className="py-2">
-          <NavigationMenu orientation="vertical" className="w-full max-w-none">
-            <NavigationMenuList className="w-full flex-col items-start space-y-0">
-              <NavigationMenuItem className="w-full">
-                <NavigationMenuTrigger className="gh-nav-item w-full justify-between">
-                  <div className="flex items-center">
-                    <User className="w-5 h-5 mr-2" />
-                    <span>Customers</span>
-                  </div>
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="w-full">
-                  <ul className="w-full">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <NavLink 
-                          to="/customers" 
-                          className={({ isActive }) => 
-                            cn("block px-4 py-2 hover:bg-gray-100", 
-                            isActive && "bg-gray-100 font-medium")
-                          }
-                        >
-                          Customer List
-                        </NavLink>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <NavLink 
-                          to="/rooms" 
-                          className={({ isActive }) => 
-                            cn("block px-4 py-2 hover:bg-gray-100", 
-                            isActive && "bg-gray-100 font-medium")
-                          }
-                        >
-                          Customer Rooms
-                        </NavLink>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
+        {/* Direct link to Customers */}
+        <NavLink to="/customers" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
+          <User className="w-5 h-5" />
+          <span>Customers</span>
+        </NavLink>
         
-        {/* Direct Rooms link - Alternative approach */}
+        {/* Direct link to Rooms */}
         <NavLink to="/rooms" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
           <FolderDot className="w-5 h-5" />
           <span>Rooms</span>
