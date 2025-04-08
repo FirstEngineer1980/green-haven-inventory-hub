@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, Package, Users, Bell, BarChart3, Settings, Warehouse, 
-  LogOut, ShoppingCart
+  LogOut, ShoppingCart, User, FileText
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -64,9 +64,14 @@ const Sidebar = () => {
           <span>Stock Movements</span>
         </NavLink>
         
+        <NavLink to="/customers" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
+          <User className="w-5 h-5" />
+          <span>Customers</span>
+        </NavLink>
+        
         {hasPermission('view_reports') && (
           <NavLink to="/reports" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-            <BarChart3 className="w-5 h-5" />
+            <FileText className="w-5 h-5" />
             <span>Reports</span>
           </NavLink>
         )}

@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ProductProvider } from './context/ProductContext';
 import { UserProvider } from './context/UserContext';
+import { CustomerProvider } from './context/CustomerContext';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -17,6 +18,11 @@ import Users from './pages/Users';
 import Notifications from './pages/Notifications';
 import Unauthorized from './pages/Unauthorized';
 import NotFound from "./pages/NotFound";
+import Inventory from './pages/Inventory';
+import StockMovements from './pages/StockMovements';
+import Reports from './pages/Reports';
+import Customers from './pages/Customers';
+import Settings from './pages/Settings';
 
 const queryClient = new QueryClient();
 
@@ -27,20 +33,27 @@ const App = () => (
         <NotificationProvider>
           <ProductProvider>
             <UserProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <Routes>
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/users" element={<Users />} />
-                  <Route path="/notifications" element={<Notifications />} />
-                  <Route path="/unauthorized" element={<Unauthorized />} />
-                  <Route path="/" element={<Login />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </TooltipProvider>
+              <CustomerProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/inventory" element={<Inventory />} />
+                    <Route path="/stock-movements" element={<StockMovements />} />
+                    <Route path="/reports" element={<Reports />} />
+                    <Route path="/users" element={<Users />} />
+                    <Route path="/customers" element={<Customers />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/unauthorized" element={<Unauthorized />} />
+                    <Route path="/" element={<Login />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </TooltipProvider>
+              </CustomerProvider>
             </UserProvider>
           </ProductProvider>
         </NotificationProvider>
