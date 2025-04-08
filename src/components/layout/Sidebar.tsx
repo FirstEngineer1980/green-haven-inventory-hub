@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, Package, Users, Bell, BarChart3, Settings, Warehouse, 
-  LogOut, ShoppingCart, User, FileText, FolderOpen
+  LogOut, ShoppingCart, User, FileText, FolderDot, FolderOpen
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -73,6 +73,7 @@ const Sidebar = () => {
           <span>Stock Movements</span>
         </NavLink>
         
+        {/* Updated Customer section with dropdown */}
         <div className="py-2">
           <NavigationMenu orientation="vertical" className="w-full max-w-none">
             <NavigationMenuList className="w-full flex-col items-start space-y-0">
@@ -107,7 +108,7 @@ const Sidebar = () => {
                             isActive && "bg-gray-100 font-medium")
                           }
                         >
-                          Rooms
+                          Customer Rooms
                         </NavLink>
                       </NavigationMenuLink>
                     </li>
@@ -117,6 +118,12 @@ const Sidebar = () => {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
+        
+        {/* Direct Rooms link - Alternative approach */}
+        <NavLink to="/rooms" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
+          <FolderDot className="w-5 h-5" />
+          <span>Rooms</span>
+        </NavLink>
         
         {hasPermission('view_reports') && (
           <NavLink to="/reports" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
