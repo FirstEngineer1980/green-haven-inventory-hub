@@ -11,6 +11,7 @@ import { ProductProvider } from './context/ProductContext';
 import { UserProvider } from './context/UserContext';
 import { CustomerProvider } from './context/CustomerContext';
 import { RoomProvider } from './context/RoomContext';
+import { UnitProvider } from './context/UnitContext';
 
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -25,6 +26,7 @@ import Reports from './pages/Reports';
 import Customers from './pages/Customers';
 import ManageCustomer from './pages/ManageCustomer';
 import Rooms from './pages/Rooms';
+import Units from './pages/Units';
 import Settings from './pages/Settings';
 
 const queryClient = new QueryClient();
@@ -38,28 +40,31 @@ const App = () => (
             <UserProvider>
               <CustomerProvider>
                 <RoomProvider>
-                  <TooltipProvider>
-                    <Toaster />
-                    <Sonner />
-                    <Routes>
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/products" element={<Products />} />
-                      <Route path="/inventory" element={<Inventory />} />
-                      <Route path="/stock-movements" element={<StockMovements />} />
-                      <Route path="/reports" element={<Reports />} />
-                      <Route path="/users" element={<Users />} />
-                      <Route path="/customers" element={<Customers />} />
-                      <Route path="/customers/manage" element={<ManageCustomer />} />
-                      <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
-                      <Route path="/rooms" element={<Rooms />} />
-                      <Route path="/notifications" element={<Notifications />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/unauthorized" element={<Unauthorized />} />
-                      <Route path="/" element={<Login />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </TooltipProvider>
+                  <UnitProvider>
+                    <TooltipProvider>
+                      <Toaster />
+                      <Sonner />
+                      <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/products" element={<Products />} />
+                        <Route path="/inventory" element={<Inventory />} />
+                        <Route path="/stock-movements" element={<StockMovements />} />
+                        <Route path="/reports" element={<Reports />} />
+                        <Route path="/users" element={<Users />} />
+                        <Route path="/customers" element={<Customers />} />
+                        <Route path="/customers/manage" element={<ManageCustomer />} />
+                        <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
+                        <Route path="/rooms" element={<Rooms />} />
+                        <Route path="/units" element={<Units />} />
+                        <Route path="/notifications" element={<Notifications />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/unauthorized" element={<Unauthorized />} />
+                        <Route path="/" element={<Login />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </TooltipProvider>
+                  </UnitProvider>
                 </RoomProvider>
               </CustomerProvider>
             </UserProvider>

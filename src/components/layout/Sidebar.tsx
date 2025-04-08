@@ -3,7 +3,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, Package, Users, Bell, BarChart3, Settings, Warehouse, 
-  LogOut, ShoppingCart, User, FileText, FolderDot
+  LogOut, ShoppingCart, User, FileText, FolderDot, Grid2X2
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -83,6 +83,12 @@ const Sidebar = () => {
         <NavLink to="/rooms" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
           <FolderDot className="w-5 h-5" />
           <span>Rooms</span>
+        </NavLink>
+        
+        {/* Direct link to Units */}
+        <NavLink to="/units" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
+          <Grid2X2 className="w-5 h-5" />
+          <span>Units</span>
         </NavLink>
         
         {hasPermission('view_reports') && (

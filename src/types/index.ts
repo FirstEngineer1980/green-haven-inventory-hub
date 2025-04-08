@@ -97,6 +97,19 @@ export interface Room {
   updatedAt: string;
 }
 
+export interface Unit {
+  id: string;
+  roomId: string;
+  roomName: string;
+  number: string;
+  size: number;
+  sizeUnit: 'sqft' | 'sqm' | 'm²';
+  status: 'available' | 'occupied' | 'maintenance';
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface DashboardStats {
   totalProducts: number;
   lowStockProducts: number;
