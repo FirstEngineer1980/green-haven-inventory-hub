@@ -1,131 +1,167 @@
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { 
-  Home, Package, Users, Bell, BarChart3, Settings, Warehouse, 
-  LogOut, ShoppingCart, User, FileText, FolderDot, Grid2X2
-} from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { cn } from '@/lib/utils';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+  BarChart3,
+  Package,
+  Users,
+  ShoppingCart,
+  LayoutDashboard,
+  Bell,
+  Settings,
+  Building2,
+  Home,
+  Grid3X3,
+  Table,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-const Sidebar = () => {
-  const { currentUser, logout, hasPermission } = useAuth();
+const Sidebar = ({ className }: { className?: string }) => {
+  const { pathname } = useLocation();
+
+  const navItems = [
+    {
+      title: 'Dashboard',
+      href: '/dashboard',
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+    {
+      title: 'Products',
+      href: '/products',
+      icon: <Package className="h-5 w-5" />,
+    },
+    {
+      title: 'Inventory',
+      icon: <ShoppingCart className="h-5 w-5" />,
+      subItems: [
+        {
+          title: 'Stock Items',
+          href: '/inventory',
+        },
+        {
+          title: 'Stock Movements',
+          href: '/stock-movements',
+        },
+      ],
+    },
+    {
+      title: 'Reports',
+      href: '/reports',
+      icon: <BarChart3 className="h-5 w-5" />,
+    },
+    {
+      title: 'Users',
+      href: '/users',
+      icon: <Users className="h-5 w-5" />,
+    },
+    {
+      title: 'Customers',
+      href: '/customers',
+      icon: <Building2 className="h-5 w-5" />,
+    },
+    {
+      title: 'Rooms',
+      href: '/rooms',
+      icon: <Home className="h-5 w-5" />,
+    },
+    {
+      title: 'Units',
+      href: '/units',
+      icon: <Grid3X3 className="h-5 w-5" />,
+    },
+    {
+      title: 'Unit Matrix',
+      href: '/unit-matrix',
+      icon: <Table className="h-5 w-5" />,
+    },
+    {
+      title: 'Notifications',
+      href: '/notifications',
+      icon: <Bell className="h-5 w-5" />,
+    },
+    {
+      title: 'Settings',
+      href: '/settings',
+      icon: <Settings className="h-5 w-5" />,
+    },
+  ];
 
   return (
-    <div className="h-screen w-64 bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center">
-          <div className="bg-gradient-to-r from-gh-green to-gh-blue w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-xl mr-3">
-            GH
-          </div>
-          <div>
-            <h1 className="text-lg font-bold">Green Haven</h1>
-            <p className="text-xs text-gray-500">Inventory Hub</p>
+    <aside className={cn('pb-12', className)}>
+      <div className="space-y-4 py-4">
+        <div className="px-4 py-2">
+          <h2 className="mb-2 px-2 text-xl font-semibold tracking-tight">
+            Storage Manager
+          </h2>
+          <div className="space-y-1">
+            <ScrollArea className="h-[calc(100vh-10rem)]">
+              <div className="space-y-1">
+                {navItems.map((item, i) => {
+                  if (item.subItems) {
+                    const isSubItemActive = item.subItems.some(
+                      (subItem) => subItem.href === pathname
+                    );
+                    return (
+                      <Collapsible key={i} defaultOpen={isSubItemActive}>
+                        <CollapsibleTrigger asChild>
+                          <Button
+                            variant={isSubItemActive ? 'secondary' : 'ghost'}
+                            className="w-full justify-start"
+                          >
+                            {item.icon}
+                            <span className="ml-2">{item.title}</span>
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="ml-4 space-y-1 pt-1">
+                            {item.subItems.map((subItem, j) => (
+                              <Button
+                                key={j}
+                                variant={
+                                  pathname === subItem.href
+                                    ? 'secondary'
+                                    : 'ghost'
+                                }
+                                asChild
+                                className="w-full justify-start pl-6"
+                              >
+                                <Link to={subItem.href}>{subItem.title}</Link>
+                              </Button>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  }
+                  return (
+                    <Button
+                      key={i}
+                      variant={pathname === item.href ? 'secondary' : 'ghost'}
+                      asChild
+                      className="w-full justify-start"
+                    >
+                      <Link to={item.href}>
+                        {item.icon}
+                        <span className="ml-2">{item.title}</span>
+                      </Link>
+                    </Button>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           </div>
         </div>
+        <Separator />
       </div>
-      
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center">
-          <div className="mr-3">
-            <div className="w-10 h-10 rounded-full bg-gh-green text-white flex items-center justify-center overflow-hidden">
-              {currentUser?.avatar ? (
-                <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
-              ) : (
-                <span>{currentUser?.name.charAt(0)}</span>
-              )}
-            </div>
-          </div>
-          <div>
-            <div className="font-medium">{currentUser?.name}</div>
-            <div className="text-xs text-gray-500">{currentUser?.role}</div>
-          </div>
-        </div>
-      </div>
-      
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        <NavLink to="/dashboard" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <Home className="w-5 h-5" />
-          <span>Dashboard</span>
-        </NavLink>
-        
-        <NavLink to="/products" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <Package className="w-5 h-5" />
-          <span>Products</span>
-        </NavLink>
-        
-        <NavLink to="/inventory" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <Warehouse className="w-5 h-5" />
-          <span>Inventory</span>
-        </NavLink>
-        
-        <NavLink to="/stock-movements" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <ShoppingCart className="w-5 h-5" />
-          <span>Stock Movements</span>
-        </NavLink>
-        
-        {/* Direct link to Customers */}
-        <NavLink to="/customers" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <User className="w-5 h-5" />
-          <span>Customers</span>
-        </NavLink>
-        
-        {/* Direct link to Rooms */}
-        <NavLink to="/rooms" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <FolderDot className="w-5 h-5" />
-          <span>Rooms</span>
-        </NavLink>
-        
-        {/* Direct link to Units */}
-        <NavLink to="/units" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <Grid2X2 className="w-5 h-5" />
-          <span>Units</span>
-        </NavLink>
-        
-        {hasPermission('view_reports') && (
-          <NavLink to="/reports" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-            <FileText className="w-5 h-5" />
-            <span>Reports</span>
-          </NavLink>
-        )}
-        
-        {hasPermission('manage_users') && (
-          <NavLink to="/users" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-            <Users className="w-5 h-5" />
-            <span>Users</span>
-          </NavLink>
-        )}
-        
-        <NavLink to="/notifications" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <Bell className="w-5 h-5" />
-          <span>Notifications</span>
-        </NavLink>
-        
-        <NavLink to="/settings" className={({ isActive }) => cn("gh-nav-item", isActive && "active")}>
-          <Settings className="w-5 h-5" />
-          <span>Settings</span>
-        </NavLink>
-      </nav>
-      
-      <div className="p-4 border-t border-gray-200">
-        <button 
-          onClick={logout}
-          className="gh-nav-item w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
-        >
-          <LogOut className="w-5 h-5" />
-          <span>Logout</span>
-        </button>
-      </div>
-    </div>
+    </aside>
   );
 };
 

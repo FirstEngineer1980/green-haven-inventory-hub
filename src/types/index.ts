@@ -1,4 +1,3 @@
-
 export type Role = 'admin' | 'manager' | 'staff' | 'viewer';
 
 export type Permission = 
@@ -108,6 +107,34 @@ export interface Unit {
   description?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UnitMatrix {
+  id: string;
+  roomId: string;
+  roomName: string; 
+  name: string;
+  rows: UnitMatrixRow[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UnitMatrixRow {
+  id: string;
+  label: string;
+  color: string;
+  cells: UnitMatrixCell[];
+}
+
+export interface UnitMatrixCell {
+  id: string;
+  value: string;
+  columnId: string;
+}
+
+export interface UnitMatrixColumn {
+  id: string;
+  label: string;
 }
 
 export interface DashboardStats {
