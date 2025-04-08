@@ -1,29 +1,15 @@
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { useCustomers } from '@/context/CustomerContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-const formSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters long'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(6, 'Phone number must be at least 6 characters long'),
-  address: z.string().min(5, 'Address must be at least 5 characters long'),
-  company: z.string().optional(),
-  notes: z.string().optional()
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { ArrowLeft, Save } from 'lucide-react';
+import { useCustomers } from '@/context/CustomerContext';
 
 const ManageCustomer = () => {
   const { customerId } = useParams();
@@ -31,190 +17,190 @@ const ManageCustomer = () => {
   const { customers, addCustomer, updateCustomer } = useCustomers();
   const { toast } = useToast();
   
-  const isEditing = !!customerId;
-  const customer = isEditing ? customers.find(c => c.id === customerId) : null;
-  
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      company: '',
-      notes: ''
-    }
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    company: '',
+    notes: ''
   });
   
   useEffect(() => {
-    if (customer) {
-      // Populate form with customer data
-      form.reset({
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        address: customer.address,
-        company: customer.company || '',
-        notes: customer.notes || ''
-      });
+    if (customerId) {
+      const customer = customers.find(c => c.id === customerId);
+      if (customer) {
+        setFormData({
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          address: customer.address,
+          company: customer.company || '',
+          notes: customer.notes || ''
+        });
+      }
     }
-  }, [customer, form]);
+  }, [customerId, customers]);
   
-  const onSubmit = (data: FormValues) => {
-    if (isEditing && customer) {
-      updateCustomer(customerId, {
-        ...data,
-        company: data.company || undefined,
-        notes: data.notes || undefined
-      });
-      
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Ensure required fields are filled
+    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
       toast({
-        title: "Customer Updated",
-        description: `${data.name}'s information has been updated successfully.`,
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (customerId) {
+      // Update existing customer
+      updateCustomer(customerId, formData);
+      toast({
+        title: "Success",
+        description: "Customer updated successfully.",
         variant: "default"
       });
     } else {
-      addCustomer({
-        ...data,
-        company: data.company || undefined,
-        notes: data.notes || undefined
-      });
+      // Add new customer
+      // Make sure all required fields are filled
+      const newCustomer = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        company: formData.company,
+        notes: formData.notes
+      };
       
+      addCustomer(newCustomer);
       toast({
-        title: "Customer Added",
-        description: `${data.name} has been added successfully.`,
+        title: "Success",
+        description: "New customer added successfully.",
         variant: "default"
       });
     }
     
+    // Navigate back to customers list
     navigate('/customers');
   };
   
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="icon" onClick={() => navigate('/customers')}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h1 className="text-2xl font-bold tracking-tight">
-              {isEditing ? 'Edit Customer' : 'Add New Customer'}
-            </h1>
-          </div>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/customers')}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {customerId ? 'Edit Customer' : 'Add New Customer'}
+          </h1>
         </div>
         
         <Card>
           <CardHeader>
-            <CardTitle>{isEditing ? 'Edit Customer Information' : 'Customer Information'}</CardTitle>
+            <CardTitle>Customer Information</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="john.doe@example.com" type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="(555) 123-4567" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="company"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Company (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Acme Inc." {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Leave blank for individual customers
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="name" 
+                    name="name" 
+                    placeholder="Full name" 
+                    value={formData.name} 
+                    onChange={handleInputChange} 
+                    required 
                   />
                 </div>
                 
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="123 Main St, City, State, ZIP" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Any additional information about this customer..."
-                          className="min-h-[120px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="flex justify-end space-x-4">
-                  <Button variant="outline" type="button" onClick={() => navigate('/customers')}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    <Save className="mr-2 h-4 w-4" />
-                    {isEditing ? 'Update Customer' : 'Add Customer'}
-                  </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="email" 
+                    name="email" 
+                    type="email" 
+                    placeholder="Email address" 
+                    value={formData.email} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
                 </div>
-              </form>
-            </Form>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="phone" 
+                    name="phone" 
+                    placeholder="Phone number" 
+                    value={formData.phone} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="company">Company</Label>
+                  <Input 
+                    id="company" 
+                    name="company" 
+                    placeholder="Company name (optional)" 
+                    value={formData.company} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+                
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="address">Address <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="address" 
+                    name="address" 
+                    placeholder="Full address" 
+                    value={formData.address} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
+                
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea 
+                    id="notes" 
+                    name="notes" 
+                    placeholder="Additional notes (optional)" 
+                    value={formData.notes} 
+                    onChange={handleInputChange} 
+                    className="min-h-32" 
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => navigate('/customers')}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  <Save className="mr-2 h-4 w-4" />
+                  {customerId ? 'Update Customer' : 'Add Customer'}
+                </Button>
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>

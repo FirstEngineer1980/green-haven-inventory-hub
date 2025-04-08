@@ -1,3 +1,4 @@
+
 export type Role = 'admin' | 'manager' | 'staff' | 'viewer';
 
 export type Permission = 
@@ -84,6 +85,16 @@ export interface Customer {
   totalOrders: number;
   totalSpent: number;
   status: 'active' | 'paused' | 'inactive';
+}
+
+export interface Room {
+  id: string;
+  customerId: string;
+  customerName: string;
+  name: string;
+  unit: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DashboardStats {
