@@ -14,15 +14,20 @@ import {
   Grid3X3,
   Table,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { ScrollArea } from '@/components/ui/scroll-area';
+  Sidebar as ShadcnSidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarTrigger,
+  SidebarProvider,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarFooter,
+} from '@/components/ui/sidebar';
 
 const Sidebar = ({ className }: { className?: string }) => {
   const { pathname } = useLocation();
@@ -95,73 +100,66 @@ const Sidebar = ({ className }: { className?: string }) => {
   ];
 
   return (
-    <aside className={cn('pb-12', className)}>
-      <div className="space-y-4 py-4">
-        <div className="px-4 py-2">
-          <h2 className="mb-2 px-2 text-xl font-semibold tracking-tight">
-            Storage Manager
-          </h2>
-          <div className="space-y-1">
-            <ScrollArea className="h-[calc(100vh-10rem)]">
-              <div className="space-y-1">
-                {navItems.map((item, i) => {
-                  if (item.subItems) {
-                    const isSubItemActive = item.subItems.some(
-                      (subItem) => subItem.href === pathname
-                    );
-                    return (
-                      <Collapsible key={i} defaultOpen={isSubItemActive}>
-                        <CollapsibleTrigger asChild>
-                          <Button
-                            variant={isSubItemActive ? 'secondary' : 'ghost'}
-                            className="w-full justify-start"
-                          >
-                            {item.icon}
-                            <span className="ml-2">{item.title}</span>
-                          </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <div className="ml-4 space-y-1 pt-1">
-                            {item.subItems.map((subItem, j) => (
-                              <Button
-                                key={j}
-                                variant={
-                                  pathname === subItem.href
-                                    ? 'secondary'
-                                    : 'ghost'
-                                }
-                                asChild
-                                className="w-full justify-start pl-6"
-                              >
-                                <Link to={subItem.href}>{subItem.title}</Link>
-                              </Button>
-                            ))}
-                          </div>
-                        </CollapsibleContent>
-                      </Collapsible>
-                    );
-                  }
-                  return (
-                    <Button
-                      key={i}
-                      variant={pathname === item.href ? 'secondary' : 'ghost'}
-                      asChild
-                      className="w-full justify-start"
-                    >
-                      <Link to={item.href}>
-                        {item.icon}
-                        <span className="ml-2">{item.title}</span>
-                      </Link>
-                    </Button>
-                  );
-                })}
-              </div>
-            </ScrollArea>
-          </div>
-        </div>
-        <Separator />
-      </div>
-    </aside>
+    <ShadcnSidebar className={className}>
+      <SidebarHeader className="pb-2">
+        <h2 className="px-4 text-xl font-semibold tracking-tight">
+          Storage Manager
+        </h2>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          {navItems.map((item, i) => {
+            if (item.subItems) {
+              const isSubItemActive = item.subItems.some(
+                (subItem) => subItem.href === pathname
+              );
+              
+              return (
+                <SidebarMenuItem key={i}>
+                  <SidebarMenuButton 
+                    isActive={isSubItemActive}
+                    tooltip={item.title}
+                  >
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                  
+                  <SidebarMenuSub>
+                    {item.subItems.map((subItem, j) => (
+                      <SidebarMenuSubButton
+                        key={j}
+                        asChild
+                        isActive={pathname === subItem.href}
+                      >
+                        <Link to={subItem.href}>{subItem.title}</Link>
+                      </SidebarMenuSubButton>
+                    ))}
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              );
+            }
+            
+            return (
+              <SidebarMenuItem key={i}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === item.href}
+                  tooltip={item.title}
+                >
+                  <Link to={item.href}>
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarTrigger />
+      </SidebarFooter>
+    </ShadcnSidebar>
   );
 };
 
