@@ -20,6 +20,8 @@ const UnitMatrixTable = ({ unitMatrix }: UnitMatrixTableProps) => {
   const [newColumnLabel, setNewColumnLabel] = useState('');
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnLabel, setEditingColumnLabel] = useState('');
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [editingRowColor, setEditingRowColor] = useState('');
   const { toast } = useToast();
 
   const handleCellChange = (rowId: string, columnId: string, value: string) => {
@@ -62,6 +64,7 @@ const UnitMatrixTable = ({ unitMatrix }: UnitMatrixTableProps) => {
   const cancelEditing = () => {
     setEditMode(false);
     setTempCells({});
+    setEditingRowId(null);
   };
 
   const handleAddRow = () => {
@@ -112,6 +115,19 @@ const UnitMatrixTable = ({ unitMatrix }: UnitMatrixTableProps) => {
 
   const handleDeleteColumn = (columnId: string) => {
     deleteColumn(columnId);
+  };
+
+  const startEditingRowColor = (rowId: string, currentColor: string) => {
+    setEditingRowId(rowId);
+    setEditingRowColor(currentColor);
+  };
+
+  const handleUpdateRowColor = (rowId: string) => {
+    if (editingRowId && editingRowColor) {
+      updateRow(unitMatrix.id, rowId, { color: editingRowColor });
+      setEditingRowId(null);
+      setEditingRowColor('');
+    }
   };
 
   const getCellValue = (rowId: string, columnId: string) => {
@@ -239,19 +255,51 @@ const UnitMatrixTable = ({ unitMatrix }: UnitMatrixTableProps) => {
             {unitMatrix.rows.map((row) => (
               <tr key={row.id}>
                 <td 
-                  className="px-4 py-2 whitespace-nowrap border-r flex items-center justify-between" 
+                  className="px-4 py-2 whitespace-nowrap border-r" 
                   style={{ backgroundColor: row.color }}
                 >
-                  <span className="font-medium text-white">{row.label}</span>
-                  {editMode && (
-                    <Button 
-                      onClick={() => handleDeleteRow(row.id)}
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 p-0 text-white hover:bg-white/20"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                  {editMode && editingRowId === row.id ? (
+                    <div className="flex items-center space-x-1">
+                      <span className="font-medium text-white">{row.label}</span>
+                      <Input 
+                        type="color" 
+                        value={editingRowColor} 
+                        onChange={(e) => setEditingRowColor(e.target.value)}
+                        className="w-8 h-5 ml-2"
+                      />
+                      <Button 
+                        onClick={() => handleUpdateRowColor(row.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 p-0 text-white hover:bg-white/20"
+                      >
+                        <Save className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-white">{row.label}</span>
+                      {editMode && (
+                        <div className="flex items-center space-x-1">
+                          <Button 
+                            onClick={() => startEditingRowColor(row.id, row.color)}
+                            variant="ghost"
+                            size="sm"
+                            className="h-5 w-5 p-0 text-white hover:bg-white/20"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button 
+                            onClick={() => handleDeleteRow(row.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="h-5 w-5 p-0 text-white hover:bg-white/20"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </td>
                 {columns.map(column => {
