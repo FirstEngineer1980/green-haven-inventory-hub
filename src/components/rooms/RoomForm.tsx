@@ -31,11 +31,15 @@ const RoomForm = ({
             <SelectValue placeholder="Select a customer" />
           </SelectTrigger>
           <SelectContent>
-            {customers.map(customer => (
-              <SelectItem key={customer.id} value={customer.id}>
-                {customer.name}
-              </SelectItem>
-            ))}
+            {customers.length > 0 ? (
+              customers.map(customer => (
+                <SelectItem key={customer.id} value={customer.id}>
+                  {customer.name}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-customers">No customers available</SelectItem>
+            )}
           </SelectContent>
         </Select>
       </div>

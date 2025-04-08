@@ -38,7 +38,7 @@ const RoomFilters = ({
             <SelectValue placeholder="All Customers" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Customers</SelectItem>
+            <SelectItem value="all">All Customers</SelectItem>
             {customers.map(customer => (
               <SelectItem key={customer.id} value={customer.id}>
                 {customer.name}

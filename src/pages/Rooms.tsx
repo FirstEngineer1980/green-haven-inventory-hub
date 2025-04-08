@@ -24,7 +24,7 @@ const Rooms = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('all');
   const itemsPerPage = 10;
   const { toast } = useToast();
 
@@ -65,7 +65,7 @@ const Rooms = () => {
 
   // Filter rooms based on search and selected customer
   const filteredRooms = rooms.filter(room => 
-    (selectedCustomer === '' || room.customerId === selectedCustomer) &&
+    (selectedCustomer === 'all' || room.customerId === selectedCustomer) &&
     (room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
      room.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
      room.unit.toString().includes(searchTerm))
