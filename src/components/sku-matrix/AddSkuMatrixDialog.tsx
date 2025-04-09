@@ -4,11 +4,11 @@ import { useUnitMatrix } from '@/context/UnitMatrixContext';
 import { useRooms } from '@/context/RoomContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Plus, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import MatrixGeneralForm from './components/MatrixGeneralForm';
+import MatrixRowList from './components/MatrixRowList';
+import AddRowForm from './components/AddRowForm';
 
 interface AddSkuMatrixDialogProps {
   open: boolean;
@@ -26,8 +26,6 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
   });
   
   const [rows, setRows] = useState<{ label: string; color: string; }[]>([]);
-  const [newRowLabel, setNewRowLabel] = useState('');
-  const [newRowColor, setNewRowColor] = useState('#FFFFFF');
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,19 +42,8 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
     }));
   };
   
-  const handleAddRow = () => {
-    if (!newRowLabel.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Row label is required",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setRows(prev => [...prev, { label: newRowLabel, color: newRowColor }]);
-    setNewRowLabel('');
-    setNewRowColor('#FFFFFF');
+  const handleAddRow = (label: string, color: string) => {
+    setRows(prev => [...prev, { label, color }]);
   };
   
   const handleRemoveRow = (index: number) => {
@@ -131,83 +118,23 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
         </DialogHeader>
         
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Matrix Name</Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="Enter matrix name"
-              value={formData.name}
-              onChange={handleInputChange}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="roomId">Room</Label>
-            <Select
-              value={formData.roomId}
-              onValueChange={(value) => handleSelectChange('roomId', value)}
-            >
-              <SelectTrigger id="roomId">
-                <SelectValue placeholder="Select a room" />
-              </SelectTrigger>
-              <SelectContent>
-                {rooms.map((room) => (
-                  <SelectItem key={room.id} value={room.id}>
-                    {room.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <MatrixGeneralForm 
+            name={formData.name}
+            roomId={formData.roomId}
+            rooms={rooms}
+            onInputChange={handleInputChange}
+            onSelectChange={handleSelectChange}
+          />
           
           <div className="space-y-2">
             <Label>Rows</Label>
             <div className="border rounded-md p-2 bg-gray-50">
-              {rows.length > 0 ? (
-                <div className="space-y-2 mb-4">
-                  {rows.map((row, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <div
-                        className="w-6 h-6 rounded-md"
-                        style={{ backgroundColor: row.color }}
-                      ></div>
-                      <span>{row.label}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveRow(index)}
-                        className="ml-auto"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center text-muted-foreground py-2">
-                  No rows added
-                </div>
-              )}
+              <MatrixRowList 
+                rows={rows} 
+                onRemoveRow={handleRemoveRow} 
+              />
               
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Row Label"
-                  value={newRowLabel}
-                  onChange={(e) => setNewRowLabel(e.target.value)}
-                  className="flex-1"
-                />
-                <Input
-                  type="color"
-                  value={newRowColor}
-                  onChange={(e) => setNewRowColor(e.target.value)}
-                  className="w-16"
-                />
-                <Button onClick={handleAddRow} type="button" size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+              <AddRowForm onAddRow={handleAddRow} />
             </div>
           </div>
         </div>
