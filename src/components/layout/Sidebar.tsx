@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -13,7 +12,6 @@ import {
   Home,
   Grid3X3,
   Table,
-  BadgePercent,
 } from 'lucide-react';
 
 import {
@@ -32,7 +30,7 @@ import {
 
 const Sidebar = ({ className }: { className?: string }) => {
   const { pathname } = useLocation();
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const navItems = [
     {
@@ -111,9 +109,7 @@ const Sidebar = ({ className }: { className?: string }) => {
   ];
 
   const handleMenuItemClick = () => {
-    // Close the mobile sidebar when a menu item is clicked
     if (isMobile) {
-      const { setOpenMobile } = useSidebar();
       setOpenMobile(false);
     }
   };
