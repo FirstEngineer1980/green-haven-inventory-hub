@@ -111,48 +111,58 @@ const ComboboxCell = ({
             </Button>
           </div>
         ) : (
-          <Command>
-            <CommandInput 
-              placeholder="Search..." 
-              value={inputValue || ''}
-              onValueChange={(value) => setInputValue(value)}
-            />
-            <CommandEmpty>
-              No item found. 
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="ml-2" 
-                onClick={handleCreateNew}
-              >
-                <Plus className="h-3 w-3 mr-1" /> Create
-              </Button>
-            </CommandEmpty>
-            <CommandGroup>
-              {safeOptions.map((option) => (
-                <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={(currentValue) => handleSelect(currentValue)}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === option ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option}
-                </CommandItem>
-              ))}
-              <CommandItem
-                className="text-sm text-muted-foreground hover:text-primary"
-                onSelect={handleCreateNew}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create new item
-              </CommandItem>
-            </CommandGroup>
-          </Command>
+          <div>
+            {/* Simplified Command component usage */}
+            <div className="flex items-center border-b px-3">
+              <Input
+                className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Search..."
+                value={inputValue || ''}
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+            </div>
+            
+            <div className="max-h-[300px] overflow-y-auto overflow-x-hidden p-1">
+              {safeOptions.length === 0 ? (
+                <div className="py-6 text-center text-sm">
+                  No item found.
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-2" 
+                    onClick={handleCreateNew}
+                  >
+                    <Plus className="h-3 w-3 mr-1" /> Create
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  {safeOptions.map((option) => (
+                    <div
+                      key={option}
+                      className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 hover:bg-accent hover:text-accent-foreground"
+                      onClick={() => handleSelect(option)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === option ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {option}
+                    </div>
+                  ))}
+                  <div
+                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    onClick={handleCreateNew}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create new item
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </PopoverContent>
     </Popover>
