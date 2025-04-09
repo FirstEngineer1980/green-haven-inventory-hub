@@ -14,6 +14,7 @@ import {
   Grid3X3,
   Table,
   Menu,
+  Database,
 } from 'lucide-react';
 
 import {
@@ -98,6 +99,11 @@ const Sidebar = ({ className }: { className?: string }) => {
       title: 'Unit Matrix',
       href: '/unit-matrix',
       icon: <Table className="h-5 w-5" />,
+    },
+    {
+      title: 'SKU Matrix',
+      href: '/sku-matrix',
+      icon: <Database className="h-5 w-5" />,
     },
     {
       title: 'Notifications',
