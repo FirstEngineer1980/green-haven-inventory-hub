@@ -1,18 +1,18 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UnitMatrix } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, X, Save, Edit, Trash } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import ComboboxCell from './components/ComboboxCell';
 
 interface SkuMatrixTableProps {
   unitMatrix: UnitMatrix;
 }
 
 const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
-  const { columns, updateCell, addRow, deleteRow, updateRow, addColumn, deleteColumn, updateColumn } = useUnitMatrix();
+  const { columns, updateCell, addRow, deleteRow, updateRow, addColumn, deleteColumn, updateColumn, unitMatrices } = useUnitMatrix();
   const [editMode, setEditMode] = useState(false);
   const [tempCells, setTempCells] = useState<{[key: string]: string}>({});
   const [newRowLabel, setNewRowLabel] = useState('');
@@ -22,7 +22,24 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   const [editingColumnLabel, setEditingColumnLabel] = useState('');
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [editingRowColor, setEditingRowColor] = useState('');
+  const [skuOptions, setSkuOptions] = useState<string[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const options = new Set<string>();
+    
+    unitMatrices.forEach(matrix => {
+      matrix.rows.forEach(row => {
+        row.cells.forEach(cell => {
+          if (cell.value && cell.value.trim() !== '') {
+            options.add(cell.value);
+          }
+        });
+      });
+    });
+    
+    setSkuOptions(Array.from(options));
+  }, [unitMatrices]);
 
   const handleCellChange = (rowId: string, columnId: string, value: string) => {
     const cellKey = `${rowId}-${columnId}`;
@@ -33,7 +50,6 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   };
 
   const startEditing = () => {
-    // Initialize tempCells with current values
     const initialTempCells: {[key: string]: string} = {};
     unitMatrix.rows.forEach(row => {
       row.cells.forEach(cell => {
@@ -45,7 +61,6 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   };
 
   const saveChanges = () => {
-    // Apply all cell changes
     Object.entries(tempCells).forEach(([key, value]) => {
       const [rowId, columnId] = key.split('-');
       updateCell(unitMatrix.id, rowId, columnId, value);
@@ -310,10 +325,11 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                       className={`px-4 py-2 whitespace-nowrap border-r ${!value && !editMode ? 'bg-gray-200' : ''}`}
                     >
                       {editMode ? (
-                        <Input 
+                        <ComboboxCell
                           value={value}
-                          onChange={(e) => handleCellChange(row.id, column.id, e.target.value)}
-                          className="h-8 py-1 px-2 text-sm"
+                          onChange={(newValue) => handleCellChange(row.id, column.id, newValue)}
+                          options={skuOptions}
+                          placeholder="Select or add SKU"
                         />
                       ) : (
                         value

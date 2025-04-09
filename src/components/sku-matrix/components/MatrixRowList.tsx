@@ -20,18 +20,17 @@ const MatrixRowList = ({ rows, onRemoveRow }: MatrixRowListProps) => {
   return (
     <div className="space-y-2 mb-4">
       {rows.map((row, index) => (
-        <div key={index} className="flex items-center space-x-2">
+        <div key={index} className="flex items-center space-x-2 p-2 border rounded-md">
           <div
-            className="w-6 h-6 rounded-md"
+            className="w-6 h-6 rounded-md flex-shrink-0"
             style={{ backgroundColor: row.color }}
           ></div>
-          <span>{row.label}</span>
+          <span className="flex-grow">{row.label}</span>
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() => onRemoveRow(index)}
-            className="ml-auto"
           >
             <X className="h-4 w-4" />
           </Button>
