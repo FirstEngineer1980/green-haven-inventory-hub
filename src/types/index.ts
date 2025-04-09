@@ -1,4 +1,3 @@
-
 export type Role = 'admin' | 'manager' | 'staff' | 'viewer';
 
 export type Permission = 
@@ -163,4 +162,40 @@ export interface DashboardStats {
     date: string;
     inStock: number;
   }[];
+}
+
+export interface PurchaseOrder {
+  id: string;
+  poNumber: string;
+  vendorId: string;
+  vendorName: string;
+  status: 'draft' | 'pending' | 'approved' | 'received' | 'cancelled';
+  total: number;
+  createdAt: string;
+  updatedAt: string;
+  expectedDeliveryDate?: string;
+  notes?: string;
+  items: PurchaseOrderItem[];
+}
+
+export interface PurchaseOrderItem {
+  id: string;
+  poId: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  contactPerson: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
 }
