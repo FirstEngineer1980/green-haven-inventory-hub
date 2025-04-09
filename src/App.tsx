@@ -10,6 +10,7 @@ import { NotificationProvider } from './context/NotificationContext';
 import { ProductProvider } from './context/ProductContext';
 import { UserProvider } from './context/UserContext';
 import { CustomerProvider } from './context/CustomerContext';
+import { CustomerProductProvider } from './context/CustomerProductContext';
 import { RoomProvider } from './context/RoomContext';
 import { UnitProvider } from './context/UnitContext';
 import { UnitMatrixProvider } from './context/UnitMatrixContext';
@@ -25,6 +26,7 @@ import Inventory from './pages/Inventory';
 import StockMovements from './pages/StockMovements';
 import Reports from './pages/Reports';
 import Customers from './pages/Customers';
+import CustomerProducts from './pages/CustomerProducts';
 import ManageCustomer from './pages/ManageCustomer';
 import Rooms from './pages/Rooms';
 import Units from './pages/Units';
@@ -41,36 +43,39 @@ const App = () => (
           <ProductProvider>
             <UserProvider>
               <CustomerProvider>
-                <RoomProvider>
-                  <UnitProvider>
-                    <UnitMatrixProvider>
-                      <TooltipProvider>
-                        <Toaster />
-                        <Sonner />
-                        <Routes>
-                          <Route path="/login" element={<Login />} />
-                          <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/products" element={<Products />} />
-                          <Route path="/inventory" element={<Inventory />} />
-                          <Route path="/stock-movements" element={<StockMovements />} />
-                          <Route path="/reports" element={<Reports />} />
-                          <Route path="/users" element={<Users />} />
-                          <Route path="/customers" element={<Customers />} />
-                          <Route path="/customers/manage" element={<ManageCustomer />} />
-                          <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
-                          <Route path="/rooms" element={<Rooms />} />
-                          <Route path="/units" element={<Units />} />
-                          <Route path="/unit-matrix" element={<UnitMatrixPage />} />
-                          <Route path="/notifications" element={<Notifications />} />
-                          <Route path="/settings" element={<Settings />} />
-                          <Route path="/unauthorized" element={<Unauthorized />} />
-                          <Route path="/" element={<Login />} />
-                          <Route path="*" element={<NotFound />} />
-                        </Routes>
-                      </TooltipProvider>
-                    </UnitMatrixProvider>
-                  </UnitProvider>
-                </RoomProvider>
+                <CustomerProductProvider>
+                  <RoomProvider>
+                    <UnitProvider>
+                      <UnitMatrixProvider>
+                        <TooltipProvider>
+                          <Toaster />
+                          <Sonner />
+                          <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/products" element={<Products />} />
+                            <Route path="/inventory" element={<Inventory />} />
+                            <Route path="/stock-movements" element={<StockMovements />} />
+                            <Route path="/reports" element={<Reports />} />
+                            <Route path="/users" element={<Users />} />
+                            <Route path="/customers" element={<Customers />} />
+                            <Route path="/customer-products" element={<CustomerProducts />} />
+                            <Route path="/customers/manage" element={<ManageCustomer />} />
+                            <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
+                            <Route path="/rooms" element={<Rooms />} />
+                            <Route path="/units" element={<Units />} />
+                            <Route path="/unit-matrix" element={<UnitMatrixPage />} />
+                            <Route path="/notifications" element={<Notifications />} />
+                            <Route path="/settings" element={<Settings />} />
+                            <Route path="/unauthorized" element={<Unauthorized />} />
+                            <Route path="/" element={<Login />} />
+                            <Route path="*" element={<NotFound />} />
+                          </Routes>
+                        </TooltipProvider>
+                      </UnitMatrixProvider>
+                    </UnitProvider>
+                  </RoomProvider>
+                </CustomerProductProvider>
               </CustomerProvider>
             </UserProvider>
           </ProductProvider>

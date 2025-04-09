@@ -13,6 +13,7 @@ import {
   Home,
   Grid3X3,
   Table,
+  BadgePercent,
 } from 'lucide-react';
 
 import {
@@ -69,8 +70,17 @@ const Sidebar = ({ className }: { className?: string }) => {
     },
     {
       title: 'Customers',
-      href: '/customers',
       icon: <Building2 className="h-5 w-5" />,
+      subItems: [
+        {
+          title: 'Manage Customers',
+          href: '/customers',
+        },
+        {
+          title: 'Customer Products',
+          href: '/customer-products',
+        },
+      ],
     },
     {
       title: 'Rooms',
