@@ -25,7 +25,7 @@ const ComboboxCell = ({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
   const [isCreating, setIsCreating] = useState(false);
-  const [allOptions, setAllOptions] = useState<string[]>([...options]);
+  const [allOptions, setAllOptions] = useState<string[]>(options || []);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -33,7 +33,8 @@ const ComboboxCell = ({
   }, [value]);
 
   useEffect(() => {
-    setAllOptions([...options]);
+    // Make sure we're working with a valid array
+    setAllOptions(Array.isArray(options) ? [...options] : []);
   }, [options]);
 
   const handleSelect = (currentValue: string) => {
@@ -69,6 +70,9 @@ const ComboboxCell = ({
       setIsCreating(false);
     }
   };
+
+  // Safely create a valid array for Command items
+  const safeOptions = Array.isArray(allOptions) ? allOptions : [];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -124,7 +128,7 @@ const ComboboxCell = ({
               </Button>
             </CommandEmpty>
             <CommandGroup>
-              {allOptions.map((option) => (
+              {safeOptions.map((option) => (
                 <CommandItem
                   key={option}
                   value={option}

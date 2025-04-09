@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { UnitMatrix } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -28,15 +29,21 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   useEffect(() => {
     const options = new Set<string>();
     
-    unitMatrices.forEach(matrix => {
-      matrix.rows.forEach(row => {
-        row.cells.forEach(cell => {
-          if (cell.value && cell.value.trim() !== '') {
-            options.add(cell.value);
-          }
-        });
+    if (Array.isArray(unitMatrices)) {
+      unitMatrices.forEach(matrix => {
+        if (matrix && Array.isArray(matrix.rows)) {
+          matrix.rows.forEach(row => {
+            if (row && Array.isArray(row.cells)) {
+              row.cells.forEach(cell => {
+                if (cell && cell.value && cell.value.trim() !== '') {
+                  options.add(cell.value);
+                }
+              });
+            }
+          });
+        }
       });
-    });
+    }
     
     setSkuOptions(Array.from(options));
   }, [unitMatrices]);
