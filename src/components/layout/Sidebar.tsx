@@ -24,14 +24,15 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
-  SidebarProvider,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarFooter,
+  useSidebar,
 } from '@/components/ui/sidebar';
 
 const Sidebar = ({ className }: { className?: string }) => {
   const { pathname } = useLocation();
+  const { isMobile } = useSidebar();
 
   const navItems = [
     {
@@ -109,6 +110,14 @@ const Sidebar = ({ className }: { className?: string }) => {
     },
   ];
 
+  const handleMenuItemClick = () => {
+    // Close the mobile sidebar when a menu item is clicked
+    if (isMobile) {
+      const { setOpenMobile } = useSidebar();
+      setOpenMobile(false);
+    }
+  };
+
   return (
     <ShadcnSidebar className={className}>
       <SidebarHeader className="pb-2">
@@ -141,7 +150,9 @@ const Sidebar = ({ className }: { className?: string }) => {
                         asChild
                         isActive={pathname === subItem.href}
                       >
-                        <Link to={subItem.href}>{subItem.title}</Link>
+                        <Link to={subItem.href} onClick={handleMenuItemClick}>
+                          {subItem.title}
+                        </Link>
                       </SidebarMenuSubButton>
                     ))}
                   </SidebarMenuSub>
@@ -156,7 +167,7 @@ const Sidebar = ({ className }: { className?: string }) => {
                   isActive={pathname === item.href}
                   tooltip={item.title}
                 >
-                  <Link to={item.href}>
+                  <Link to={item.href} onClick={handleMenuItemClick}>
                     {item.icon}
                     <span>{item.title}</span>
                   </Link>

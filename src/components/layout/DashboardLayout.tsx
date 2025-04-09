@@ -5,6 +5,7 @@ import Header from './Header';
 import { useAuth } from '@/context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, requiredPermission }) => {
   const { isAuthenticated, hasPermission } = useAuth();
+  const isMobile = useIsMobile();
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
@@ -25,7 +27,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, requiredPer
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={!isMobile}>
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
         <SidebarInset>
