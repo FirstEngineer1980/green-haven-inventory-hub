@@ -24,7 +24,7 @@ const CustomerProducts = () => {
   const { addNotification } = useNotifications();
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<CustomerProduct | undefined>(undefined);
   
@@ -62,7 +62,7 @@ const CustomerProducts = () => {
   
   const resetFilters = () => {
     setSearchTerm('');
-    setSelectedCustomerId('');
+    setSelectedCustomerId('all');
   };
   
   return (
@@ -99,7 +99,7 @@ const CustomerProducts = () => {
                     <SelectValue placeholder="All Customers" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Customers</SelectItem>
+                    <SelectItem value="all">All Customers</SelectItem>
                     {customers.map((customer) => (
                       <SelectItem key={customer.id} value={customer.id}>
                         {customer.name}
@@ -117,7 +117,7 @@ const CustomerProducts = () => {
         </Card>
         
         <CustomerProductTable 
-          customerIdFilter={selectedCustomerId} 
+          customerIdFilter={selectedCustomerId === 'all' ? '' : selectedCustomerId} 
           onEdit={handleEdit} 
         />
         

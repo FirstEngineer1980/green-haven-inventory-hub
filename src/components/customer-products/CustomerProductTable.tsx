@@ -34,7 +34,7 @@ interface CustomerProductTableProps {
 }
 
 const CustomerProductTable: React.FC<CustomerProductTableProps> = ({ customerIdFilter, onEdit }) => {
-  const { getCustomerProducts, deleteCustomerProduct } = useCustomerProducts();
+  const { customerProducts, deleteCustomerProduct } = useCustomerProducts();
   const { customers } = useCustomers();
   const { hasPermission } = useAuth();
   const { addNotification } = useNotifications();
@@ -43,7 +43,10 @@ const CustomerProductTable: React.FC<CustomerProductTableProps> = ({ customerIdF
   const [selectedProduct, setSelectedProduct] = useState<CustomerProduct | null>(null);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   
-  const products = getCustomerProducts(customerIdFilter);
+  // Filter products based on customer ID if provided
+  const products = customerIdFilter
+    ? customerProducts.filter(product => product.customerId === customerIdFilter)
+    : customerProducts;
   
   const canEdit = hasPermission('manage_products');
   

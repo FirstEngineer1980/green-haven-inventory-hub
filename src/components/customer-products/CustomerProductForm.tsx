@@ -61,7 +61,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
       name: '',
       picture: '',
       description: '',
-      customerId: '',
+      customerId: customers.length > 0 ? customers[0].id : '',
     },
   });
   
@@ -188,7 +188,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Customer</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || (customers.length > 0 ? customers[0].id : undefined)}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a customer" />
