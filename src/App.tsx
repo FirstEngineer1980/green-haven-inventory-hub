@@ -28,10 +28,11 @@ import Reports from './pages/Reports';
 import Customers from './pages/Customers';
 import CustomerProducts from './pages/CustomerProducts';
 import ManageCustomer from './pages/ManageCustomer';
-import CustomerList from './pages/CustomerList'; // Add the import
+import CustomerList from './pages/CustomerList';
 import Rooms from './pages/Rooms';
 import Units from './pages/Units';
 import UnitMatrixPage from './pages/UnitMatrixPage';
+import SkuMatrixPage from './pages/SkuMatrixPage'; // Add the import
 import Settings from './pages/Settings';
 
 const queryClient = new QueryClient();
@@ -63,10 +64,11 @@ const App = () => (
                             <Route path="/customer-products" element={<CustomerProducts />} />
                             <Route path="/customers/manage" element={<ManageCustomer />} />
                             <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
-                            <Route path="/customer-list/:customerId" element={<CustomerList />} /> {/* Add the new route */}
+                            <Route path="/customer-list/:customerId" element={<CustomerList />} />
                             <Route path="/rooms" element={<Rooms />} />
                             <Route path="/units" element={<Units />} />
                             <Route path="/unit-matrix" element={<UnitMatrixPage />} />
+                            <Route path="/sku-matrix" element={<SkuMatrixPage />} /> {/* Add the new route */}
                             <Route path="/notifications" element={<Notifications />} />
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/unauthorized" element={<Unauthorized />} />

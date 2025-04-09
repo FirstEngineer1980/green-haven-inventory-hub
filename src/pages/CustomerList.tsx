@@ -30,6 +30,9 @@ const CustomerList = () => {
     description: ''
   });
   
+  // State for custom SKU input
+  const [customSkuValue, setCustomSkuValue] = useState('');
+  
   // Get all existing SKUs for dropdown
   const availableSkus = [...new Set(customerProducts.map(product => product.sku))];
   
@@ -47,8 +50,11 @@ const CustomerList = () => {
       return;
     }
     
+    // Use custom SKU if selected
+    const finalSku = newProduct.sku === 'custom' ? customSkuValue : newProduct.sku;
+    
     addCustomerProduct({
-      sku: newProduct.sku,
+      sku: finalSku,
       name: newProduct.name,
       qty: newProduct.qty || 1,
       description: newProduct.description || '',
@@ -63,12 +69,13 @@ const CustomerList = () => {
       qty: 1,
       description: ''
     });
+    setCustomSkuValue('');
     setShowNewLine(false);
     
     toast({
       title: "Product Added",
       description: "New product line has been added successfully.",
-      variant: "success"
+      variant: "default"
     });
   };
   
@@ -174,8 +181,8 @@ const CustomerList = () => {
                       <Input
                         type="text"
                         placeholder="Enter custom SKU"
-                        value={typeof newProduct.customSku === 'string' ? newProduct.customSku : ''}
-                        onChange={(e) => handleChange('customSku', e.target.value)}
+                        value={customSkuValue}
+                        onChange={(e) => setCustomSkuValue(e.target.value)}
                         className="w-full"
                       />
                     </div>
