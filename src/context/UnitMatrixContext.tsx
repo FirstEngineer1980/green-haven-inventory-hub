@@ -122,18 +122,23 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const now = new Date().toISOString();
     const roomName = getRoomName(unitMatrix.roomId);
     
-    // Create cells for each row based on existing columns
+    // Ensure rows have cells based on existing columns
     const rowsWithCells = unitMatrix.rows.map(row => {
-      const cellsForRow = columns.map(column => ({
-        id: `${row.id}-${column.id}`,
-        value: '',
-        columnId: column.id
-      }));
+      // If cells are not provided, create them
+      if (!row.cells || row.cells.length === 0) {
+        const cellsForRow = columns.map(column => ({
+          id: `${row.id}-${column.id}`,
+          value: '',
+          columnId: column.id
+        }));
+        
+        return {
+          ...row,
+          cells: cellsForRow
+        };
+      }
       
-      return {
-        ...row,
-        cells: cellsForRow
-      };
+      return row;
     });
     
     const newUnitMatrix: UnitMatrix = {
