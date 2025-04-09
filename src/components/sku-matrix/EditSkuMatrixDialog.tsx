@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { UnitMatrix } from '@/types';
+import { Plus, X } from 'lucide-react';
 
 interface EditSkuMatrixDialogProps {
   open: boolean;
@@ -17,7 +18,7 @@ interface EditSkuMatrixDialogProps {
 }
 
 const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDialogProps) => {
-  const { updateUnitMatrix } = useUnitMatrix();
+  const { updateUnitMatrix, addRow, columns } = useUnitMatrix();
   const { rooms } = useRooms();
   const { toast } = useToast();
   
@@ -26,12 +27,17 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
     roomId: unitMatrix.roomId,
   });
   
+  const [newRows, setNewRows] = useState<{ label: string; color: string; }[]>([]);
+  const [newRowLabel, setNewRowLabel] = useState('');
+  const [newRowColor, setNewRowColor] = useState('#FFFFFF');
+  
   // Reset form data when unitMatrix changes
   useEffect(() => {
     setFormData({
       name: unitMatrix.name,
       roomId: unitMatrix.roomId,
     });
+    setNewRows([]);
   }, [unitMatrix]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +55,25 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
     }));
   };
   
+  const handleAddRow = () => {
+    if (!newRowLabel.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Row label is required",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setNewRows(prev => [...prev, { label: newRowLabel, color: newRowColor }]);
+    setNewRowLabel('');
+    setNewRowColor('#FFFFFF');
+  };
+  
+  const handleRemoveNewRow = (index: number) => {
+    setNewRows(prev => prev.filter((_, i) => i !== index));
+  };
+  
   const handleSubmit = () => {
     if (!formData.name || !formData.roomId) {
       toast({
@@ -59,10 +84,19 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
       return;
     }
     
+    // First update the basic info
     updateUnitMatrix(unitMatrix.id, {
       name: formData.name,
       roomId: formData.roomId,
     });
+    
+    // Then add any new rows
+    if (newRows.length > 0) {
+      // Add the new rows one by one
+      newRows.forEach(row => {
+        addRow(unitMatrix.id, row.label, row.color);
+      });
+    }
     
     onOpenChange(false);
     
@@ -112,6 +146,56 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Add New Rows</Label>
+            <div className="border rounded-md p-2 bg-gray-50">
+              {newRows.length > 0 ? (
+                <div className="space-y-2 mb-4">
+                  {newRows.map((row, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div
+                        className="w-6 h-6 rounded-md"
+                        style={{ backgroundColor: row.color }}
+                      ></div>
+                      <span>{row.label}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveNewRow(index)}
+                        className="ml-auto"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-2">
+                  No new rows to add
+                </div>
+              )}
+              
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Row Label"
+                  value={newRowLabel}
+                  onChange={(e) => setNewRowLabel(e.target.value)}
+                  className="flex-1"
+                />
+                <Input
+                  type="color"
+                  value={newRowColor}
+                  onChange={(e) => setNewRowColor(e.target.value)}
+                  className="w-16"
+                />
+                <Button onClick={handleAddRow} type="button" size="sm">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
         

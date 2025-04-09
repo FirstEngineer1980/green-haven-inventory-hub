@@ -16,7 +16,7 @@ interface AddSkuMatrixDialogProps {
 }
 
 const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => {
-  const { addUnitMatrix } = useUnitMatrix();
+  const { addUnitMatrix, columns } = useUnitMatrix();
   const { rooms } = useRooms();
   const { toast } = useToast();
   
@@ -82,13 +82,25 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
       return;
     }
     
-    // Add IDs to rows
-    const rowsWithIds = rows.map((row, index) => ({
-      id: `row-${Date.now()}-${index}`,
-      label: row.label,
-      color: row.color,
-      cells: [] // Cells will be created in the context
-    }));
+    // Add IDs to rows and create cells for each row
+    const timestamp = Date.now();
+    const rowsWithIds = rows.map((row, index) => {
+      const rowId = `row-${timestamp}-${index}`;
+      
+      // Create cells for each column in this row
+      const cellsForRow = columns.map(column => ({
+        id: `${rowId}-${column.id}`,
+        value: '',
+        columnId: column.id
+      }));
+      
+      return {
+        id: rowId,
+        label: row.label,
+        color: row.color,
+        cells: cellsForRow
+      };
+    });
     
     addUnitMatrix({
       name: formData.name,
