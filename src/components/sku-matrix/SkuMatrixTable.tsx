@@ -27,25 +27,30 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const options = new Set<string>();
-    
-    if (Array.isArray(unitMatrices)) {
-      unitMatrices.forEach(matrix => {
-        if (matrix && Array.isArray(matrix.rows)) {
-          matrix.rows.forEach(row => {
-            if (row && Array.isArray(row.cells)) {
-              row.cells.forEach(cell => {
-                if (cell && cell.value && cell.value.trim() !== '') {
-                  options.add(cell.value);
-                }
-              });
-            }
-          });
-        }
-      });
+    try {
+      const options = new Set<string>();
+      
+      if (Array.isArray(unitMatrices)) {
+        unitMatrices.forEach(matrix => {
+          if (matrix && Array.isArray(matrix.rows)) {
+            matrix.rows.forEach(row => {
+              if (row && Array.isArray(row.cells)) {
+                row.cells.forEach(cell => {
+                  if (cell && cell.value && cell.value.trim() !== '') {
+                    options.add(cell.value);
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+      
+      setSkuOptions(Array.from(options));
+    } catch (error) {
+      console.error("Error collecting SKU options:", error);
+      setSkuOptions([]);
     }
-    
-    setSkuOptions(Array.from(options));
   }, [unitMatrices]);
 
   const handleCellChange = (rowId: string, columnId: string, value: string) => {
@@ -231,7 +236,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
               <th className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                 Unit
               </th>
-              {columns.map(column => (
+              {Array.isArray(columns) && columns.map(column => (
                 <th key={column.id} className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                   {editMode && editingColumnId === column.id ? (
                     <div className="flex items-center space-x-1">
@@ -274,7 +279,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {unitMatrix.rows.map((row) => (
+            {Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
               <tr key={row.id}>
                 <td 
                   className="px-4 py-2 whitespace-nowrap border-r" 
@@ -324,7 +329,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                     </div>
                   )}
                 </td>
-                {columns.map(column => {
+                {Array.isArray(columns) && columns.map(column => {
                   const value = getCellValue(row.id, column.id);
                   return (
                     <td 
@@ -333,9 +338,9 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                     >
                       {editMode ? (
                         <ComboboxCell
-                          value={value}
+                          value={value || ''}
                           onChange={(newValue) => handleCellChange(row.id, column.id, newValue)}
-                          options={skuOptions}
+                          options={skuOptions || []}
                           placeholder="Select or add SKU"
                         />
                       ) : (
