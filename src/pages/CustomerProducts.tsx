@@ -67,10 +67,10 @@ const CustomerProducts = () => {
   
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Customer Products</h1>
-          <Button onClick={handleAddNew}>
+      <div className="space-y-4 md:space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Customer Products</h1>
+          <Button onClick={handleAddNew} className="w-full md:w-auto">
             <Plus className="mr-2 h-4 w-4" /> Add New Product
           </Button>
         </div>
@@ -80,8 +80,8 @@ const CustomerProducts = () => {
             <CardTitle>Filters</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4">
-              <div className="grid w-full max-w-sm">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div className="grid w-full">
                 <Input
                   placeholder="Search by name or SKU"
                   value={searchTerm}
@@ -90,7 +90,7 @@ const CustomerProducts = () => {
                 />
               </div>
               
-              <div className="grid w-full max-w-sm">
+              <div className="grid w-full">
                 <Select
                   value={selectedCustomerId}
                   onValueChange={setSelectedCustomerId}
@@ -109,7 +109,7 @@ const CustomerProducts = () => {
                 </Select>
               </div>
               
-              <Button variant="outline" onClick={resetFilters}>
+              <Button variant="outline" onClick={resetFilters} className="w-full md:w-auto">
                 <RefreshCw className="mr-2 h-4 w-4" /> Reset
               </Button>
             </div>

@@ -112,11 +112,11 @@ const Sidebar = ({ className }: { className?: string }) => {
   return (
     <ShadcnSidebar className={className}>
       <SidebarHeader className="pb-2">
-        <h2 className="px-4 text-xl font-semibold tracking-tight">
+        <h2 className="px-4 text-xl font-semibold tracking-tight truncate">
           Storage Manager
         </h2>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="overflow-y-auto">
         <SidebarMenu>
           {navItems.map((item, i) => {
             if (item.subItems) {
