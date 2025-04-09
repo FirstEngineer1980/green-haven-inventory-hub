@@ -23,18 +23,19 @@ const ComboboxCell = ({
   disabled = false 
 }: ComboboxCellProps) => {
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState(value);
+  const [inputValue, setInputValue] = useState(value || '');
   const [isCreating, setIsCreating] = useState(false);
-  const [allOptions, setAllOptions] = useState<string[]>(options || []);
+  const [allOptions, setAllOptions] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setInputValue(value);
+    setInputValue(value || '');
   }, [value]);
 
   useEffect(() => {
     // Make sure we're working with a valid array
-    setAllOptions(Array.isArray(options) ? [...options] : []);
+    const safeOptions = Array.isArray(options) ? options : [];
+    setAllOptions(safeOptions);
   }, [options]);
 
   const handleSelect = (currentValue: string) => {
@@ -51,7 +52,7 @@ const ComboboxCell = ({
   };
 
   const handleCreateSubmit = () => {
-    if (inputValue.trim() !== "") {
+    if (inputValue && inputValue.trim() !== "") {
       // Only add to options if it doesn't already exist
       if (!allOptions.includes(inputValue)) {
         setAllOptions(prev => [...prev, inputValue]);
@@ -113,8 +114,8 @@ const ComboboxCell = ({
           <Command>
             <CommandInput 
               placeholder="Search..." 
-              value={inputValue}
-              onValueChange={setInputValue}
+              value={inputValue || ''}
+              onValueChange={(value) => setInputValue(value)}
             />
             <CommandEmpty>
               No item found. 

@@ -13,7 +13,7 @@ interface SkuMatrixTableProps {
 }
 
 const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
-  const { columns, updateCell, addRow, deleteRow, updateRow, addColumn, deleteColumn, updateColumn, unitMatrices } = useUnitMatrix();
+  const { columns = [], updateCell, addRow, deleteRow, updateRow, addColumn, deleteColumn, updateColumn, unitMatrices = [] } = useUnitMatrix();
   const [editMode, setEditMode] = useState(false);
   const [tempCells, setTempCells] = useState<{[key: string]: string}>({});
   const [newRowLabel, setNewRowLabel] = useState('');
@@ -46,7 +46,8 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
         });
       }
       
-      setSkuOptions(Array.from(options));
+      // Convert the Set to an array (with fallback)
+      setSkuOptions(Array.from(options || new Set<string>()));
     } catch (error) {
       console.error("Error collecting SKU options:", error);
       setSkuOptions([]);
@@ -63,11 +64,15 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
 
   const startEditing = () => {
     const initialTempCells: {[key: string]: string} = {};
-    unitMatrix.rows.forEach(row => {
-      row.cells.forEach(cell => {
-        initialTempCells[`${row.id}-${cell.columnId}`] = cell.value;
+    if (unitMatrix && Array.isArray(unitMatrix.rows)) {
+      unitMatrix.rows.forEach(row => {
+        if (row && Array.isArray(row.cells)) {
+          row.cells.forEach(cell => {
+            initialTempCells[`${row.id}-${cell.columnId}`] = cell.value || '';
+          });
+        }
       });
-    });
+    }
     setTempCells(initialTempCells);
     setEditMode(true);
   };
@@ -163,12 +168,25 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
       return tempCells[cellKey];
     }
     
+    if (!unitMatrix || !Array.isArray(unitMatrix.rows)) {
+      return '';
+    }
+    
     const row = unitMatrix.rows.find(r => r.id === rowId);
-    if (!row) return '';
+    if (!row || !Array.isArray(row.cells)) return '';
     
     const cell = row.cells.find(c => c.columnId === columnId);
     return cell ? cell.value : '';
   };
+
+  // Safety check for unitMatrix
+  if (!unitMatrix || !unitMatrix.rows) {
+    return (
+      <div className="p-4 border rounded bg-gray-50 text-center text-gray-500">
+        Invalid matrix data. Please check the data structure.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -283,7 +301,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
               <tr key={row.id}>
                 <td 
                   className="px-4 py-2 whitespace-nowrap border-r" 
-                  style={{ backgroundColor: row.color }}
+                  style={{ backgroundColor: row.color || '#FFFFFF' }}
                 >
                   {editMode && editingRowId === row.id ? (
                     <div className="flex items-center space-x-1">
@@ -309,7 +327,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                       {editMode && (
                         <div className="flex items-center space-x-1">
                           <Button 
-                            onClick={() => startEditingRowColor(row.id, row.color)}
+                            onClick={() => startEditingRowColor(row.id, row.color || '#FFFFFF')}
                             variant="ghost"
                             size="sm"
                             className="h-5 w-5 p-0 text-white hover:bg-white/20"
