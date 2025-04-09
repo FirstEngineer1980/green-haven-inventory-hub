@@ -28,6 +28,7 @@ import Reports from './pages/Reports';
 import Customers from './pages/Customers';
 import CustomerProducts from './pages/CustomerProducts';
 import ManageCustomer from './pages/ManageCustomer';
+import CustomerList from './pages/CustomerList'; // Add the import
 import Rooms from './pages/Rooms';
 import Units from './pages/Units';
 import UnitMatrixPage from './pages/UnitMatrixPage';
@@ -62,6 +63,7 @@ const App = () => (
                             <Route path="/customer-products" element={<CustomerProducts />} />
                             <Route path="/customers/manage" element={<ManageCustomer />} />
                             <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
+                            <Route path="/customer-list/:customerId" element={<CustomerList />} /> {/* Add the new route */}
                             <Route path="/rooms" element={<Rooms />} />
                             <Route path="/units" element={<Units />} />
                             <Route path="/unit-matrix" element={<UnitMatrixPage />} />

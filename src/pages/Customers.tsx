@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useCustomers } from '@/context/CustomerContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Filter, PlusCircle, User, Phone, Mail, MapPin, Building, Clock, MoreHorizontal, Edit, Trash2, Pause, Play, Eye } from 'lucide-react';
+import { Search, Filter, PlusCircle, User, Phone, Mail, MapPin, Building, Clock, MoreHorizontal, Edit, Trash2, Pause, Play, Eye, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -184,6 +184,10 @@ const Customers = () => {
                             <DropdownMenuItem onClick={() => handleEditCustomer(customer.id)}>
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/customer-list/${customer.id}`)}>
+                              <List className="mr-2 h-4 w-4" />
+                              List
                             </DropdownMenuItem>
                             {customer.status === 'active' ? (
                               <DropdownMenuItem onClick={() => handleToggleStatus(customer.id, 'paused')}>

@@ -27,7 +27,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, requiredPer
   }
 
   return (
-    <SidebarProvider defaultOpen={!isMobile} openMobile={false}>
+    <SidebarProvider defaultOpen={!isMobile}>
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar />
         <SidebarInset>
