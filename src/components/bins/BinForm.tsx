@@ -7,15 +7,12 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bin } from '@/types';
-import { useUnitMatrix } from '@/context/UnitMatrixContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const binSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   length: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Length must be a positive number'),
   width: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Width must be a positive number'),
   height: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Height must be a positive number'),
-  unitMatrixId: z.string().optional()
 });
 
 type BinFormValues = z.infer<typeof binSchema>;
@@ -31,8 +28,6 @@ export const BinForm: React.FC<BinFormProps> = ({
   defaultValues = {},
   isEditing = false
 }) => {
-  const { unitMatrices } = useUnitMatrix();
-  
   const form = useForm<BinFormValues>({
     resolver: zodResolver(binSchema),
     defaultValues: {
@@ -40,7 +35,6 @@ export const BinForm: React.FC<BinFormProps> = ({
       length: defaultValues.length?.toString() || '',
       width: defaultValues.width?.toString() || '',
       height: defaultValues.height?.toString() || '',
-      unitMatrixId: defaultValues.unitMatrixId || ''
     }
   });
 
@@ -50,7 +44,7 @@ export const BinForm: React.FC<BinFormProps> = ({
       length: Number(values.length),
       width: Number(values.width),
       height: Number(values.height),
-      unitMatrixId: values.unitMatrixId || undefined
+      unitMatrixId: defaultValues.unitMatrixId
     });
   };
 
@@ -114,35 +108,6 @@ export const BinForm: React.FC<BinFormProps> = ({
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="unitMatrixId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Unit Matrix (Optional)</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a unit matrix" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  {unitMatrices.map((unitMatrix) => (
-                    <SelectItem key={unitMatrix.id} value={unitMatrix.id}>
-                      {unitMatrix.name} ({unitMatrix.roomName})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <Button type="submit">
           {isEditing ? 'Update Bin' : 'Add Bin'}
