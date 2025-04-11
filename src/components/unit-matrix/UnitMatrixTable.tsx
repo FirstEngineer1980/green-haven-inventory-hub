@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/utils';
 import { UnitMatrix } from '@/types';
-import { EditUnitMatrixDialog } from './EditUnitMatrixDialog';
+import EditUnitMatrixDialog from './EditUnitMatrixDialog';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BinTable } from '@/components/bins/BinTable';

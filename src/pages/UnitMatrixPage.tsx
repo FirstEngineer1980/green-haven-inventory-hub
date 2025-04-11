@@ -9,7 +9,7 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import UnitMatrixTable from '@/components/unit-matrix/UnitMatrixTable';
+import { UnitMatrixTable } from '@/components/unit-matrix/UnitMatrixTable';
 import AddUnitMatrixDialog from '@/components/unit-matrix/AddUnitMatrixDialog';
 import EditUnitMatrixDialog from '@/components/unit-matrix/EditUnitMatrixDialog';
 import { UnitMatrix } from '@/types';
@@ -99,7 +99,11 @@ const UnitMatrixPage = () => {
                     </Button>
                   </div>
                 </div>
-                <UnitMatrixTable unitMatrix={unitMatrix} />
+                <UnitMatrixTable 
+                  unitMatrices={[unitMatrix]} 
+                  onEdit={handleEditClick}
+                  onDelete={handleDeleteUnitMatrix}
+                />
               </div>
             ))}
             
