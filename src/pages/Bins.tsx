@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, FileDown, Box } from 'lucide-react';
+import { PlusCircle, FileDown } from 'lucide-react';
 import { BinTable } from '@/components/bins/BinTable';
 import { AddBinDialog } from '@/components/bins/AddBinDialog';
 import { Input } from '@/components/ui/input';
