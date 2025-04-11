@@ -121,11 +121,14 @@ export interface Unit {
   updatedAt: string;
 }
 
+export type MatrixType = 'unit' | 'sku';
+
 export interface UnitMatrix {
   id: string;
   roomId: string;
   roomName: string; 
   name: string;
+  type: MatrixType;
   rows: UnitMatrixRow[];
   createdAt: string;
   updatedAt: string;

@@ -15,7 +15,7 @@ import EditSkuMatrixDialog from '@/components/sku-matrix/EditSkuMatrixDialog';
 import { UnitMatrix } from '@/types';
 
 const SkuMatrixPage = () => {
-  const { unitMatrices, deleteUnitMatrix } = useUnitMatrix();
+  const { getMatricesByType, deleteUnitMatrix } = useUnitMatrix();
   const { rooms } = useRooms();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -24,8 +24,11 @@ const SkuMatrixPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  // Filter unit matrices based on search and filters
-  const filteredUnitMatrices = unitMatrices.filter(unitMatrix => 
+  // Get only SKU type matrices
+  const skuMatrices = getMatricesByType('sku');
+  
+  // Filter SKU matrices based on search and filters
+  const filteredSkuMatrices = skuMatrices.filter(unitMatrix => 
     (selectedRoom === 'all' || unitMatrix.roomId === selectedRoom) &&
     unitMatrix.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -83,10 +86,10 @@ const SkuMatrixPage = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>SKU Matrices ({filteredUnitMatrices.length})</CardTitle>
+            <CardTitle>SKU Matrices ({filteredSkuMatrices.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {filteredUnitMatrices.map(unitMatrix => (
+            {filteredSkuMatrices.map(unitMatrix => (
               <div key={unitMatrix.id} className="mb-8">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold">{unitMatrix.name} - {unitMatrix.roomName}</h3>
@@ -103,7 +106,7 @@ const SkuMatrixPage = () => {
               </div>
             ))}
             
-            {filteredUnitMatrices.length === 0 && (
+            {filteredSkuMatrices.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 No SKU matrices found
               </div>
@@ -113,7 +116,8 @@ const SkuMatrixPage = () => {
 
         <AddSkuMatrixDialog 
           open={showAddDialog} 
-          onOpenChange={setShowAddDialog} 
+          onOpenChange={setShowAddDialog}
+          matrixType="sku" 
         />
         
         {selectedUnitMatrix && (
