@@ -9,7 +9,7 @@ import {
   TableCell 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, Box } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { Bin } from '@/types';
 import { useBins } from '@/context/BinContext';
@@ -58,7 +58,6 @@ export const BinTable: React.FC<BinTableProps> = ({ unitMatrixId }) => {
             <TableHead>Width (cm)</TableHead>
             <TableHead>Height (cm)</TableHead>
             <TableHead>Volume (cm³)</TableHead>
-            <TableHead>Unit Matrix</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -66,7 +65,7 @@ export const BinTable: React.FC<BinTableProps> = ({ unitMatrixId }) => {
         <TableBody>
           {displayBins.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 No bins found
               </TableCell>
             </TableRow>
@@ -78,7 +77,6 @@ export const BinTable: React.FC<BinTableProps> = ({ unitMatrixId }) => {
                 <TableCell>{bin.width}</TableCell>
                 <TableCell>{bin.height}</TableCell>
                 <TableCell>{bin.volumeCapacity.toLocaleString()}</TableCell>
-                <TableCell>{bin.unitMatrixName || 'N/A'}</TableCell>
                 <TableCell>{formatDate(bin.createdAt)}</TableCell>
                 <TableCell className="space-x-2">
                   <Button
