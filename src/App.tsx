@@ -16,30 +16,28 @@ import { UnitProvider } from './context/UnitContext';
 import { UnitMatrixProvider } from './context/UnitMatrixContext';
 import { POProvider } from './context/POContext';
 import Bins from './pages/Bins';
-
-// Import other pages here as needed
-// These are placeholders until the actual components are created
-const Login = () => <div>Login Page</div>;
-const Dashboard = () => <div>Dashboard Page</div>;
-const Products = () => <div>Products Page</div>;
-const Inventory = () => <div>Inventory Page</div>;
-const StockMovements = () => <div>Stock Movements Page</div>;
-const Reports = () => <div>Reports Page</div>;
-const Users = () => <div>Users Page</div>;
-const Customers = () => <div>Customers Page</div>;
-const CustomerProducts = () => <div>Customer Products Page</div>;
-const ManageCustomer = () => <div>Manage Customer Page</div>;
-const CustomerList = () => <div>Customer List Page</div>;
-const Rooms = () => <div>Rooms Page</div>;
-const Units = () => <div>Units Page</div>;
-const UnitMatrixPage = () => <div>Unit Matrix Page</div>;
-const SkuMatrixPage = () => <div>SKU Matrix Page</div>;
-const PurchaseOrders = () => <div>Purchase Orders Page</div>;
-const Vendors = () => <div>Vendors Page</div>;
-const Notifications = () => <div>Notifications Page</div>;
-const Settings = () => <div>Settings Page</div>;
-const Unauthorized = () => <div>Unauthorized Page</div>;
-const NotFound = () => <div>Not Found Page</div>;
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Products from './pages/Products';
+import Inventory from './pages/Inventory';
+import StockMovements from './pages/StockMovements';
+import Reports from './pages/Reports';
+import Users from './pages/Users';
+import Customers from './pages/Customers';
+import CustomerProducts from './pages/CustomerProducts';
+import ManageCustomer from './pages/ManageCustomer';
+import CustomerList from './pages/CustomerList';
+import Rooms from './pages/Rooms';
+import Units from './pages/Units';
+import UnitMatrixPage from './pages/UnitMatrixPage';
+import SkuMatrixPage from './pages/SkuMatrixPage';
+import PurchaseOrders from './pages/PurchaseOrders';
+import Vendors from './pages/Vendors';
+import Notifications from './pages/Notifications';
+import Settings from './pages/Settings';
+import Unauthorized from './pages/Unauthorized';
+import NotFound from './pages/NotFound';
+import Index from './pages/Index';
 
 const queryClient = new QueryClient();
 
