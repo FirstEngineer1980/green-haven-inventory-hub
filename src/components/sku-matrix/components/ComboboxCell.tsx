@@ -72,8 +72,9 @@ const ComboboxCell = ({
     }
   };
 
-  // Safely create a valid array for Command items
-  const safeOptions = Array.isArray(allOptions) ? allOptions : [];
+  const filteredOptions = allOptions.filter(option => 
+    option.toLowerCase().includes(inputValue.toLowerCase())
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -90,7 +91,7 @@ const ComboboxCell = ({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-[200px] p-0" align="start">
         {isCreating ? (
           <div className="flex items-center p-2">
             <Input
@@ -111,58 +112,49 @@ const ComboboxCell = ({
             </Button>
           </div>
         ) : (
-          <div>
-            {/* Simplified Command component usage */}
-            <div className="flex items-center border-b px-3">
-              <Input
-                className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Search..."
-                value={inputValue || ''}
-                onChange={(e) => setInputValue(e.target.value)}
-              />
-            </div>
-            
-            <div className="max-h-[300px] overflow-y-auto overflow-x-hidden p-1">
-              {safeOptions.length === 0 ? (
-                <div className="py-6 text-center text-sm">
-                  No item found.
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="ml-2" 
-                    onClick={handleCreateNew}
-                  >
-                    <Plus className="h-3 w-3 mr-1" /> Create
-                  </Button>
-                </div>
-              ) : (
-                <div>
-                  {safeOptions.map((option) => (
-                    <div
-                      key={option}
-                      className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 hover:bg-accent hover:text-accent-foreground"
-                      onClick={() => handleSelect(option)}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === option ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {option}
-                    </div>
-                  ))}
-                  <div
-                    className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                    onClick={handleCreateNew}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create new item
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <Command>
+            <CommandInput 
+              placeholder="Search..."
+              value={inputValue}
+              onValueChange={setInputValue}
+              className="h-9"
+            />
+            <CommandEmpty>
+              No item found.
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="ml-2" 
+                onClick={handleCreateNew}
+              >
+                <Plus className="h-3 w-3 mr-1" /> Create
+              </Button>
+            </CommandEmpty>
+            <CommandGroup className="max-h-[200px] overflow-y-auto">
+              {filteredOptions.map((option) => (
+                <CommandItem
+                  key={option}
+                  value={option}
+                  onSelect={() => handleSelect(option)}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === option ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {option}
+                </CommandItem>
+              ))}
+              <CommandItem
+                onSelect={handleCreateNew}
+                className="text-muted-foreground"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create new item
+              </CommandItem>
+            </CommandGroup>
+          </Command>
         )}
       </PopoverContent>
     </Popover>
