@@ -2,10 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { UnitMatrix } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
-import { useBins } from '@/context/BinContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X, Save, Edit, Trash } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ComboboxCell from './components/ComboboxCell';
@@ -16,13 +14,11 @@ interface SkuMatrixTableProps {
 
 const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   const { columns = [], updateCell, addRow, deleteRow, updateRow, addColumn, deleteColumn, updateColumn, unitMatrices = [] } = useUnitMatrix();
-  const { bins = [] } = useBins();
   const [editMode, setEditMode] = useState(false);
   const [tempCells, setTempCells] = useState<{[key: string]: string}>({});
   const [newRowLabel, setNewRowLabel] = useState('');
   const [newRowColor, setNewRowColor] = useState('#FFFFFF');
   const [newColumnLabel, setNewColumnLabel] = useState('');
-  const [selectedBinId, setSelectedBinId] = useState('');
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnLabel, setEditingColumnLabel] = useState('');
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -50,6 +46,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
         });
       }
       
+      // Convert the Set to an array (with fallback)
       setSkuOptions(Array.from(options || new Set<string>()));
     } catch (error) {
       console.error("Error collecting SKU options:", error);
@@ -81,21 +78,19 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   };
 
   const saveChanges = () => {
-    if (unitMatrix && unitMatrix.id) {
-      Object.entries(tempCells).forEach(([key, value]) => {
-        const [rowId, columnId] = key.split('-');
-        updateCell(unitMatrix.id, rowId, columnId, value);
-      });
-  
-      setEditMode(false);
-      setTempCells({});
-      
-      toast({
-        title: "Changes Saved",
-        description: "SKU matrix has been updated successfully",
-        variant: "default"
-      });
-    }
+    Object.entries(tempCells).forEach(([key, value]) => {
+      const [rowId, columnId] = key.split('-');
+      updateCell(unitMatrix.id, rowId, columnId, value);
+    });
+
+    setEditMode(false);
+    setTempCells({});
+    
+    toast({
+      title: "Changes Saved",
+      description: "SKU matrix has been updated successfully",
+      variant: "default"
+    });
   };
 
   const cancelEditing = () => {
@@ -114,17 +109,13 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
       return;
     }
 
-    if (unitMatrix && unitMatrix.id) {
-      addRow(unitMatrix.id, newRowLabel, newRowColor);
-      setNewRowLabel('');
-      setNewRowColor('#FFFFFF');
-    }
+    addRow(unitMatrix.id, newRowLabel, newRowColor);
+    setNewRowLabel('');
+    setNewRowColor('#FFFFFF');
   };
 
   const handleDeleteRow = (rowId: string) => {
-    if (unitMatrix && unitMatrix.id) {
-      deleteRow(unitMatrix.id, rowId);
-    }
+    deleteRow(unitMatrix.id, rowId);
   };
 
   const handleAddColumn = () => {
@@ -137,36 +128,20 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
       return;
     }
 
-    const selectedBin = selectedBinId ? bins.find(bin => bin.id === selectedBinId) : null;
-    const binWidth = selectedBin ? selectedBin.width : undefined;
-    
-    addColumn(newColumnLabel, selectedBinId, binWidth);
+    addColumn(newColumnLabel);
     setNewColumnLabel('');
-    setSelectedBinId('');
-    
-    toast({
-      title: "Column Added",
-      description: `Column "${newColumnLabel}" added successfully`,
-      variant: "default"
-    });
   };
 
   const startEditingColumn = (columnId: string, label: string) => {
-    const column = columns.find(c => c.id === columnId);
     setEditingColumnId(columnId);
     setEditingColumnLabel(label);
-    setSelectedBinId(column?.binId || '');
   };
 
   const handleUpdateColumn = () => {
     if (editingColumnId && editingColumnLabel) {
-      const selectedBin = selectedBinId ? bins.find(bin => bin.id === selectedBinId) : null;
-      const binWidth = selectedBin ? selectedBin.width : undefined;
-      
-      updateColumn(editingColumnId, editingColumnLabel, selectedBinId, binWidth);
+      updateColumn(editingColumnId, editingColumnLabel);
       setEditingColumnId(null);
       setEditingColumnLabel('');
-      setSelectedBinId('');
     }
   };
 
@@ -180,7 +155,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   };
 
   const handleUpdateRowColor = (rowId: string) => {
-    if (editingRowId && editingRowColor && unitMatrix && unitMatrix.id) {
+    if (editingRowId && editingRowColor) {
       updateRow(unitMatrix.id, rowId, { color: editingRowColor });
       setEditingRowId(null);
       setEditingRowColor('');
@@ -204,17 +179,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
     return cell ? cell.value : '';
   };
 
-  const getColumnStyle = (columnId: string) => {
-    const column = columns.find(c => c.id === columnId);
-    if (column?.width) {
-      return {
-        width: `${column.width * 10}px`,
-        minWidth: '100px'
-      };
-    }
-    return { minWidth: '100px' };
-  };
-
+  // Safety check for unitMatrix
   if (!unitMatrix || !unitMatrix.rows) {
     return (
       <div className="p-4 border rounded bg-gray-50 text-center text-gray-500">
@@ -267,31 +232,16 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
           
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Add Column</h4>
-            <div className="flex flex-col space-y-2">
+            <div className="flex space-x-2">
               <Input 
                 placeholder="Column Label" 
                 value={newColumnLabel} 
                 onChange={(e) => setNewColumnLabel(e.target.value)}
-                className="w-full"
+                className="flex-1"
               />
-              <div className="flex space-x-2">
-                <Select value={selectedBinId} onValueChange={setSelectedBinId}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Select a bin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">No bin</SelectItem>
-                    {Array.isArray(bins) && bins.map(bin => (
-                      <SelectItem key={bin.id} value={bin.id}>
-                        {bin.name} ({bin.width}cm)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button onClick={handleAddColumn} size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button onClick={handleAddColumn} size="sm">
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -305,46 +255,21 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                 Unit
               </th>
               {Array.isArray(columns) && columns.map(column => (
-                <th 
-                  key={column.id} 
-                  className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r"
-                  style={getColumnStyle(column.id)}
-                >
+                <th key={column.id} className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                   {editMode && editingColumnId === column.id ? (
-                    <div className="flex flex-col space-y-2">
+                    <div className="flex items-center space-x-1">
                       <Input 
                         value={editingColumnLabel} 
                         onChange={(e) => setEditingColumnLabel(e.target.value)}
                         className="h-6 text-xs py-0 px-1"
                       />
-                      <Select value={selectedBinId} onValueChange={setSelectedBinId}>
-                        <SelectTrigger className="h-6 text-xs py-0 px-1">
-                          <SelectValue placeholder="Select bin" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="">No bin</SelectItem>
-                          {Array.isArray(bins) && bins.map(bin => (
-                            <SelectItem key={bin.id} value={bin.id}>
-                              {bin.name} ({bin.width}cm)
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                       <Button onClick={handleUpdateColumn} size="sm" variant="ghost" className="h-6 w-6 p-0">
                         <Save className="h-3 w-3" />
                       </Button>
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span>{column.label}</span>
-                        {column.binId && bins && Array.isArray(bins) && bins.find(b => b.id === column.binId) && (
-                          <span className="text-xs text-gray-400">
-                            {bins.find(b => b.id === column.binId)?.name} 
-                            ({bins.find(b => b.id === column.binId)?.width}cm)
-                          </span>
-                        )}
-                      </div>
+                      <span>{column.label}</span>
                       {editMode && (
                         <div className="flex items-center space-x-1">
                           <Button 
@@ -372,7 +297,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {unitMatrix && Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
+            {Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
               <tr key={row.id}>
                 <td 
                   className="px-4 py-2 whitespace-nowrap border-r" 
@@ -428,7 +353,6 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                     <td 
                       key={`${row.id}-${column.id}`} 
                       className={`px-4 py-2 whitespace-nowrap border-r ${!value && !editMode ? 'bg-gray-200' : ''}`}
-                      style={getColumnStyle(column.id)}
                     >
                       {editMode ? (
                         <ComboboxCell

@@ -15,7 +15,7 @@ import EditUnitMatrixDialog from '@/components/unit-matrix/EditUnitMatrixDialog'
 import { UnitMatrix } from '@/types';
 
 const UnitMatrixPage = () => {
-  const { getMatricesByType, deleteUnitMatrix } = useUnitMatrix();
+  const { unitMatrices, deleteUnitMatrix } = useUnitMatrix();
   const { rooms } = useRooms();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -24,9 +24,6 @@ const UnitMatrixPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  // Get only unit type matrices
-  const unitMatrices = getMatricesByType('unit');
-  
   // Filter unit matrices based on search and filters
   const filteredUnitMatrices = unitMatrices.filter(unitMatrix => 
     (selectedRoom === 'all' || unitMatrix.roomId === selectedRoom) &&
@@ -121,7 +118,6 @@ const UnitMatrixPage = () => {
         <AddUnitMatrixDialog 
           open={showAddDialog} 
           onOpenChange={setShowAddDialog} 
-          matrixType="unit"
         />
         
         {selectedUnitMatrix && (

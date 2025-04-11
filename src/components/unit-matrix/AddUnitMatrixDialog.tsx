@@ -9,15 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Plus, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { MatrixType } from '@/types';
 
 interface AddUnitMatrixDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  matrixType: MatrixType;
 }
 
-const AddUnitMatrixDialog = ({ open, onOpenChange, matrixType }: AddUnitMatrixDialogProps) => {
+const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) => {
   const { addUnitMatrix } = useUnitMatrix();
   const { rooms } = useRooms();
   const { toast } = useToast();
@@ -95,7 +93,6 @@ const AddUnitMatrixDialog = ({ open, onOpenChange, matrixType }: AddUnitMatrixDi
     addUnitMatrix({
       name: formData.name,
       roomId: formData.roomId,
-      type: matrixType,
       rows: rowsWithIds,
     });
     
@@ -104,23 +101,20 @@ const AddUnitMatrixDialog = ({ open, onOpenChange, matrixType }: AddUnitMatrixDi
     setRows([]);
     onOpenChange(false);
     
-    const matrixTypeLabel = matrixType === 'sku' ? 'SKU' : 'Unit';
     toast({
-      title: `${matrixTypeLabel} Matrix Added`,
-      description: `The new ${matrixTypeLabel} matrix has been created successfully`,
+      title: "Unit Matrix Added",
+      description: "The new unit matrix has been created successfully",
       variant: "default"
     });
   };
-  
-  const matrixTypeLabel = matrixType === 'sku' ? 'SKU' : 'Unit';
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New {matrixTypeLabel} Matrix</DialogTitle>
+          <DialogTitle>Add New Unit Matrix</DialogTitle>
           <DialogDescription>
-            Create a new {matrixTypeLabel.toLowerCase()} matrix and assign it to a room.
+            Create a new unit matrix and assign it to a room.
           </DialogDescription>
         </DialogHeader>
         
@@ -208,7 +202,7 @@ const AddUnitMatrixDialog = ({ open, onOpenChange, matrixType }: AddUnitMatrixDi
         
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSubmit}>Add {matrixTypeLabel} Matrix</Button>
+          <Button onClick={handleSubmit}>Add Unit Matrix</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

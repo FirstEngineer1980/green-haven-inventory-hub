@@ -1,8 +1,8 @@
+
 import React, { createContext, useState, useContext } from 'react';
-import { UnitMatrix, UnitMatrixRow, UnitMatrixColumn, UnitMatrixCell, Room, MatrixType } from '../types';
+import { UnitMatrix, UnitMatrixRow, UnitMatrixColumn, UnitMatrixCell, Room } from '../types';
 import { useNotifications } from './NotificationContext';
 import { useRooms } from './RoomContext';
-import { useBins } from './BinContext';
 
 // Mock column data
 const mockColumns: UnitMatrixColumn[] = [
@@ -13,14 +13,13 @@ const mockColumns: UnitMatrixColumn[] = [
   { id: 'bin5', label: 'Bin5' }
 ];
 
-// Mock unit matrix data with type field added
+// Mock unit matrix data
 const mockUnitMatrix: UnitMatrix[] = [
   {
     id: '1',
     roomId: '1',
     roomName: 'Storage Room A',
     name: 'UnitA',
-    type: 'unit',
     rows: [
       {
         id: 'shelf1',
@@ -95,9 +94,8 @@ interface UnitMatrixContextType {
   updateUnitMatrix: (id: string, updates: Partial<UnitMatrix>) => void;
   deleteUnitMatrix: (id: string) => void;
   getUnitMatrixByRoomId: (roomId: string) => UnitMatrix[];
-  getMatricesByType: (type: MatrixType) => UnitMatrix[];
-  addColumn: (label: string, binId?: string, width?: number) => void;
-  updateColumn: (id: string, label: string, binId?: string, width?: number) => void;
+  addColumn: (label: string) => void;
+  updateColumn: (id: string, label: string) => void;
   deleteColumn: (id: string) => void;
   addRow: (unitMatrixId: string, label: string, color: string) => void;
   updateRow: (unitMatrixId: string, rowId: string, updates: Partial<UnitMatrixRow>) => void;
@@ -114,7 +112,6 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [columns, setColumns] = useState<UnitMatrixColumn[]>(mockColumns);
   const { addNotification } = useNotifications();
   const { rooms } = useRooms();
-  const { bins } = useBins();
 
   const getRoomName = (roomId: string): string => {
     const room = rooms.find(r => r.id === roomId);
@@ -125,7 +122,9 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const now = new Date().toISOString();
     const roomName = getRoomName(unitMatrix.roomId);
     
+    // Ensure rows have cells based on existing columns
     const rowsWithCells = unitMatrix.rows.map(row => {
+      // If cells are not provided, create them
       if (!row.cells || row.cells.length === 0) {
         const cellsForRow = columns.map(column => ({
           id: `${row.id}-${column.id}`,
@@ -153,9 +152,10 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     
     setUnitMatrices(prev => [...prev, newUnitMatrix]);
     
+    // Send notification about new unit matrix
     addNotification({
-      title: `New ${unitMatrix.type === 'sku' ? 'SKU' : 'Unit'} Matrix Added`,
-      message: `${unitMatrix.type === 'sku' ? 'SKU' : 'Unit'} Matrix "${newUnitMatrix.name}" has been added to ${roomName}`,
+      title: 'New Unit Matrix Added',
+      message: `Unit Matrix "${newUnitMatrix.name}" has been added to ${roomName}`,
       type: 'info',
       for: ['1', '2'], // Admin, Manager
     });
@@ -175,12 +175,13 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       )
     );
     
+    // Get the updated unit matrix
     const updatedUnitMatrix = unitMatrices.find(u => u.id === id);
     if (updatedUnitMatrix) {
-      const matrixType = updatedUnitMatrix.type === 'sku' ? 'SKU' : 'Unit';
+      // Send notification about update
       addNotification({
-        title: `${matrixType} Matrix Updated`,
-        message: `${matrixType} Matrix "${updatedUnitMatrix.name}" has been updated`,
+        title: 'Unit Matrix Updated',
+        message: `Unit Matrix "${updatedUnitMatrix.name}" has been updated`,
         type: 'success',
         for: ['1', '2'], // Admin, Manager
       });
@@ -188,15 +189,15 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const deleteUnitMatrix = (id: string) => {
+    // Get the unit matrix before deleting
     const unitMatrixToDelete = unitMatrices.find(u => u.id === id);
     
     setUnitMatrices(prev => prev.filter(unitMatrix => unitMatrix.id !== id));
     
     if (unitMatrixToDelete) {
-      const matrixType = unitMatrixToDelete.type === 'sku' ? 'SKU' : 'Unit';
       addNotification({
-        title: `${matrixType} Matrix Deleted`,
-        message: `${matrixType} Matrix "${unitMatrixToDelete.name}" has been removed from ${unitMatrixToDelete.roomName}`,
+        title: 'Unit Matrix Deleted',
+        message: `Unit Matrix "${unitMatrixToDelete.name}" has been removed from ${unitMatrixToDelete.roomName}`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
@@ -207,20 +208,15 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return unitMatrices.filter(unitMatrix => unitMatrix.roomId === roomId);
   };
 
-  const getMatricesByType = (type: MatrixType): UnitMatrix[] => {
-    return unitMatrices.filter(unitMatrix => unitMatrix.type === type);
-  };
-
-  const addColumn = (label: string, binId?: string, width?: number) => {
+  const addColumn = (label: string) => {
     const newColumn: UnitMatrixColumn = {
       id: `column-${Date.now()}`,
-      label,
-      binId,
-      width
+      label
     };
     
     setColumns(prev => [...prev, newColumn]);
     
+    // Add empty cells for the new column to all rows in all matrices
     setUnitMatrices(prev => 
       prev.map(unitMatrix => ({
         ...unitMatrix,
@@ -240,11 +236,11 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  const updateColumn = (id: string, label: string, binId?: string, width?: number) => {
+  const updateColumn = (id: string, label: string) => {
     setColumns(prev => 
       prev.map(column => 
         column.id === id 
-          ? { ...column, label, binId, width } 
+          ? { ...column, label } 
           : column
       )
     );
@@ -253,6 +249,7 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const deleteColumn = (id: string) => {
     setColumns(prev => prev.filter(column => column.id !== id));
     
+    // Remove cells for the deleted column from all rows in all matrices
     setUnitMatrices(prev => 
       prev.map(unitMatrix => ({
         ...unitMatrix,
@@ -268,6 +265,7 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const addRow = (unitMatrixId: string, label: string, color: string) => {
     const rowId = `row-${Date.now()}`;
     
+    // Create cells for the new row based on existing columns
     const cellsForRow = columns.map(column => ({
       id: `${rowId}-${column.id}`,
       value: '',
@@ -360,7 +358,6 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       updateUnitMatrix, 
       deleteUnitMatrix,
       getUnitMatrixByRoomId,
-      getMatricesByType,
       addColumn,
       updateColumn,
       deleteColumn,

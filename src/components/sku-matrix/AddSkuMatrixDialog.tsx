@@ -9,15 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 import MatrixGeneralForm from './components/MatrixGeneralForm';
 import MatrixRowList from './components/MatrixRowList';
 import AddRowForm from './components/AddRowForm';
-import { MatrixType } from '@/types';
 
 interface AddSkuMatrixDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  matrixType: MatrixType;
 }
 
-const AddSkuMatrixDialog = ({ open, onOpenChange, matrixType }: AddSkuMatrixDialogProps) => {
+const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => {
   const { addUnitMatrix, columns } = useUnitMatrix();
   const { rooms } = useRooms();
   const { toast } = useToast();
@@ -94,7 +92,6 @@ const AddSkuMatrixDialog = ({ open, onOpenChange, matrixType }: AddSkuMatrixDial
     addUnitMatrix({
       name: formData.name,
       roomId: formData.roomId,
-      type: matrixType,
       rows: rowsWithIds,
     });
     
@@ -103,23 +100,20 @@ const AddSkuMatrixDialog = ({ open, onOpenChange, matrixType }: AddSkuMatrixDial
     setRows([]);
     onOpenChange(false);
     
-    const matrixTypeLabel = matrixType === 'sku' ? 'SKU' : 'Unit';
     toast({
-      title: `${matrixTypeLabel} Matrix Added`,
-      description: `The new ${matrixTypeLabel} matrix has been created successfully`,
+      title: "SKU Matrix Added",
+      description: "The new SKU matrix has been created successfully",
       variant: "default"
     });
   };
-  
-  const matrixTypeLabel = matrixType === 'sku' ? 'SKU' : 'Unit';
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New {matrixTypeLabel} Matrix</DialogTitle>
+          <DialogTitle>Add New SKU Matrix</DialogTitle>
           <DialogDescription>
-            Create a new {matrixTypeLabel.toLowerCase()} matrix and assign it to a room.
+            Create a new SKU matrix and assign it to a room.
           </DialogDescription>
         </DialogHeader>
         
@@ -147,7 +141,7 @@ const AddSkuMatrixDialog = ({ open, onOpenChange, matrixType }: AddSkuMatrixDial
         
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSubmit}>Add {matrixTypeLabel} Matrix</Button>
+          <Button onClick={handleSubmit}>Add SKU Matrix</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

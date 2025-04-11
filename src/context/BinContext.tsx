@@ -50,13 +50,7 @@ interface BinContextType {
   getBinsByUnitMatrix: (unitMatrixId: string) => Bin[];
 }
 
-const BinContext = createContext<BinContextType>({
-  bins: [],
-  addBin: () => {},
-  updateBin: () => {},
-  deleteBin: () => {},
-  getBinsByUnitMatrix: () => [],
-});
+const BinContext = createContext<BinContextType>({} as BinContextType);
 
 export const useBins = () => useContext(BinContext);
 
@@ -66,7 +60,6 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { unitMatrices } = useUnitMatrix();
 
   const getUnitMatrixName = (unitMatrixId: string): string | undefined => {
-    if (!unitMatrixId) return undefined;
     const unitMatrix = unitMatrices.find(um => um.id === unitMatrixId);
     return unitMatrix ? unitMatrix.name : undefined;
   };
