@@ -131,7 +131,7 @@ export const BinForm: React.FC<BinFormProps> = ({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {unitMatrices.map((unitMatrix) => (
                     <SelectItem key={unitMatrix.id} value={unitMatrix.id}>
                       {unitMatrix.name} ({unitMatrix.roomName})
