@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -14,7 +15,31 @@ import { RoomProvider } from './context/RoomContext';
 import { UnitProvider } from './context/UnitContext';
 import { UnitMatrixProvider } from './context/UnitMatrixContext';
 import { POProvider } from './context/POContext';
-import { Bins } from './pages/Bins';
+import Bins from './pages/Bins';
+
+// Import other pages here as needed
+// These are placeholders until the actual components are created
+const Login = () => <div>Login Page</div>;
+const Dashboard = () => <div>Dashboard Page</div>;
+const Products = () => <div>Products Page</div>;
+const Inventory = () => <div>Inventory Page</div>;
+const StockMovements = () => <div>Stock Movements Page</div>;
+const Reports = () => <div>Reports Page</div>;
+const Users = () => <div>Users Page</div>;
+const Customers = () => <div>Customers Page</div>;
+const CustomerProducts = () => <div>Customer Products Page</div>;
+const ManageCustomer = () => <div>Manage Customer Page</div>;
+const CustomerList = () => <div>Customer List Page</div>;
+const Rooms = () => <div>Rooms Page</div>;
+const Units = () => <div>Units Page</div>;
+const UnitMatrixPage = () => <div>Unit Matrix Page</div>;
+const SkuMatrixPage = () => <div>SKU Matrix Page</div>;
+const PurchaseOrders = () => <div>Purchase Orders Page</div>;
+const Vendors = () => <div>Vendors Page</div>;
+const Notifications = () => <div>Notifications Page</div>;
+const Settings = () => <div>Settings Page</div>;
+const Unauthorized = () => <div>Unauthorized Page</div>;
+const NotFound = () => <div>Not Found Page</div>;
 
 const queryClient = new QueryClient();
 

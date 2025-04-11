@@ -6,12 +6,12 @@ import { BinTable } from '@/components/bins/BinTable';
 import { AddBinDialog } from '@/components/bins/AddBinDialog';
 import { Input } from '@/components/ui/input';
 import { BinProvider } from '@/context/BinContext';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Bins() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
 
   return (
     <BinProvider>
