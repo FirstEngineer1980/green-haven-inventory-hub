@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { UnitMatrix, UnitMatrixRow, UnitMatrixCell, Bin } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -282,20 +283,21 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
         </div>
       )}
 
-      <div className="overflow-auto border rounded-md">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-x-auto border rounded-md">
+        <table className="min-w-full table-fixed divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 md:w-32">
                 Shelf
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 md:w-20">
                 Color
               </th>
               {Array.isArray(columns) && columns.map(column => (
                 <th 
                   key={column.id} 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  style={{ minWidth: '100px' }}
                 >
                   {editMode && editingColumnId === column.id ? (
                     <div className="flex items-center space-x-1">
@@ -315,9 +317,9 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
-                      <span>{column.label}</span>
+                      <span className="w-full text-center">{column.label}</span>
                       {editMode && (
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center space-x-1 absolute right-1">
                           <Button 
                             onClick={() => startEditingColumn(column.id, column.label)}
                             variant="ghost"
@@ -345,7 +347,7 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
           <tbody className="bg-white divide-y divide-gray-200">
             {Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
               <tr key={row.id}>
-                <td className="px-4 py-3 whitespace-nowrap">
+                <td className="px-3 py-2 whitespace-nowrap">
                   {editMode && editingRowId === row.id ? (
                     <Input 
                       value={editingRowLabel} 
@@ -369,23 +371,23 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                   )}
                 </td>
                 <td 
-                  className="px-4 py-3 whitespace-nowrap" 
+                  className="px-3 py-2 whitespace-nowrap" 
                 >
                   {editMode && editingRowId === row.id ? (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1">
                       <Input 
                         type="color" 
                         value={editingRowColor} 
                         onChange={(e) => setEditingRowColor(e.target.value)}
-                        className="w-16 h-8"
+                        className="w-10 h-6"
                       />
                       <Button 
                         onClick={handleUpdateRow}
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0"
+                        className="h-6 w-6 p-0"
                       >
-                        <Save className="h-4 w-4" />
+                        <Save className="h-3 w-3" />
                       </Button>
                       {editMode && (
                         <Button 
@@ -400,7 +402,7 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                     </div>
                   ) : (
                     <div 
-                      className="w-12 h-6 rounded-sm" 
+                      className="w-8 h-6 rounded-sm" 
                       style={{ backgroundColor: row.color || '#FFFFFF' }}
                     ></div>
                   )}
@@ -414,7 +416,15 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                   return (
                     <td 
                       key={`${row.id}-${column.id}`} 
-                      className={`px-4 py-3 whitespace-nowrap ${!cellValue && !editMode ? 'bg-gray-50' : ''}`}
+                      className={cn(
+                        "px-3 py-2 relative",
+                        !cellValue && !editMode ? 'bg-gray-50' : '',
+                        editMode && 'cursor-pointer hover:bg-gray-100'
+                      )}
+                      style={{ 
+                        maxWidth: '180px',
+                        position: 'relative'
+                      }}
                       onClick={() => editMode && startEditingCell(row.id, column.id)}
                     >
                       {isEditing ? (
@@ -450,8 +460,14 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                           </PopoverContent>
                         </Popover>
                       ) : (
-                        <div className={`p-1 ${editMode ? 'cursor-pointer hover:bg-gray-100' : ''}`}>
-                          {cellValue}
+                        <div className="w-full h-full">
+                          <div 
+                            className={`p-1 text-center w-full overflow-hidden text-ellipsis ${
+                              cellValue ? 'bg-blue-500 text-white rounded-md' : ''
+                            }`}
+                          >
+                            {cellValue}
+                          </div>
                         </div>
                       )}
                     </td>
