@@ -66,6 +66,7 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { unitMatrices } = useUnitMatrix();
 
   const getUnitMatrixName = (unitMatrixId: string): string | undefined => {
+    if (!unitMatrixId) return undefined;
     const unitMatrix = unitMatrices.find(um => um.id === unitMatrixId);
     return unitMatrix ? unitMatrix.name : undefined;
   };
