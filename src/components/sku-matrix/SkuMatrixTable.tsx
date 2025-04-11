@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { UnitMatrix } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -15,7 +16,7 @@ interface SkuMatrixTableProps {
 
 const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   const { columns = [], updateCell, addRow, deleteRow, updateRow, addColumn, deleteColumn, updateColumn, unitMatrices = [] } = useUnitMatrix();
-  const { bins } = useBins();
+  const { bins = [] } = useBins();
   const [editMode, setEditMode] = useState(false);
   const [tempCells, setTempCells] = useState<{[key: string]: string}>({});
   const [newRowLabel, setNewRowLabel] = useState('');
@@ -80,19 +81,21 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   };
 
   const saveChanges = () => {
-    Object.entries(tempCells).forEach(([key, value]) => {
-      const [rowId, columnId] = key.split('-');
-      updateCell(unitMatrix.id, rowId, columnId, value);
-    });
-
-    setEditMode(false);
-    setTempCells({});
-    
-    toast({
-      title: "Changes Saved",
-      description: "SKU matrix has been updated successfully",
-      variant: "default"
-    });
+    if (unitMatrix && unitMatrix.id) {
+      Object.entries(tempCells).forEach(([key, value]) => {
+        const [rowId, columnId] = key.split('-');
+        updateCell(unitMatrix.id, rowId, columnId, value);
+      });
+  
+      setEditMode(false);
+      setTempCells({});
+      
+      toast({
+        title: "Changes Saved",
+        description: "SKU matrix has been updated successfully",
+        variant: "default"
+      });
+    }
   };
 
   const cancelEditing = () => {
@@ -111,13 +114,17 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
       return;
     }
 
-    addRow(unitMatrix.id, newRowLabel, newRowColor);
-    setNewRowLabel('');
-    setNewRowColor('#FFFFFF');
+    if (unitMatrix && unitMatrix.id) {
+      addRow(unitMatrix.id, newRowLabel, newRowColor);
+      setNewRowLabel('');
+      setNewRowColor('#FFFFFF');
+    }
   };
 
   const handleDeleteRow = (rowId: string) => {
-    deleteRow(unitMatrix.id, rowId);
+    if (unitMatrix && unitMatrix.id) {
+      deleteRow(unitMatrix.id, rowId);
+    }
   };
 
   const handleAddColumn = () => {
@@ -173,7 +180,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
   };
 
   const handleUpdateRowColor = (rowId: string) => {
-    if (editingRowId && editingRowColor) {
+    if (editingRowId && editingRowColor && unitMatrix && unitMatrix.id) {
       updateRow(unitMatrix.id, rowId, { color: editingRowColor });
       setEditingRowId(null);
       setEditingRowColor('');
@@ -274,7 +281,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">No bin</SelectItem>
-                    {bins.map(bin => (
+                    {Array.isArray(bins) && bins.map(bin => (
                       <SelectItem key={bin.id} value={bin.id}>
                         {bin.name} ({bin.width}cm)
                       </SelectItem>
@@ -316,7 +323,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">No bin</SelectItem>
-                          {bins.map(bin => (
+                          {Array.isArray(bins) && bins.map(bin => (
                             <SelectItem key={bin.id} value={bin.id}>
                               {bin.name} ({bin.width}cm)
                             </SelectItem>
@@ -331,7 +338,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                     <div className="flex items-center justify-between">
                       <div className="flex flex-col">
                         <span>{column.label}</span>
-                        {column.binId && bins.find(b => b.id === column.binId) && (
+                        {column.binId && bins && Array.isArray(bins) && bins.find(b => b.id === column.binId) && (
                           <span className="text-xs text-gray-400">
                             {bins.find(b => b.id === column.binId)?.name} 
                             ({bins.find(b => b.id === column.binId)?.width}cm)
@@ -365,7 +372,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
+            {unitMatrix && Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
               <tr key={row.id}>
                 <td 
                   className="px-4 py-2 whitespace-nowrap border-r" 
