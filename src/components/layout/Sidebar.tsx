@@ -15,6 +15,7 @@ import {
   Table,
   Menu,
   Database,
+  Archive,
 } from 'lucide-react';
 
 import {
@@ -58,6 +59,10 @@ const Sidebar = ({ className }: { className?: string }) => {
         {
           title: 'Stock Movements',
           href: '/stock-movements',
+        },
+        {
+          title: 'Bins',
+          href: '/bins',
         },
       ],
     },
