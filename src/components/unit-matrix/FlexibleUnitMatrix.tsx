@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { UnitMatrix, UnitMatrixRow, UnitMatrixCell, Bin } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -47,8 +46,11 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Filter out any undefined or null bins
-    setAvailableBins(bins.filter(bin => !!bin));
+    if (Array.isArray(bins)) {
+      setAvailableBins(bins.filter(bin => !!bin));
+    } else {
+      setAvailableBins([]);
+    }
   }, [bins]);
 
   const handleAddRow = () => {
@@ -158,10 +160,9 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
   const startEditingCell = (rowId: string, columnId: string) => {
     setEditingCell({ rowId, columnId });
     
-    // Find the current cell value
-    const row = unitMatrix.rows.find(r => r.id === rowId);
+    const row = unitMatrix.rows?.find(r => r.id === rowId);
     if (row) {
-      const cell = row.cells.find(c => c.columnId === columnId);
+      const cell = row.cells?.find(c => c.columnId === columnId);
       if (cell) {
         setSelectedBin(cell.value);
       } else {
@@ -185,24 +186,22 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
   };
 
   const getCellValue = (rowId: string, columnId: string): string => {
-    const row = unitMatrix.rows.find(r => r.id === rowId);
+    const row = unitMatrix.rows?.find(r => r.id === rowId);
     if (!row) return '';
     
-    const cell = row.cells.find(c => c.columnId === columnId);
+    const cell = row.cells?.find(c => c.columnId === columnId);
     return cell ? cell.value : '';
   };
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
     if (editMode) {
-      // Clear all editing states when exiting edit mode
       setEditingColumnId(null);
       setEditingRowId(null);
       setEditingCell(null);
     }
   };
 
-  // Safety check for unitMatrix
   if (!unitMatrix || !unitMatrix.rows) {
     return (
       <div className="p-4 border rounded bg-gray-50 text-center text-gray-500">

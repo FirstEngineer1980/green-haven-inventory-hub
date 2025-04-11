@@ -50,7 +50,13 @@ interface BinContextType {
   getBinsByUnitMatrix: (unitMatrixId: string) => Bin[];
 }
 
-const BinContext = createContext<BinContextType>({} as BinContextType);
+const BinContext = createContext<BinContextType>({
+  bins: [],
+  addBin: () => {},
+  updateBin: () => {},
+  deleteBin: () => {},
+  getBinsByUnitMatrix: () => []
+});
 
 export const useBins = () => useContext(BinContext);
 
