@@ -9,7 +9,7 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { UnitMatrixTable } from '@/components/unit-matrix/UnitMatrixTable';
+import FlexibleUnitMatrix from '@/components/unit-matrix/FlexibleUnitMatrix';
 import AddUnitMatrixDialog from '@/components/unit-matrix/AddUnitMatrixDialog';
 import EditUnitMatrixDialog from '@/components/unit-matrix/EditUnitMatrixDialog';
 import { UnitMatrix } from '@/types';
@@ -86,31 +86,20 @@ const UnitMatrixPage = () => {
             <CardTitle>Unit Matrices ({filteredUnitMatrices.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {filteredUnitMatrices.map(unitMatrix => (
-              <div key={unitMatrix.id} className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">{unitMatrix.name} - {unitMatrix.roomName}</h3>
-                  <div className="space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditClick(unitMatrix)}>
-                      Edit
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteUnitMatrix(unitMatrix.id)}>
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-                <UnitMatrixTable 
-                  unitMatrices={[unitMatrix]} 
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteUnitMatrix}
-                />
-              </div>
-            ))}
-            
-            {filteredUnitMatrices.length === 0 && (
+            {filteredUnitMatrices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No unit matrices found
               </div>
+            ) : (
+              filteredUnitMatrices.map(unitMatrix => (
+                <div key={unitMatrix.id} className="mb-8">
+                  <FlexibleUnitMatrix 
+                    unitMatrix={unitMatrix} 
+                    onEdit={handleEditClick}
+                    onDelete={handleDeleteUnitMatrix}
+                  />
+                </div>
+              ))
             )}
           </CardContent>
         </Card>

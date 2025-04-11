@@ -60,6 +60,11 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { unitMatrices } = useUnitMatrix();
 
   const getUnitMatrixName = (unitMatrixId: string): string | undefined => {
+    if (!unitMatrixId) return undefined;
+    
+    // Safely handle unitMatrices being undefined or not an array
+    if (!Array.isArray(unitMatrices)) return undefined;
+    
     const unitMatrix = unitMatrices.find(um => um.id === unitMatrixId);
     return unitMatrix ? unitMatrix.name : undefined;
   };
@@ -69,6 +74,11 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addBin = (bin: Omit<Bin, 'id' | 'volumeCapacity' | 'unitMatrixName' | 'createdAt' | 'updatedAt'>) => {
+    if (!bin) {
+      console.error('Invalid bin data');
+      return;
+    }
+    
     const now = new Date().toISOString();
     const volumeCapacity = calculateVolumeCapacity(bin.length, bin.width, bin.height);
     const unitMatrixName = bin.unitMatrixId ? getUnitMatrixName(bin.unitMatrixId) : undefined;
@@ -94,6 +104,8 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateBin = (id: string, updates: Partial<Bin>) => {
+    if (!id) return;
+    
     setBins(prev => 
       prev.map(bin => {
         if (bin.id === id) {
@@ -105,7 +117,7 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           
           // Get unit matrix name if unitMatrixId is updated
           const unitMatrixId = updates.unitMatrixId ?? bin.unitMatrixId;
-          const unitMatrixName = unitMatrixId ? getUnitMatrixName(unitMatrixId) : undefined;
+          const unitMatrixName = unitMatrixId ? getUnitMatrixName(unitMatrixId) : bin.unitMatrixName;
           
           return { 
             ...bin, 
@@ -133,6 +145,8 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteBin = (id: string) => {
+    if (!id) return;
+    
     // Get the bin before deleting
     const binToDelete = bins.find(b => b.id === id);
     
@@ -149,7 +163,10 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const getBinsByUnitMatrix = (unitMatrixId: string): Bin[] => {
-    return bins.filter(bin => bin.unitMatrixId === unitMatrixId);
+    if (!unitMatrixId) return [];
+    
+    // Filter bins by unitMatrixId with a safety check
+    return Array.isArray(bins) ? bins.filter(bin => bin.unitMatrixId === unitMatrixId) : [];
   };
 
   return (
