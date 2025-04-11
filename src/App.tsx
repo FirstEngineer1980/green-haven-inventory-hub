@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,28 +14,7 @@ import { RoomProvider } from './context/RoomContext';
 import { UnitProvider } from './context/UnitContext';
 import { UnitMatrixProvider } from './context/UnitMatrixContext';
 import { POProvider } from './context/POContext';
-
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Products from './pages/Products';
-import Users from './pages/Users';
-import Notifications from './pages/Notifications';
-import Unauthorized from './pages/Unauthorized';
-import NotFound from "./pages/NotFound";
-import Inventory from './pages/Inventory';
-import StockMovements from './pages/StockMovements';
-import Reports from './pages/Reports';
-import Customers from './pages/Customers';
-import CustomerProducts from './pages/CustomerProducts';
-import ManageCustomer from './pages/ManageCustomer';
-import CustomerList from './pages/CustomerList';
-import Rooms from './pages/Rooms';
-import Units from './pages/Units';
-import UnitMatrixPage from './pages/UnitMatrixPage';
-import SkuMatrixPage from './pages/SkuMatrixPage';
-import PurchaseOrders from './pages/PurchaseOrders';
-import Vendors from './pages/Vendors';
-import Settings from './pages/Settings';
+import { Bins } from './pages/Bins';
 
 const queryClient = new QueryClient();
 
@@ -78,6 +56,7 @@ const App = () => (
                               <Route path="/notifications" element={<Notifications />} />
                               <Route path="/settings" element={<Settings />} />
                               <Route path="/unauthorized" element={<Unauthorized />} />
+                              <Route path="/bins" element={<Bins />} />
                               <Route path="/" element={<Login />} />
                               <Route path="*" element={<NotFound />} />
                             </Routes>

@@ -199,3 +199,16 @@ export interface Vendor {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Bin {
+  id: string;
+  name: string;
+  length: number;
+  width: number;
+  height: number;
+  volumeCapacity: number;
+  unitMatrixId?: string;
+  unitMatrixName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
