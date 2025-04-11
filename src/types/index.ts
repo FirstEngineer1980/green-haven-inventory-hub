@@ -147,6 +147,8 @@ export interface UnitMatrixCell {
 export interface UnitMatrixColumn {
   id: string;
   label: string;
+  binId?: string;
+  width?: number;
 }
 
 export interface DashboardStats {

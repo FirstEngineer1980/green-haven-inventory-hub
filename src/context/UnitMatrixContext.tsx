@@ -1,8 +1,8 @@
-
 import React, { createContext, useState, useContext } from 'react';
 import { UnitMatrix, UnitMatrixRow, UnitMatrixColumn, UnitMatrixCell, Room } from '../types';
 import { useNotifications } from './NotificationContext';
 import { useRooms } from './RoomContext';
+import { useBins } from './BinContext';
 
 // Mock column data
 const mockColumns: UnitMatrixColumn[] = [
@@ -94,8 +94,8 @@ interface UnitMatrixContextType {
   updateUnitMatrix: (id: string, updates: Partial<UnitMatrix>) => void;
   deleteUnitMatrix: (id: string) => void;
   getUnitMatrixByRoomId: (roomId: string) => UnitMatrix[];
-  addColumn: (label: string) => void;
-  updateColumn: (id: string, label: string) => void;
+  addColumn: (label: string, binId?: string, width?: number) => void;
+  updateColumn: (id: string, label: string, binId?: string, width?: number) => void;
   deleteColumn: (id: string) => void;
   addRow: (unitMatrixId: string, label: string, color: string) => void;
   updateRow: (unitMatrixId: string, rowId: string, updates: Partial<UnitMatrixRow>) => void;
@@ -112,6 +112,7 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [columns, setColumns] = useState<UnitMatrixColumn[]>(mockColumns);
   const { addNotification } = useNotifications();
   const { rooms } = useRooms();
+  const { bins } = useBins();
 
   const getRoomName = (roomId: string): string => {
     const room = rooms.find(r => r.id === roomId);
@@ -208,10 +209,12 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return unitMatrices.filter(unitMatrix => unitMatrix.roomId === roomId);
   };
 
-  const addColumn = (label: string) => {
+  const addColumn = (label: string, binId?: string, width?: number) => {
     const newColumn: UnitMatrixColumn = {
       id: `column-${Date.now()}`,
-      label
+      label,
+      binId,
+      width
     };
     
     setColumns(prev => [...prev, newColumn]);
@@ -236,11 +239,11 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  const updateColumn = (id: string, label: string) => {
+  const updateColumn = (id: string, label: string, binId?: string, width?: number) => {
     setColumns(prev => 
       prev.map(column => 
         column.id === id 
-          ? { ...column, label } 
+          ? { ...column, label, binId, width } 
           : column
       )
     );
