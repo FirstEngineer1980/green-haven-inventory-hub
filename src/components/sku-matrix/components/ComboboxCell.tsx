@@ -34,8 +34,13 @@ const ComboboxCell = ({
 
   useEffect(() => {
     // Make sure we're working with a valid array
-    const safeOptions = Array.isArray(options) ? options : [];
-    setAllOptions(safeOptions);
+    try {
+      const safeOptions = Array.isArray(options) ? options.filter(opt => !!opt) : [];
+      setAllOptions(safeOptions);
+    } catch (error) {
+      console.error("Error processing options:", error);
+      setAllOptions([]);
+    }
   }, [options]);
 
   const handleSelect = (currentValue: string) => {
@@ -72,10 +77,10 @@ const ComboboxCell = ({
     }
   };
 
-  // Filter options based on input value
-  const filteredOptions = allOptions.filter(option => 
-    option.toLowerCase().includes(inputValue.toLowerCase())
-  );
+  // Filter options based on input value - ensure allOptions is an array
+  const filteredOptions = Array.isArray(allOptions) 
+    ? allOptions.filter(option => option.toLowerCase().includes(inputValue.toLowerCase()))
+    : [];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -121,39 +126,47 @@ const ComboboxCell = ({
               className="h-9"
             />
             <CommandEmpty>
-              No item found.
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="ml-2" 
-                onClick={handleCreateNew}
-              >
-                <Plus className="h-3 w-3 mr-1" /> Create
-              </Button>
+              {filteredOptions.length === 0 ? 
+                <>
+                  No item found.
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-2" 
+                    onClick={handleCreateNew}
+                  >
+                    <Plus className="h-3 w-3 mr-1" /> Create
+                  </Button>
+                </> : 
+                "No item found."
+              }
             </CommandEmpty>
             <CommandGroup className="max-h-[200px] overflow-y-auto">
-              {filteredOptions.map((option) => (
+              {Array.isArray(filteredOptions) && filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => (
+                  <CommandItem
+                    key={option}
+                    value={option}
+                    onSelect={() => handleSelect(option)}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === option ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option}
+                  </CommandItem>
+                ))
+              ) : (
                 <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={() => handleSelect(option)}
+                  onSelect={handleCreateNew}
+                  className="text-muted-foreground"
                 >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === option ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option}
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create new item
                 </CommandItem>
-              ))}
-              <CommandItem
-                onSelect={handleCreateNew}
-                className="text-muted-foreground"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create new item
-              </CommandItem>
+              )}
             </CommandGroup>
           </Command>
         )}

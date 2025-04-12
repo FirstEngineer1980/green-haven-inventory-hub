@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { UnitMatrix, UnitMatrixRow, UnitMatrixCell, Bin } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -47,22 +46,20 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
   
   const tableRef = useRef<HTMLDivElement>(null);
 
-  // Update available bins when bins context changes
   useEffect(() => {
-    if (Array.isArray(bins)) {
-      const validBins = bins.filter(bin => !!bin);
+    try {
+      const validBins = Array.isArray(bins) ? bins.filter(bin => !!bin) : [];
       setAvailableBins(validBins);
       
-      // Extract bin names for the dropdown
-      const binNames = validBins.map(bin => bin.name);
-      setBinOptions(binNames);
+      const binNames = validBins.map(bin => bin.name || '').filter(name => name !== '');
+      setBinOptions(binNames.length > 0 ? binNames : []);
       
       console.log("Available bins:", validBins);
       console.log("Bin options for dropdown:", binNames);
-    } else {
+    } catch (error) {
+      console.error("Error processing bins:", error);
       setAvailableBins([]);
       setBinOptions([]);
-      console.log("No bins available or bins is not an array");
     }
   }, [bins]);
 
@@ -454,16 +451,16 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                           <PopoverContent className="w-[200px] p-0" align="start">
                             <Command>
                               <CommandInput placeholder="Search bins..." />
-                              <CommandEmpty>No bin found. Click to add new.</CommandEmpty>
+                              <CommandEmpty>
+                                {binOptions.length === 0 ? "No bins available" : "No bin found"}
+                              </CommandEmpty>
                               <CommandGroup className="max-h-[200px] overflow-y-auto">
-                                {binOptions.length > 0 ? (
+                                {binOptions && binOptions.length > 0 ? (
                                   binOptions.map((binName) => (
                                     <CommandItem
                                       key={binName}
                                       value={binName}
-                                      onSelect={() => {
-                                        handleCellUpdate(binName);
-                                      }}
+                                      onSelect={() => handleCellUpdate(binName)}
                                     >
                                       {binName}
                                     </CommandItem>
