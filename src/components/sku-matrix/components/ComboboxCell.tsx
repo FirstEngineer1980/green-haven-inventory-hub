@@ -72,6 +72,7 @@ const ComboboxCell = ({
     }
   };
 
+  // Filter options based on input value
   const filteredOptions = allOptions.filter(option => 
     option.toLowerCase().includes(inputValue.toLowerCase())
   );

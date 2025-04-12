@@ -43,14 +43,26 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
   const [editingCell, setEditingCell] = useState<{ rowId: string; columnId: string } | null>(null);
   const [selectedBin, setSelectedBin] = useState<string>('');
   const [availableBins, setAvailableBins] = useState<Bin[]>([]);
+  const [binOptions, setBinOptions] = useState<string[]>([]);
   
   const tableRef = useRef<HTMLDivElement>(null);
 
+  // Update available bins when bins context changes
   useEffect(() => {
     if (Array.isArray(bins)) {
-      setAvailableBins(bins.filter(bin => !!bin));
+      const validBins = bins.filter(bin => !!bin);
+      setAvailableBins(validBins);
+      
+      // Extract bin names for the dropdown
+      const binNames = validBins.map(bin => bin.name);
+      setBinOptions(binNames);
+      
+      console.log("Available bins:", validBins);
+      console.log("Bin options for dropdown:", binNames);
     } else {
       setAvailableBins([]);
+      setBinOptions([]);
+      console.log("No bins available or bins is not an array");
     }
   }, [bins]);
 
@@ -442,19 +454,23 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                           <PopoverContent className="w-[200px] p-0" align="start">
                             <Command>
                               <CommandInput placeholder="Search bins..." />
-                              <CommandEmpty>No bin found.</CommandEmpty>
-                              <CommandGroup>
-                                {availableBins.map((bin) => (
-                                  <CommandItem
-                                    key={bin.id}
-                                    value={bin.name}
-                                    onSelect={() => {
-                                      handleCellUpdate(bin.name);
-                                    }}
-                                  >
-                                    <span>{bin.name}</span>
-                                  </CommandItem>
-                                ))}
+                              <CommandEmpty>No bin found. Click to add new.</CommandEmpty>
+                              <CommandGroup className="max-h-[200px] overflow-y-auto">
+                                {binOptions.length > 0 ? (
+                                  binOptions.map((binName) => (
+                                    <CommandItem
+                                      key={binName}
+                                      value={binName}
+                                      onSelect={() => {
+                                        handleCellUpdate(binName);
+                                      }}
+                                    >
+                                      {binName}
+                                    </CommandItem>
+                                  ))
+                                ) : (
+                                  <CommandItem disabled>No bins available</CommandItem>
+                                )}
                               </CommandGroup>
                             </Command>
                           </PopoverContent>
