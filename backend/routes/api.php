@@ -11,6 +11,16 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\StockMovementController;
+use App\Http\Controllers\InventoryItemController;
+use App\Http\Controllers\BinController;
+use App\Http\Controllers\SkuMatrixController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,9 +58,11 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Room routes
     Route::apiResource('rooms', RoomController::class);
+    Route::get('/customers/{customer}/rooms', [RoomController::class, 'getByCustomer']);
     
     // Unit routes
     Route::apiResource('units', UnitController::class);
+    Route::get('/rooms/{room}/units', [UnitController::class, 'getByRoom']);
     
     // Vendor routes
     Route::apiResource('vendors', VendorController::class);
@@ -58,4 +70,54 @@ Route::middleware('auth:sanctum')->group(function () {
     // Purchase Order routes
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
     Route::patch('/purchase-orders/{purchaseOrder}/status', [PurchaseOrderController::class, 'updateStatus']);
+    Route::get('/vendors/{vendor}/purchase-orders', [PurchaseOrderController::class, 'getByVendor']);
+    
+    // Product routes
+    Route::apiResource('products', ProductController::class);
+    Route::get('/products/low-stock', [ProductController::class, 'lowStock']);
+    Route::post('/products/{product}/adjust-stock', [ProductController::class, 'adjustStock']);
+    
+    // Category routes
+    Route::apiResource('categories', CategoryController::class);
+    Route::get('/categories/{category}/products', [CategoryController::class, 'getProducts']);
+    
+    // Stock Movement routes
+    Route::apiResource('stock-movements', StockMovementController::class);
+    Route::get('/products/{product}/stock-movements', [StockMovementController::class, 'getByProduct']);
+    
+    // Inventory Item routes
+    Route::apiResource('inventory-items', InventoryItemController::class);
+    Route::get('/units/{unit}/inventory', [InventoryItemController::class, 'getByUnit']);
+    Route::get('/products/{product}/inventory', [InventoryItemController::class, 'getByProduct']);
+    
+    // Bin routes
+    Route::apiResource('bins', BinController::class);
+    
+    // SKU Matrix routes
+    Route::apiResource('sku-matrices', SkuMatrixController::class);
+    Route::get('/rooms/{room}/sku-matrices', [SkuMatrixController::class, 'getByRoom']);
+    Route::apiResource('sku-matrix-rows', 'SkuMatrixRowController');
+    Route::apiResource('sku-matrix-cells', 'SkuMatrixCellController');
+    
+    // Setting routes
+    Route::get('/settings', [SettingController::class, 'index']);
+    Route::get('/settings/{key}', [SettingController::class, 'show']);
+    Route::post('/settings', [SettingController::class, 'store']);
+    Route::put('/settings/{key}', [SettingController::class, 'update']);
+    
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    
+    // Report routes
+    Route::apiResource('reports', ReportController::class);
+    Route::post('/reports/{report}/generate', [ReportController::class, 'generate']);
+    
+    // Dashboard routes
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('/dashboard/low-stock', [DashboardController::class, 'lowStock']);
+    Route::get('/dashboard/recent-movements', [DashboardController::class, 'recentMovements']);
+    Route::get('/dashboard/products-by-category', [DashboardController::class, 'productsByCategory']);
+    Route::get('/dashboard/stock-trend', [DashboardController::class, 'stockTrend']);
 });

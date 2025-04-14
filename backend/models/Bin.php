@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Unit extends Model
+class Bin extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -18,32 +18,25 @@ class Unit extends Model
      */
     protected $fillable = [
         'name',
-        'description',
-        'room_id',
-        'number',
-        'size',
-        'size_unit',
+        'length',
+        'width',
+        'height',
+        'volume_capacity',
+        'location',
+        'unit_matrix_id',
         'status',
     ];
-
+    
     /**
-     * Get the room that owns the unit.
+     * Get the unit matrix associated with this bin.
      */
-    public function room()
+    public function unitMatrix()
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(UnitMatrix::class);
     }
     
     /**
-     * Get the SKU matrices associated with this unit.
-     */
-    public function skuMatrices()
-    {
-        return $this->belongsToMany(SkuMatrix::class, 'sku_matrix_units');
-    }
-    
-    /**
-     * Get the inventory items in this unit.
+     * Get the inventory items in this bin.
      */
     public function inventoryItems()
     {

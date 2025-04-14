@@ -23,6 +23,10 @@ class CustomerProduct extends Model
         'qty',
         'description',
         'picture',
+        'category',
+        'location',
+        'status',
+        'notes',
     ];
 
     /**
@@ -31,5 +35,29 @@ class CustomerProduct extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+    
+    /**
+     * Get the inventory items for this customer product.
+     */
+    public function inventoryItems()
+    {
+        return $this->hasMany(InventoryItem::class, 'product_id');
+    }
+    
+    /**
+     * Get the room where the product is located.
+     */
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
+    
+    /**
+     * Get the unit where the product is located.
+     */
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
     }
 }

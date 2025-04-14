@@ -22,6 +22,11 @@ class Vendor extends Model
         'email',
         'phone',
         'address',
+        'website',
+        'notes',
+        'status',
+        'payment_terms',
+        'tax_id',
     ];
 
     /**
@@ -30,5 +35,15 @@ class Vendor extends Model
     public function purchaseOrders()
     {
         return $this->hasMany(PurchaseOrder::class);
+    }
+    
+    /**
+     * Get the products provided by this vendor.
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_vendors')
+                    ->withPivot('sku', 'cost', 'lead_time', 'is_preferred')
+                    ->withTimestamps();
     }
 }

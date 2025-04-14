@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Unit extends Model
+class SkuMatrix extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,14 +20,17 @@ class Unit extends Model
         'name',
         'description',
         'room_id',
-        'number',
-        'size',
-        'size_unit',
-        'status',
     ];
-
+    
     /**
-     * Get the room that owns the unit.
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'sku_matrices';
+    
+    /**
+     * Get the room associated with this SKU matrix.
      */
     public function room()
     {
@@ -35,15 +38,23 @@ class Unit extends Model
     }
     
     /**
-     * Get the SKU matrices associated with this unit.
+     * Get the units associated with this SKU matrix.
      */
-    public function skuMatrices()
+    public function units()
     {
-        return $this->belongsToMany(SkuMatrix::class, 'sku_matrix_units');
+        return $this->belongsToMany(Unit::class, 'sku_matrix_units');
     }
     
     /**
-     * Get the inventory items in this unit.
+     * Get the matrix rows for this SKU matrix.
+     */
+    public function rows()
+    {
+        return $this->hasMany(SkuMatrixRow::class);
+    }
+    
+    /**
+     * Get the inventory items using this SKU matrix.
      */
     public function inventoryItems()
     {

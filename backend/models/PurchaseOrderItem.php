@@ -5,10 +5,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseOrderItem extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -17,11 +18,14 @@ class PurchaseOrderItem extends Model
      */
     protected $fillable = [
         'purchase_order_id',
+        'product_id',
         'sku',
         'name',
         'quantity',
         'unit_price',
         'total_price',
+        'received_quantity',
+        'status',
     ];
 
     /**
@@ -30,5 +34,13 @@ class PurchaseOrderItem extends Model
     public function purchaseOrder()
     {
         return $this->belongsTo(PurchaseOrder::class);
+    }
+    
+    /**
+     * Get the product associated with this purchase order item.
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

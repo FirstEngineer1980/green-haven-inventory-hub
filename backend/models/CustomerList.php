@@ -24,6 +24,9 @@ class CustomerList extends Model
         'description',
         'picture',
         'notes',
+        'category',
+        'status',
+        'location',
     ];
 
     /**
@@ -32,5 +35,21 @@ class CustomerList extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+    
+    /**
+     * Get the items in this list.
+     */
+    public function items()
+    {
+        return $this->hasMany(CustomerListItem::class, 'list_id');
+    }
+    
+    /**
+     * Get the room associated with this list.
+     */
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
     }
 }
