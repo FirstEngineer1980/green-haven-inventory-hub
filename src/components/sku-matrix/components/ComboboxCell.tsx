@@ -35,7 +35,8 @@ const ComboboxCell = ({
   useEffect(() => {
     // Make sure we're working with a valid array
     try {
-      const safeOptions = Array.isArray(options) ? options.filter(opt => !!opt) : [];
+      // Create a defensive copy - ensure options is an array
+      const safeOptions = Array.isArray(options) ? [...options].filter(Boolean) : [];
       setAllOptions(safeOptions);
     } catch (error) {
       console.error("Error processing options:", error);
@@ -78,9 +79,9 @@ const ComboboxCell = ({
   };
 
   // Filter options based on input value - ensure allOptions is an array
-  const filteredOptions = Array.isArray(allOptions) 
-    ? allOptions.filter(option => option.toLowerCase().includes(inputValue.toLowerCase()))
-    : [];
+  const filteredOptions = allOptions.filter(option => 
+    option && option.toLowerCase().includes((inputValue || '').toLowerCase())
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -142,7 +143,7 @@ const ComboboxCell = ({
               }
             </CommandEmpty>
             <CommandGroup className="max-h-[200px] overflow-y-auto">
-              {Array.isArray(filteredOptions) && filteredOptions.length > 0 ? (
+              {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (
                   <CommandItem
                     key={option}
