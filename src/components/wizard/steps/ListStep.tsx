@@ -1,14 +1,14 @@
-
 import React, { useState } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Save, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, Plus, Trash2, Image, Link, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ListItem {
   id: string;
@@ -34,7 +34,7 @@ const ListStep = () => {
     picture: '',
     notes: ''
   });
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCurrentList(prev => ({
@@ -42,9 +42,23 @@ const ListStep = () => {
       [name]: value
     }));
   };
-  
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setCurrentList(prev => ({
+          ...prev,
+          picture: base64String
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddList = () => {
-    // Validate required fields
     if (!currentList.name || !currentList.sku || !currentList.quantity) {
       toast({
         title: "Validation Error",
@@ -54,10 +68,7 @@ const ListStep = () => {
       return;
     }
     
-    // Add the current list to lists array
     setLists(prev => [...prev, currentList]);
-    
-    // Reset the form for a new list
     setCurrentList({
       id: crypto.randomUUID(),
       name: '',
@@ -73,7 +84,7 @@ const ListStep = () => {
       description: `List "${currentList.name}" added for customer ${selectedCustomer?.name}`,
     });
   };
-  
+
   const handleDeleteList = (id: string) => {
     setLists(prev => prev.filter(list => list.id !== id));
     toast({
@@ -81,7 +92,7 @@ const ListStep = () => {
       description: "The list has been removed",
     });
   };
-  
+
   const handleSaveAndContinue = () => {
     if (lists.length === 0 && !currentList.name) {
       toast({
@@ -92,7 +103,6 @@ const ListStep = () => {
       return;
     }
     
-    // If there's an incomplete list, ask to add it first
     if (currentList.name || currentList.sku || currentList.quantity) {
       toast({
         title: "Unsaved List",
@@ -102,7 +112,6 @@ const ListStep = () => {
       return;
     }
     
-    // In a real app, we would save all lists to the database here
     toast({
       title: "Success",
       description: `${lists.length} lists saved for customer ${selectedCustomer?.name}`,
@@ -110,7 +119,7 @@ const ListStep = () => {
     
     nextStep();
   };
-  
+
   return (
     <div className="space-y-6">
       <div>
@@ -187,14 +196,60 @@ const ListStep = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="picture">Picture URL</Label>
-                <Input 
-                  id="picture" 
-                  name="picture" 
-                  placeholder="Enter picture URL (optional)" 
-                  value={currentList.picture} 
-                  onChange={handleInputChange} 
-                />
+                <Label>Picture</Label>
+                <Tabs defaultValue="upload" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upload" className="flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload
+                    </TabsTrigger>
+                    <TabsTrigger value="url" className="flex items-center gap-2">
+                      <Link className="h-4 w-4" />
+                      URL
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="upload" className="space-y-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="cursor-pointer"
+                    />
+                    {currentList.picture && (
+                      <div className="mt-2">
+                        <img
+                          src={currentList.picture}
+                          alt="Preview"
+                          className="max-w-[200px] rounded-md"
+                        />
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="url" className="space-y-2">
+                    <Input
+                      type="url"
+                      name="picture"
+                      placeholder="Enter image URL"
+                      value={currentList.picture}
+                      onChange={handleInputChange}
+                    />
+                    {currentList.picture && (
+                      <div className="mt-2">
+                        <img
+                          src={currentList.picture}
+                          alt="Preview"
+                          className="max-w-[200px] rounded-md"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </div>
               
               <div className="space-y-2 md:col-span-2">
