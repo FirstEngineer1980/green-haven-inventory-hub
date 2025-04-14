@@ -43,7 +43,8 @@ const Dashboard = () => {
       description: 'Apple MacBook Pro',
       category: 'Electronics',
       price: 1999.99,
-      unit: 'piece',
+      costPrice: 1799.99,
+      location: 'Warehouse A',
       createdAt: '2023-06-01T10:00:00Z',
       updatedAt: '2023-06-10T15:30:00Z'
     },
@@ -56,7 +57,8 @@ const Dashboard = () => {
       description: 'Samsung Ultra-wide Monitor',
       category: 'Electronics',
       price: 599.99,
-      unit: 'piece',
+      costPrice: 499.99,
+      location: 'Warehouse B',
       createdAt: '2023-06-02T11:00:00Z',
       updatedAt: '2023-06-11T16:30:00Z'
     },
@@ -69,7 +71,8 @@ const Dashboard = () => {
       description: 'Ergonomic Desk Chair',
       category: 'Furniture',
       price: 299.99,
-      unit: 'piece',
+      costPrice: 249.99,
+      location: 'Warehouse A',
       createdAt: '2023-06-03T12:00:00Z',
       updatedAt: '2023-06-12T17:30:00Z'
     },
@@ -104,25 +107,25 @@ const Dashboard = () => {
           title="Total Inventory"
           value="1,234"
           icon={<Package className="h-4 w-4" />}
-          trend="+12% from last month"
+          change={{ value: "12%", positive: true }}
         />
         <StatCard 
           title="New Customers"
           value="24"
           icon={<UserPlus className="h-4 w-4" />}
-          trend="+4 since last week"
+          change={{ value: "4", positive: true }}
         />
         <StatCard 
           title="Stock In"
           value="528"
           icon={<ArrowDown className="h-4 w-4" />}
-          trend="Items received this month"
+          change={{ value: "Items received this month", positive: true }}
         />
         <StatCard 
           title="Stock Out"
           value="432"
           icon={<ArrowUp className="h-4 w-4" />}
-          trend="Items dispatched this month"
+          change={{ value: "Items dispatched this month", positive: false }}
         />
       </div>
 

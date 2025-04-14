@@ -39,7 +39,6 @@ const StatCard: React.FC<StatCardProps> = ({
           <span className={`text-xs font-medium ${change.positive ? 'text-green-600' : 'text-red-600'}`}>
             {change.positive ? '↑' : '↓'} {change.value}
           </span>
-          <span className="text-xs text-gray-500 ml-1">from last month</span>
         </div>
       )}
     </div>
