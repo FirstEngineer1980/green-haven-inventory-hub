@@ -11,6 +11,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\ClientOrderTemplateController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\StockMovementController;
@@ -70,7 +71,16 @@ Route::middleware('auth:sanctum')->group(function () {
     // Purchase Order routes
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
     Route::patch('/purchase-orders/{purchaseOrder}/status', [PurchaseOrderController::class, 'updateStatus']);
+    Route::post('/purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receiveItems']);
     Route::get('/vendors/{vendor}/purchase-orders', [PurchaseOrderController::class, 'getByVendor']);
+    Route::post('/purchase-orders/process-recurring', [PurchaseOrderController::class, 'processRecurring']);
+    
+    // Client Order Template routes
+    Route::apiResource('client-order-templates', ClientOrderTemplateController::class);
+    Route::get('/customers/{customer}/order-templates', [ClientOrderTemplateController::class, 'getByCustomer']);
+    Route::post('/client-order-templates/process', [ClientOrderTemplateController::class, 'processTemplates']);
+    Route::get('/client-order-templates/due', [ClientOrderTemplateController::class, 'getDueTemplates']);
+    Route::post('/client-order-templates/{clientOrderTemplate}/create-order', [ClientOrderTemplateController::class, 'createOrder']);
     
     // Product routes
     Route::apiResource('products', ProductController::class);
@@ -120,4 +130,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/recent-movements', [DashboardController::class, 'recentMovements']);
     Route::get('/dashboard/products-by-category', [DashboardController::class, 'productsByCategory']);
     Route::get('/dashboard/stock-trend', [DashboardController::class, 'stockTrend']);
+    Route::get('/dashboard/upcoming-orders', [DashboardController::class, 'upcomingOrders']);
 });

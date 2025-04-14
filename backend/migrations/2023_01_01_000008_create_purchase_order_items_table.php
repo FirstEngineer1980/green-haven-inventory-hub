@@ -15,12 +15,16 @@ return new class extends Migration
         Schema::create('purchase_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->nullable()->constrained()->onDelete('set null');
             $table->string('sku');
             $table->string('name');
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
             $table->decimal('total_price', 10, 2);
+            $table->integer('received_quantity')->default(0);
+            $table->string('status')->default('pending'); // pending, partial, received
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
