@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -16,6 +15,7 @@ import {
   Menu,
   Database,
   Archive,
+  Wand2
 } from 'lucide-react';
 
 import {
@@ -120,6 +120,11 @@ const Sidebar = ({ className }: { className?: string }) => {
       href: '/settings',
       icon: <Settings className="h-5 w-5" />,
     },
+    {
+      title: 'Setup Wizard',
+      href: '/wizard',
+      icon: <Wand2 className="h-5 w-5" />,
+    },
   ];
 
   const handleMenuItemClick = () => {
@@ -128,7 +133,6 @@ const Sidebar = ({ className }: { className?: string }) => {
     }
   };
 
-  // Mobile menu toggle button that appears in the header
   const MobileMenuButton = () => {
     if (!isMobile) return null;
 
