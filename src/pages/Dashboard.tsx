@@ -10,6 +10,7 @@ import ProductsChart from '@/components/dashboard/ProductsChart';
 import StockTrendChart from '@/components/dashboard/StockTrendChart';
 import RecentMovements from '@/components/dashboard/RecentMovements';
 import LowStockAlert from '@/components/dashboard/LowStockAlert';
+import { Product, StockMovement } from '@/types';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -21,28 +22,67 @@ const Dashboard = () => {
     { category: 'Bathroom', count: 6 }
   ]);
 
+  // Updated stockTrends to match the expected format for StockTrendChart
   const [stockTrends] = useState([
-    { name: 'Jan', inflow: 65, outflow: 45 },
-    { name: 'Feb', inflow: 78, outflow: 52 },
-    { name: 'Mar', inflow: 82, outflow: 70 },
-    { name: 'Apr', inflow: 70, outflow: 68 },
-    { name: 'May', inflow: 85, outflow: 65 },
-    { name: 'Jun', inflow: 90, outflow: 75 },
+    { date: '2023-01-15T00:00:00Z', inStock: 65 },
+    { date: '2023-02-15T00:00:00Z', inStock: 78 },
+    { date: '2023-03-15T00:00:00Z', inStock: 82 },
+    { date: '2023-04-15T00:00:00Z', inStock: 70 },
+    { date: '2023-05-15T00:00:00Z', inStock: 85 },
+    { date: '2023-06-15T00:00:00Z', inStock: 90 },
   ]);
 
-  const [recentMovements] = useState([
-    { id: '1', productName: 'Desk Chair', type: 'in', quantity: 10, date: '2023-06-12T15:30:00Z' },
-    { id: '2', productName: 'Desk Lamp', type: 'out', quantity: 5, date: '2023-06-11T13:45:00Z' },
-    { id: '3', productName: 'Notebook', type: 'in', quantity: 50, date: '2023-06-10T09:20:00Z' },
-    { id: '4', productName: 'Monitor', type: 'out', quantity: 8, date: '2023-06-09T14:15:00Z' },
-    { id: '5', productName: 'Keyboard', type: 'out', quantity: 12, date: '2023-06-08T11:30:00Z' },
-    { id: '6', productName: 'Mouse', type: 'in', quantity: 25, date: '2023-06-07T10:00:00Z' },
+  // Define lowStockProducts with correct Product type
+  const [lowStockProducts] = useState<Product[]>([
+    { 
+      id: '1', 
+      name: 'MacBook Pro', 
+      quantity: 2, 
+      threshold: 5,
+      sku: 'MBP-2023',
+      description: 'Apple MacBook Pro',
+      category: 'Electronics',
+      price: 1999.99,
+      unit: 'piece',
+      createdAt: '2023-06-01T10:00:00Z',
+      updatedAt: '2023-06-10T15:30:00Z'
+    },
+    { 
+      id: '2', 
+      name: 'Samsung Monitor', 
+      quantity: 3, 
+      threshold: 10,
+      sku: 'SM-2023',
+      description: 'Samsung Ultra-wide Monitor',
+      category: 'Electronics',
+      price: 599.99,
+      unit: 'piece',
+      createdAt: '2023-06-02T11:00:00Z',
+      updatedAt: '2023-06-11T16:30:00Z'
+    },
+    { 
+      id: '3', 
+      name: 'Desk Chair', 
+      quantity: 4, 
+      threshold: 8,
+      sku: 'DC-2023',
+      description: 'Ergonomic Desk Chair',
+      category: 'Furniture',
+      price: 299.99,
+      unit: 'piece',
+      createdAt: '2023-06-03T12:00:00Z',
+      updatedAt: '2023-06-12T17:30:00Z'
+    },
   ]);
 
-  const [lowStockProducts] = useState([
-    { id: '1', name: 'MacBook Pro', quantity: 2, threshold: 5 },
-    { id: '2', name: 'Samsung Monitor', quantity: 3, threshold: 10 },
-    { id: '3', name: 'Desk Chair', quantity: 4, threshold: 8 },
+  // Define recentMovements with correct StockMovement type
+  const [recentMovements] = useState<StockMovement[]>([
+    { id: '1', productId: 'p1', productName: 'Desk Chair', type: 'in', quantity: 10, date: '2023-06-12T15:30:00Z', reason: 'restock', performedBy: 'user1' },
+    { id: '2', productId: 'p2', productName: 'Desk Lamp', type: 'out', quantity: 5, date: '2023-06-11T13:45:00Z', reason: 'sale', performedBy: 'user2' },
+    { id: '3', productId: 'p3', productName: 'Notebook', type: 'in', quantity: 50, date: '2023-06-10T09:20:00Z', reason: 'restock', performedBy: 'user1' },
+    { id: '4', productId: 'p4', productName: 'Monitor', type: 'out', quantity: 8, date: '2023-06-09T14:15:00Z', reason: 'sale', performedBy: 'user3' },
+    { id: '5', productId: 'p5', productName: 'Keyboard', type: 'out', quantity: 12, date: '2023-06-08T11:30:00Z', reason: 'sale', performedBy: 'user2' },
+    { id: '6', productId: 'p6', productName: 'Mouse', type: 'in', quantity: 25, date: '2023-06-07T10:00:00Z', reason: 'restock', performedBy: 'user1' },
   ]);
 
   return (
@@ -63,26 +103,26 @@ const Dashboard = () => {
         <StatCard 
           title="Total Inventory"
           value="1,234"
-          description="+12% from last month"
           icon={<Package className="h-4 w-4" />}
+          trend="+12% from last month"
         />
         <StatCard 
           title="New Customers"
           value="24"
-          description="+4 since last week"
           icon={<UserPlus className="h-4 w-4" />}
+          trend="+4 since last week"
         />
         <StatCard 
           title="Stock In"
           value="528"
-          description="Items received this month"
           icon={<ArrowDown className="h-4 w-4" />}
+          trend="Items received this month"
         />
         <StatCard 
           title="Stock Out"
           value="432"
-          description="Items dispatched this month"
           icon={<ArrowUp className="h-4 w-4" />}
+          trend="Items dispatched this month"
         />
       </div>
 
