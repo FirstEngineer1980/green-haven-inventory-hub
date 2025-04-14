@@ -15,6 +15,7 @@ import { RoomProvider } from './context/RoomContext';
 import { UnitProvider } from './context/UnitContext';
 import { UnitMatrixProvider } from './context/UnitMatrixContext';
 import { POProvider } from './context/POContext';
+import { WizardProvider } from './context/WizardContext';
 import Bins from './pages/Bins';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -38,6 +39,7 @@ import Settings from './pages/Settings';
 import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
 import Index from './pages/Index';
+import WizardPage from './pages/WizardPage';
 
 const queryClient = new QueryClient();
 
@@ -54,36 +56,39 @@ const App = () => (
                     <UnitProvider>
                       <UnitMatrixProvider>
                         <POProvider>
-                          <TooltipProvider>
-                            <Toaster />
-                            <Sonner />
-                            <Routes>
-                              <Route path="/login" element={<Login />} />
-                              <Route path="/dashboard" element={<Dashboard />} />
-                              <Route path="/products" element={<Products />} />
-                              <Route path="/inventory" element={<Inventory />} />
-                              <Route path="/stock-movements" element={<StockMovements />} />
-                              <Route path="/reports" element={<Reports />} />
-                              <Route path="/users" element={<Users />} />
-                              <Route path="/customers" element={<Customers />} />
-                              <Route path="/customer-products" element={<CustomerProducts />} />
-                              <Route path="/customers/manage" element={<ManageCustomer />} />
-                              <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
-                              <Route path="/customer-list/:customerId" element={<CustomerList />} />
-                              <Route path="/rooms" element={<Rooms />} />
-                              <Route path="/units" element={<Units />} />
-                              <Route path="/unit-matrix" element={<UnitMatrixPage />} />
-                              <Route path="/sku-matrix" element={<SkuMatrixPage />} />
-                              <Route path="/purchase-orders" element={<PurchaseOrders />} />
-                              <Route path="/vendors" element={<Vendors />} />
-                              <Route path="/notifications" element={<Notifications />} />
-                              <Route path="/settings" element={<Settings />} />
-                              <Route path="/unauthorized" element={<Unauthorized />} />
-                              <Route path="/bins" element={<Bins />} />
-                              <Route path="/" element={<Login />} />
-                              <Route path="*" element={<NotFound />} />
-                            </Routes>
-                          </TooltipProvider>
+                          <WizardProvider>
+                            <TooltipProvider>
+                              <Toaster />
+                              <Sonner />
+                              <Routes>
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/dashboard" element={<Dashboard />} />
+                                <Route path="/products" element={<Products />} />
+                                <Route path="/inventory" element={<Inventory />} />
+                                <Route path="/stock-movements" element={<StockMovements />} />
+                                <Route path="/reports" element={<Reports />} />
+                                <Route path="/users" element={<Users />} />
+                                <Route path="/customers" element={<Customers />} />
+                                <Route path="/customer-products" element={<CustomerProducts />} />
+                                <Route path="/customers/manage" element={<ManageCustomer />} />
+                                <Route path="/customers/manage/:customerId" element={<ManageCustomer />} />
+                                <Route path="/customer-list/:customerId" element={<CustomerList />} />
+                                <Route path="/rooms" element={<Rooms />} />
+                                <Route path="/units" element={<Units />} />
+                                <Route path="/unit-matrix" element={<UnitMatrixPage />} />
+                                <Route path="/sku-matrix" element={<SkuMatrixPage />} />
+                                <Route path="/purchase-orders" element={<PurchaseOrders />} />
+                                <Route path="/vendors" element={<Vendors />} />
+                                <Route path="/notifications" element={<Notifications />} />
+                                <Route path="/settings" element={<Settings />} />
+                                <Route path="/unauthorized" element={<Unauthorized />} />
+                                <Route path="/bins" element={<Bins />} />
+                                <Route path="/wizard" element={<WizardPage />} />
+                                <Route path="/" element={<Login />} />
+                                <Route path="*" element={<NotFound />} />
+                              </Routes>
+                            </TooltipProvider>
+                          </WizardProvider>
                         </POProvider>
                       </UnitMatrixProvider>
                     </UnitProvider>
