@@ -94,7 +94,7 @@ const ListStep = () => {
   };
 
   const handleSaveAndContinue = () => {
-    if (lists.length === 0 && !currentList.name) {
+    if (lists.length === 0) {
       toast({
         title: "No Lists",
         description: "Please add at least one list before continuing",
@@ -105,8 +105,8 @@ const ListStep = () => {
     
     if (currentList.name || currentList.sku || currentList.quantity) {
       toast({
-        title: "Unsaved List",
-        description: "Please add or clear the current list before continuing",
+        title: "Unsaved Changes",
+        description: "Please add or clear the current list before saving",
         variant: "destructive"
       });
       return;
@@ -289,24 +289,14 @@ const ListStep = () => {
           <ChevronLeft className="h-4 w-4" />
           Previous
         </Button>
-        <div className="space-x-4">
-          <Button
-            onClick={handleAddList}
-            variant="outline"
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add List
-          </Button>
-          <Button 
-            onClick={handleSaveAndContinue}
-            className="gap-2"
-          >
-            <Save className="h-4 w-4" />
-            Save and Continue
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button 
+          onClick={handleSaveAndContinue}
+          className="gap-2"
+        >
+          <Save className="h-4 w-4" />
+          Save Lists and Continue
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
