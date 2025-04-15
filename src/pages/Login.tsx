@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -27,8 +28,14 @@ const Login = () => {
     try {
       const success = await login(email, password);
       if (success) {
+        toast.success('Login successful');
         navigate('/dashboard');
+      } else {
+        toast.error('Invalid credentials. Please try again.');
       }
+    } catch (error) {
+      toast.error('An error occurred during login. Please try again.');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +61,7 @@ const Login = () => {
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@greenhaven.com"
+                placeholder="admin@example.com"
                 required
               />
             </div>
@@ -90,23 +97,23 @@ const Login = () => {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="bg-gray-50 p-2 rounded">
                 <div className="font-medium">Admin</div>
-                <div>admin@greenhaven.com</div>
+                <div>admin@example.com</div>
               </div>
               <div className="bg-gray-50 p-2 rounded">
                 <div className="font-medium">Manager</div>
-                <div>john@greenhaven.com</div>
+                <div>manager@example.com</div>
               </div>
               <div className="bg-gray-50 p-2 rounded">
                 <div className="font-medium">Staff</div>
-                <div>sarah@greenhaven.com</div>
+                <div>staff@example.com</div>
               </div>
               <div className="bg-gray-50 p-2 rounded">
                 <div className="font-medium">Viewer</div>
-                <div>michael@greenhaven.com</div>
+                <div>viewer@example.com</div>
               </div>
             </div>
             <div className="mt-2 text-gray-400 text-xs">
-              (No password required for demo)
+              (No password required for demo accounts)
             </div>
           </div>
         </div>
