@@ -34,14 +34,8 @@ const ComboboxCell = ({
 
   useEffect(() => {
     // Make sure we're working with a valid array
-    try {
-      // Create a defensive copy - ensure options is an array
-      const safeOptions = Array.isArray(options) ? [...options].filter(Boolean) : [];
-      setAllOptions(safeOptions);
-    } catch (error) {
-      console.error("Error processing options:", error);
-      setAllOptions([]);
-    }
+    const safeOptions = Array.isArray(options) ? [...options].filter(Boolean) : [];
+    setAllOptions(safeOptions);
   }, [options]);
 
   const handleSelect = (currentValue: string) => {
@@ -126,25 +120,21 @@ const ComboboxCell = ({
               onValueChange={setInputValue}
               className="h-9"
             />
-            <CommandEmpty>
-              {filteredOptions.length === 0 ? 
-                <>
-                  No item found.
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="ml-2" 
-                    onClick={handleCreateNew}
-                  >
-                    <Plus className="h-3 w-3 mr-1" /> Create
-                  </Button>
-                </> : 
-                "No item found."
-              }
-            </CommandEmpty>
-            <CommandGroup className="max-h-[200px] overflow-y-auto">
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option) => (
+            {filteredOptions.length === 0 ? (
+              <div className="py-6 text-center text-sm">
+                No item found.
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="ml-2" 
+                  onClick={handleCreateNew}
+                >
+                  <Plus className="h-3 w-3 mr-1" /> Create
+                </Button>
+              </div>
+            ) : (
+              <CommandGroup className="max-h-[200px] overflow-y-auto">
+                {filteredOptions.map((option) => (
                   <CommandItem
                     key={option}
                     value={option}
@@ -158,17 +148,9 @@ const ComboboxCell = ({
                     />
                     {option}
                   </CommandItem>
-                ))
-              ) : (
-                <CommandItem
-                  onSelect={handleCreateNew}
-                  className="text-muted-foreground"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create new item
-                </CommandItem>
-              )}
-            </CommandGroup>
+                ))}
+              </CommandGroup>
+            )}
           </Command>
         )}
       </PopoverContent>

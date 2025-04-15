@@ -1,53 +1,33 @@
 
 import React, { createContext, useState, useContext } from 'react';
-import { Bin } from '../types';
+import { Bin } from '@/types';
 import { useNotifications } from './NotificationContext';
-import { useUnitMatrix } from './UnitMatrixContext';
 
-// Mock bin data
-const mockBins: Bin[] = [
+const initialBins: Bin[] = [
   {
     id: '1',
-    name: 'Bin-A1',
-    length: 30,
-    width: 20,
-    height: 15,
-    volumeCapacity: 9000, // length * width * height
-    unitMatrixId: '1',
-    unitMatrixName: 'UnitA',
-    createdAt: '2023-05-15T09:30:00Z',
-    updatedAt: '2023-08-25T11:45:00Z'
+    name: 'Bin A1',
+    description: 'Storage bin A1',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
     id: '2',
-    name: 'Bin-B2',
-    length: 40,
-    width: 25,
-    height: 20,
-    volumeCapacity: 20000, // length * width * height
-    unitMatrixId: '1',
-    unitMatrixName: 'UnitA',
-    createdAt: '2023-06-20T14:15:00Z',
-    updatedAt: '2023-09-05T16:20:00Z'
+    name: 'Bin B2',
+    description: 'Storage bin B2',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
-  {
-    id: '3',
-    name: 'Bin-C3',
-    length: 25,
-    width: 15,
-    height: 10,
-    volumeCapacity: 3750, // length * width * height
-    createdAt: '2023-07-18T10:40:00Z',
-    updatedAt: '2023-10-02T13:30:00Z'
-  }
 ];
 
 interface BinContextType {
   bins: Bin[];
-  addBin: (bin: Omit<Bin, 'id' | 'volumeCapacity' | 'unitMatrixName' | 'createdAt' | 'updatedAt'>) => void;
+  addBin: (bin: Omit<Bin, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateBin: (id: string, updates: Partial<Bin>) => void;
   deleteBin: (id: string) => void;
-  getBinsByUnitMatrix: (unitMatrixId: string) => Bin[];
+  getBinById: (id: string) => Bin | undefined;
 }
 
 const BinContext = createContext<BinContextType>({
@@ -55,45 +35,26 @@ const BinContext = createContext<BinContextType>({
   addBin: () => {},
   updateBin: () => {},
   deleteBin: () => {},
-  getBinsByUnitMatrix: () => []
+  getBinById: () => undefined
 });
 
 export const useBins = () => useContext(BinContext);
 
 export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [bins, setBins] = useState<Bin[]>(mockBins);
+  const [bins, setBins] = useState<Bin[]>(initialBins);
   const { addNotification } = useNotifications();
-  const { unitMatrices } = useUnitMatrix();
 
-  const getUnitMatrixName = (unitMatrixId: string): string | undefined => {
-    if (!unitMatrixId) return undefined;
-    
-    // Safely handle unitMatrices being undefined or not an array
-    if (!Array.isArray(unitMatrices)) return undefined;
-    
-    const unitMatrix = unitMatrices.find(um => um.id === unitMatrixId);
-    return unitMatrix ? unitMatrix.name : undefined;
-  };
-
-  const calculateVolumeCapacity = (length: number, width: number, height: number): number => {
-    return length * width * height;
-  };
-
-  const addBin = (bin: Omit<Bin, 'id' | 'volumeCapacity' | 'unitMatrixName' | 'createdAt' | 'updatedAt'>) => {
-    if (!bin) {
+  const addBin = (bin: Omit<Bin, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!bin || !bin.name) {
       console.error('Invalid bin data');
       return;
     }
-    
+
     const now = new Date().toISOString();
-    const volumeCapacity = calculateVolumeCapacity(bin.length, bin.width, bin.height);
-    const unitMatrixName = bin.unitMatrixId ? getUnitMatrixName(bin.unitMatrixId) : undefined;
     
     const newBin: Bin = {
       ...bin,
       id: Date.now().toString(),
-      volumeCapacity,
-      unitMatrixName,
       createdAt: now,
       updatedAt: now
     };
@@ -111,30 +72,17 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateBin = (id: string, updates: Partial<Bin>) => {
     if (!id) return;
-    
+
     setBins(prev => 
-      prev.map(bin => {
-        if (bin.id === id) {
-          // Recalculate volume capacity if any dimension is updated
-          const length = updates.length ?? bin.length;
-          const width = updates.width ?? bin.width;
-          const height = updates.height ?? bin.height;
-          const volumeCapacity = calculateVolumeCapacity(length, width, height);
-          
-          // Get unit matrix name if unitMatrixId is updated
-          const unitMatrixId = updates.unitMatrixId ?? bin.unitMatrixId;
-          const unitMatrixName = unitMatrixId ? getUnitMatrixName(unitMatrixId) : bin.unitMatrixName;
-          
-          return { 
-            ...bin, 
-            ...updates, 
-            volumeCapacity,
-            unitMatrixName,
-            updatedAt: new Date().toISOString() 
-          };
-        }
-        return bin;
-      })
+      prev.map(bin => 
+        bin.id === id 
+          ? { 
+              ...bin, 
+              ...updates,
+              updatedAt: new Date().toISOString() 
+            } 
+          : bin
+      )
     );
     
     // Get the updated bin
@@ -152,7 +100,7 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteBin = (id: string) => {
     if (!id) return;
-    
+
     // Get the bin before deleting
     const binToDelete = bins.find(b => b.id === id);
     
@@ -161,18 +109,16 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (binToDelete) {
       addNotification({
         title: 'Bin Deleted',
-        message: `Bin "${binToDelete.name}" has been deleted`,
+        message: `Bin "${binToDelete.name}" has been removed`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
     }
   };
 
-  const getBinsByUnitMatrix = (unitMatrixId: string): Bin[] => {
-    if (!unitMatrixId) return [];
-    
-    // Filter bins by unitMatrixId with a safety check
-    return Array.isArray(bins) ? bins.filter(bin => bin.unitMatrixId === unitMatrixId) : [];
+  const getBinById = (id: string): Bin | undefined => {
+    if (!id) return undefined;
+    return bins.find(bin => bin.id === id);
   };
 
   return (
@@ -181,7 +127,7 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addBin, 
       updateBin, 
       deleteBin,
-      getBinsByUnitMatrix
+      getBinById
     }}>
       {children}
     </BinContext.Provider>

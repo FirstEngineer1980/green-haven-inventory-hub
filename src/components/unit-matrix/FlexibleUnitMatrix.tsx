@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Plus, X, Save, Edit, Trash, ChevronsUpDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
 interface FlexibleUnitMatrixProps {
@@ -220,6 +219,9 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
     );
   }
 
+  const safeColumns = Array.isArray(columns) ? columns : [];
+  const safeRows = Array.isArray(unitMatrix.rows) ? unitMatrix.rows : [];
+
   return (
     <div className="space-y-4" ref={tableRef}>
       <div className="flex justify-between items-center">
@@ -302,7 +304,7 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
               <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 md:w-20">
                 Color
               </th>
-              {Array.isArray(columns) && columns.map(column => (
+              {safeColumns.map(column => (
                 <th 
                   key={column.id} 
                   className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -354,7 +356,7 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
+            {safeRows.map((row) => (
               <tr key={row.id}>
                 <td className="px-3 py-2 whitespace-nowrap">
                   {editMode && editingRowId === row.id ? (
@@ -416,7 +418,7 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                     ></div>
                   )}
                 </td>
-                {Array.isArray(columns) && columns.map(column => {
+                {safeColumns.map(column => {
                   const cellValue = getCellValue(row.id, column.id);
                   const isEditing = editingCell && 
                                     editingCell.rowId === row.id && 
@@ -449,27 +451,42 @@ const FlexibleUnitMatrix = ({ unitMatrix, onEdit, onDelete }: FlexibleUnitMatrix
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-[200px] p-0" align="start">
-                            <Command>
-                              <CommandInput placeholder="Search bins..." />
-                              <CommandEmpty>
-                                {binOptions.length === 0 ? "No bins available" : "No bin found"}
-                              </CommandEmpty>
-                              <CommandGroup className="max-h-[200px] overflow-y-auto">
-                                {binOptions && binOptions.length > 0 ? (
-                                  binOptions.map((binName) => (
-                                    <CommandItem
-                                      key={binName}
-                                      value={binName}
-                                      onSelect={() => handleCellUpdate(binName)}
-                                    >
-                                      {binName}
-                                    </CommandItem>
-                                  ))
+                            <div className="p-2">
+                              <div className="space-y-2">
+                                {binOptions.length > 0 ? (
+                                  <>
+                                    {binOptions.map((binName) => (
+                                      <Button
+                                        key={binName}
+                                        variant={selectedBin === binName ? "default" : "outline"}
+                                        onClick={() => handleCellUpdate(binName)}
+                                        className="w-full justify-start text-left"
+                                      >
+                                        {binName}
+                                      </Button>
+                                    ))}
+                                  </>
                                 ) : (
-                                  <CommandItem disabled>No bins available</CommandItem>
+                                  <div className="text-center text-sm text-muted-foreground py-2">
+                                    No bins available
+                                  </div>
                                 )}
-                              </CommandGroup>
-                            </Command>
+                                <Button
+                                  variant="ghost"
+                                  onClick={() => {
+                                    const newBin = window.prompt("Enter bin name");
+                                    if (newBin && newBin.trim()) {
+                                      setBinOptions(prev => [...prev, newBin.trim()]);
+                                      handleCellUpdate(newBin.trim());
+                                    }
+                                  }}
+                                  className="w-full mt-2"
+                                >
+                                  <Plus className="mr-2 h-4 w-4" />
+                                  Add new bin
+                                </Button>
+                              </div>
+                            </div>
                           </PopoverContent>
                         </Popover>
                       ) : (

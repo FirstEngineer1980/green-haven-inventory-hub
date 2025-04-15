@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { UnitMatrix } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -188,6 +187,10 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
     );
   }
 
+  // Ensure columns and rows are arrays
+  const safeColumns = Array.isArray(columns) ? columns : [];
+  const safeRows = Array.isArray(unitMatrix.rows) ? unitMatrix.rows : [];
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between">
@@ -254,7 +257,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
               <th className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                 Unit
               </th>
-              {Array.isArray(columns) && columns.map(column => (
+              {safeColumns.map(column => (
                 <th key={column.id} className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                   {editMode && editingColumnId === column.id ? (
                     <div className="flex items-center space-x-1">
@@ -297,12 +300,10 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {Array.isArray(unitMatrix.rows) && unitMatrix.rows.map((row) => (
+            {safeRows.map((row) => (
               <tr key={row.id}>
-                <td 
-                  className="px-4 py-2 whitespace-nowrap border-r" 
-                  style={{ backgroundColor: row.color || '#FFFFFF' }}
-                >
+                <td className="px-4 py-2 whitespace-nowrap border-r" 
+                   style={{ backgroundColor: row.color || '#FFFFFF' }}>
                   {editMode && editingRowId === row.id ? (
                     <div className="flex items-center space-x-1">
                       <span className="font-medium text-white">{row.label}</span>
@@ -347,7 +348,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
                     </div>
                   )}
                 </td>
-                {Array.isArray(columns) && columns.map(column => {
+                {safeColumns.map(column => {
                   const value = getCellValue(row.id, column.id);
                   return (
                     <td 
