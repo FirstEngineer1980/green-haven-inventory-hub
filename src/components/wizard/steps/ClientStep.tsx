@@ -50,6 +50,7 @@ const ClientStep = () => {
       address: formData.address,
       company: formData.company,
       notes: formData.notes
+      // contact is now optional in the type definition
     };
     
     addCustomer(customerData);

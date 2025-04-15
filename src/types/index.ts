@@ -1,9 +1,10 @@
 
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'employee';
+  role: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
   permissions?: Permission[];
   avatar?: string;
   createdAt?: string;
@@ -38,6 +39,9 @@ export interface Product {
   categoryName?: string;
   vendorId: string;
   vendorName?: string;
+  category?: string; // Used in mock data
+  costPrice?: number; // Used in mock data
+  location?: string; // Used in mock data
   createdAt?: string;
   updatedAt?: string;
 }
@@ -46,6 +50,7 @@ export interface Category {
   id: string;
   name: string;
   description: string;
+  productCount?: number; // Used in mock data
   createdAt?: string;
   updatedAt?: string;
 }
@@ -66,7 +71,7 @@ export interface Vendor {
 export interface Customer {
   id: string;
   name: string;
-  contact: string;
+  contact?: string; // Make it optional to match actual usage
   email: string;
   phone: string;
   address: string;
@@ -166,7 +171,7 @@ export interface StockMovement {
 export interface Bin {
   id: string;
   name: string;
-  description: string;
+  description?: string; // Make it optional to match actual usage
   length: number;
   width: number;
   height: number;
@@ -205,3 +210,23 @@ export interface UnitMatrix {
   createdAt: string;
   updatedAt: string;
 }
+
+// Additional types used in mock data
+export interface Warehouse {
+  id: string;
+  name: string;
+  location: string;
+  capacity: number;
+  currentCapacity: number;
+  manager: string;
+}
+
+export interface DashboardStats {
+  totalProducts: number;
+  lowStockProducts: number;
+  totalValue: number;
+  recentMovements: StockMovement[];
+  productsByCategory: { category: string; count: number }[];
+  stockTrend: { date: string; inStock: number }[];
+}
+

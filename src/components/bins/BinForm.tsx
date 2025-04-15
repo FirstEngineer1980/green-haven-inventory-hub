@@ -10,6 +10,7 @@ import { Bin } from '@/types';
 
 const binSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  description: z.string().optional(),
   length: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Length must be a positive number'),
   width: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Width must be a positive number'),
   height: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Height must be a positive number'),
@@ -32,6 +33,7 @@ export const BinForm: React.FC<BinFormProps> = ({
     resolver: zodResolver(binSchema),
     defaultValues: {
       name: defaultValues.name || '',
+      description: defaultValues.description || '',
       length: defaultValues.length?.toString() || '',
       width: defaultValues.width?.toString() || '',
       height: defaultValues.height?.toString() || '',
@@ -41,6 +43,7 @@ export const BinForm: React.FC<BinFormProps> = ({
   const handleSubmit = (values: BinFormValues) => {
     onSubmit({
       name: values.name,
+      description: values.description,
       length: Number(values.length),
       width: Number(values.width),
       height: Number(values.height),
@@ -59,6 +62,20 @@ export const BinForm: React.FC<BinFormProps> = ({
               <FormLabel>Bin Name</FormLabel>
               <FormControl>
                 <Input placeholder="Enter bin name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter bin description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
