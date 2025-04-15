@@ -17,6 +17,8 @@ interface WizardContextType {
   setSelectedCustomer: (customer: Customer | null) => void;
   setSelectedRoom: (room: Room | null) => void;
   createdUnits: Unit[];
+  createdRooms: Room[];
+  addCreatedRoom: (room: Room) => void;
   addCreatedUnit: (unit: Unit) => void;
   resetWizard: () => void;
   isComplete: boolean;
@@ -32,6 +34,7 @@ export const WizardProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentStep, setCurrentStep] = useState<WizardStep>('client');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [createdRooms, setCreatedRooms] = useState<Room[]>([]);
   const [createdUnits, setCreatedUnits] = useState<Unit[]>([]);
   const [isComplete, setIsComplete] = useState(false);
 
@@ -59,6 +62,11 @@ export const WizardProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const addCreatedRoom = (room: Room) => {
+    setCreatedRooms(prev => [...prev, room]);
+    setSelectedRoom(room);
+  };
+
   const addCreatedUnit = (unit: Unit) => {
     setCreatedUnits(prev => [...prev, unit]);
   };
@@ -67,6 +75,7 @@ export const WizardProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setCurrentStep('client');
     setSelectedCustomer(null);
     setSelectedRoom(null);
+    setCreatedRooms([]);
     setCreatedUnits([]);
     setIsComplete(false);
   };
@@ -83,6 +92,8 @@ export const WizardProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSelectedCustomer,
         setSelectedRoom,
         createdUnits,
+        createdRooms,
+        addCreatedRoom,
         addCreatedUnit,
         resetWizard,
         isComplete
