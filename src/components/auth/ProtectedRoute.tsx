@@ -16,7 +16,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredPermission }) =
   }
   
   // If a specific permission is required, check if the user has it
-  if (requiredPermission && !hasPermission(requiredPermission)) {
+  if (requiredPermission && !hasPermission(requiredPermission as any)) {
     return <Navigate to="/unauthorized" replace />;
   }
   
