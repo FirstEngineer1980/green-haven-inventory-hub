@@ -1,220 +1,190 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  BarChart3,
-  Package,
-  Users,
-  ShoppingCart,
-  LayoutDashboard,
-  Bell,
-  Settings,
-  Building2,
-  Home,
-  Grid3X3,
-  Table,
-  Menu,
-  Database,
-  Archive,
-  Wand2
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/context/AuthContext';
+import { 
+  LayoutDashboard, 
+  Package, 
+  Users, 
+  Boxes, 
+  ClipboardList, 
+  Warehouse, 
+  Grid3X3, 
+  TruckIcon, 
+  ShoppingCart, 
+  FileText, 
+  Settings, 
+  BellRing,
+  Layers,
+  FolderTree
 } from 'lucide-react';
 
-import {
-  Sidebar as ShadcnSidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarFooter,
-  useSidebar,
-} from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
+interface SidebarProps {
+  className?: string;
+}
 
-const Sidebar = ({ className }: { className?: string }) => {
-  const { pathname } = useLocation();
-  const { isMobile, setOpenMobile, openMobile } = useSidebar();
+interface SidebarItem {
+  title: string;
+  icon: React.ReactNode;
+  href: string;
+  permission?: string;
+}
 
-  const navItems = [
+const sections: Record<string, SidebarItem[]> = {
+  main: [
     {
       title: 'Dashboard',
-      href: '/dashboard',
       icon: <LayoutDashboard className="h-5 w-5" />,
+      href: '/dashboard',
     },
+  ],
+  inventory: [
     {
       title: 'Products',
-      href: '/products',
       icon: <Package className="h-5 w-5" />,
+      href: '/products',
+      permission: 'manage_products',
     },
     {
-      title: 'Inventory',
-      icon: <ShoppingCart className="h-5 w-5" />,
-      subItems: [
-        {
-          title: 'Stock Items',
-          href: '/inventory',
-        },
-        {
-          title: 'Stock Movements',
-          href: '/stock-movements',
-        },
-        {
-          title: 'Bins',
-          href: '/bins',
-        },
-      ],
+      title: 'Categories',
+      icon: <FolderTree className="h-5 w-5" />,
+      href: '/categories',
+      permission: 'manage_products',
     },
     {
-      title: 'Reports',
-      href: '/reports',
-      icon: <BarChart3 className="h-5 w-5" />,
+      title: 'Stock Movements',
+      icon: <Boxes className="h-5 w-5" />,
+      href: '/stock-movements',
+      permission: 'manage_inventory',
     },
     {
-      title: 'Users',
-      href: '/users',
-      icon: <Users className="h-5 w-5" />,
+      title: 'Bins',
+      icon: <Layers className="h-5 w-5" />,
+      href: '/bins',
+      permission: 'manage_inventory',
     },
+  ],
+  customers: [
     {
       title: 'Customers',
-      icon: <Building2 className="h-5 w-5" />,
-      subItems: [
-        {
-          title: 'Manage Customers',
-          href: '/customers',
-        },
-        {
-          title: 'Customer Products',
-          href: '/customer-products',
-        },
-      ],
+      icon: <Users className="h-5 w-5" />,
+      href: '/customers',
+    },
+    {
+      title: 'Customer Products',
+      icon: <ClipboardList className="h-5 w-5" />,
+      href: '/customer-products',
     },
     {
       title: 'Rooms',
+      icon: <Warehouse className="h-5 w-5" />,
       href: '/rooms',
-      icon: <Home className="h-5 w-5" />,
     },
     {
       title: 'Units',
-      href: '/units',
       icon: <Grid3X3 className="h-5 w-5" />,
-    },
-    {
-      title: 'Unit Matrix',
-      href: '/unit-matrix',
-      icon: <Table className="h-5 w-5" />,
+      href: '/units',
     },
     {
       title: 'SKU Matrix',
+      icon: <Grid3X3 className="h-5 w-5" />,
       href: '/sku-matrix',
-      icon: <Database className="h-5 w-5" />,
+    },
+  ],
+  purchasing: [
+    {
+      title: 'Purchase Orders',
+      icon: <TruckIcon className="h-5 w-5" />,
+      href: '/purchase-orders',
+    },
+    {
+      title: 'Vendors',
+      icon: <ShoppingCart className="h-5 w-5" />,
+      href: '/vendors',
+    },
+  ],
+  management: [
+    {
+      title: 'Reports',
+      icon: <FileText className="h-5 w-5" />,
+      href: '/reports',
+      permission: 'view_reports',
+    },
+    {
+      title: 'Users',
+      icon: <Users className="h-5 w-5" />,
+      href: '/users',
+      permission: 'manage_users',
     },
     {
       title: 'Notifications',
+      icon: <BellRing className="h-5 w-5" />,
       href: '/notifications',
-      icon: <Bell className="h-5 w-5" />,
+      permission: 'manage_notifications',
     },
     {
       title: 'Settings',
-      href: '/settings',
       icon: <Settings className="h-5 w-5" />,
+      href: '/settings',
     },
-    {
-      title: 'Setup Wizard',
-      href: '/wizard',
-      icon: <Wand2 className="h-5 w-5" />,
-    },
-  ];
+  ],
+};
 
-  const handleMenuItemClick = () => {
-    if (isMobile) {
-      setOpenMobile(false);
-    }
-  };
+const Sidebar = ({ className }: SidebarProps) => {
+  const location = useLocation();
+  const { currentUser } = useAuth();
 
-  const MobileMenuButton = () => {
-    if (!isMobile) return null;
-
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden fixed top-4 left-4 z-50"
-        onClick={() => setOpenMobile(!openMobile)}
-      >
-        <Menu className="h-6 w-6" />
-        <span className="sr-only">Toggle mobile menu</span>
-      </Button>
-    );
+  // Check if user has the required permission
+  const hasPermission = (permission?: string) => {
+    if (!permission) return true;
+    if (!currentUser) return false;
+    return currentUser.permissions.includes(permission);
   };
 
   return (
-    <>
-      <MobileMenuButton />
-      <ShadcnSidebar className={className}>
-        <SidebarHeader className="pb-2">
-          <h2 className="px-4 text-xl font-semibold tracking-tight truncate">
-            Storage Manager
+    <div className={cn("pb-12 border-r h-full", className)}>
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <h2 className="mb-2 px-4 text-lg font-semibold">
+            Inventory System
           </h2>
-        </SidebarHeader>
-        <SidebarContent className="overflow-y-auto">
-          <SidebarMenu>
-            {navItems.map((item, i) => {
-              if (item.subItems) {
-                const isSubItemActive = item.subItems.some(
-                  (subItem) => subItem.href === pathname
-                );
+          <ScrollArea className="h-[calc(100vh-9rem)]">
+            <div className="space-y-8">
+              {Object.entries(sections).map(([sectionKey, items]) => {
+                const filteredItems = items.filter(item => hasPermission(item.permission));
+                if (filteredItems.length === 0) return null;
                 
                 return (
-                  <SidebarMenuItem key={i}>
-                    <SidebarMenuButton 
-                      isActive={isSubItemActive}
-                      tooltip={item.title}
-                    >
-                      {item.icon}
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                    
-                    <SidebarMenuSub>
-                      {item.subItems.map((subItem, j) => (
-                        <SidebarMenuSubButton
-                          key={j}
-                          asChild
-                          isActive={pathname === subItem.href}
-                        >
-                          <Link to={subItem.href} onClick={handleMenuItemClick}>
-                            {subItem.title}
-                          </Link>
-                        </SidebarMenuSubButton>
-                      ))}
-                    </SidebarMenuSub>
-                  </SidebarMenuItem>
+                  <div key={sectionKey} className="space-y-2">
+                    <div className="px-4 font-medium uppercase text-xs text-muted-foreground">
+                      {sectionKey === 'main' ? '' : sectionKey}
+                    </div>
+                    {filteredItems.map((item) => (
+                      <div key={item.href}>
+                        <Link to={item.href}>
+                          <Button
+                            variant={location.pathname === item.href ? 'secondary' : 'ghost'}
+                            className="w-full justify-start"
+                          >
+                            {item.icon}
+                            <span className="ml-2">{item.title}</span>
+                          </Button>
+                        </Link>
+                      </div>
+                    ))}
+                    <Separator />
+                  </div>
                 );
-              }
-              
-              return (
-                <SidebarMenuItem key={i}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.title}
-                  >
-                    <Link to={item.href} onClick={handleMenuItemClick}>
-                      {item.icon}
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-          <SidebarTrigger />
-        </SidebarFooter>
-      </ShadcnSidebar>
-    </>
+              })}
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
+    </div>
   );
 };
 

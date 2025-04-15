@@ -1,261 +1,161 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUnits } from '@/context/UnitContext';
 import { useRooms } from '@/context/RoomContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import UnitFilters from '@/components/units/UnitFilters';
+import UnitTable from '@/components/units/UnitTable';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { Unit } from '@/types';
-import { useToast } from '@/hooks/use-toast';
-
-// Import components
-import UnitTable from '@/components/units/UnitTable';
-import UnitFilters from '@/components/units/UnitFilters';
 import AddUnitDialog from '@/components/units/AddUnitDialog';
 import EditUnitDialog from '@/components/units/EditUnitDialog';
 import UnitDetails from '@/components/units/UnitDetails';
+import { Unit } from '@/types';
+import { useToast } from '@/hooks/use-toast';
+import ExportButton from '@/components/shared/ExportButton';
+import ImportButton from '@/components/shared/ImportButton';
+import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const Units = () => {
-  const { units, addUnit, updateUnit, deleteUnit } = useUnits();
+  const { units, addUnit } = useUnits();
   const { rooms } = useRooms();
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [roomFilter, setRoomFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedRoom, setSelectedRoom] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const itemsPerPage = 10;
+  const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { toast } = useToast();
+  
+  const handleUnitImport = (data: any[]) => {
+    try {
+      data.forEach(unitData => {
+        const unit = {
+          roomId: unitData.roomId,
+          number: unitData.number,
+          size: unitData.size,
+          sizeUnit: unitData.sizeUnit,
+          status: unitData.status,
+          description: unitData.description
+        };
+        addUnit(unit);
+      });
+      
+      toast({
+        title: "Units imported",
+        description: `${data.length} units have been imported successfully`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Error importing units:', error);
+      toast({
+        title: "Import failed",
+        description: "An error occurred while importing units",
+        variant: "destructive",
+      });
+    }
+  };
 
-  // Unit form state
-  const [formData, setFormData] = useState<{
-    roomId: string;
-    number: string;
-    size: number;
-    sizeUnit: 'sqft' | 'sqm' | 'm²';
-    status: 'available' | 'occupied' | 'maintenance';
-    description: string;
-  }>({
-    roomId: '',
-    number: '',
-    size: 0,
-    sizeUnit: 'sqft',
-    status: 'available',
-    description: ''
+  // Filter units by search term, room, and status
+  const filteredUnits = units.filter(unit => {
+    const matchesSearch = unit.number.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRoom = roomFilter === 'all' || unit.roomId === roomFilter;
+    const matchesStatus = statusFilter === 'all' || unit.status === statusFilter;
+    
+    return matchesSearch && matchesRoom && matchesStatus;
   });
-
-  // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'size' ? parseInt(value) || 0 : value,
-    }));
-  };
-
-  // Handle select changes
-  const handleSelectChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // Filter change handlers
-  const handleRoomFilterChange = (value: string) => {
-    setSelectedRoom(value);
-    setCurrentPage(1);
-  };
-
-  const handleStatusFilterChange = (value: string) => {
-    setSelectedStatus(value);
-    setCurrentPage(1);
-  };
-
-  // Filter units based on search and filters
-  const filteredUnits = units.filter(unit => 
-    (selectedRoom === 'all' || unit.roomId === selectedRoom) &&
-    (selectedStatus === 'all' || unit.status === selectedStatus) &&
-    (unit.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     unit.roomName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     (unit.description && unit.description.toLowerCase().includes(searchTerm.toLowerCase())))
-  );
-
-  // Calculate pagination
+  
+  // Pagination
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredUnits.length / itemsPerPage);
   const paginatedUnits = filteredUnits.slice(
-    (currentPage - 1) * itemsPerPage, 
+    (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const resetForm = () => {
-    setFormData({
-      roomId: '',
-      number: '',
-      size: 0,
-      sizeUnit: 'sqft',
-      status: 'available',
-      description: ''
-    });
-  };
-
-  const handleAddUnit = () => {
-    if (!formData.roomId || !formData.number) {
-      toast({
-        title: "Validation Error",
-        description: "Room and Unit Number are required fields",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    addUnit({
-      roomId: formData.roomId,
-      number: formData.number,
-      size: formData.size,
-      sizeUnit: formData.sizeUnit,
-      status: formData.status,
-      description: formData.description
-    });
-
-    toast({
-      title: "Unit Added",
-      description: "The unit has been successfully added",
-      variant: "default"
-    });
-
-    resetForm();
-    setShowAddDialog(false);
-  };
-
-  const handleEditUnit = () => {
-    if (!selectedUnit || !formData.roomId || !formData.number) {
-      toast({
-        title: "Validation Error",
-        description: "Room and Unit Number are required fields",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    updateUnit(selectedUnit.id, {
-      roomId: formData.roomId,
-      number: formData.number,
-      size: formData.size,
-      sizeUnit: formData.sizeUnit,
-      status: formData.status,
-      description: formData.description
-    });
-
-    toast({
-      title: "Unit Updated",
-      description: "The unit has been successfully updated",
-      variant: "default"
-    });
-
-    setShowEditDialog(false);
-    setSelectedUnit(null);
-  };
-
-  const handleDeleteUnit = (id: string) => {
-    deleteUnit(id);
-    
-    toast({
-      title: "Unit Deleted",
-      description: "The unit has been removed from the system",
-      variant: "default"
-    });
-  };
-
-  const handleEditClick = (unit: Unit) => {
-    setSelectedUnit(unit);
-    setFormData({
-      roomId: unit.roomId,
-      number: unit.number,
-      size: unit.size,
-      sizeUnit: unit.sizeUnit,
-      status: unit.status,
-      description: unit.description || ''
-    });
-    setShowEditDialog(true);
-  };
-
-  const handleViewUnit = (unit: Unit) => {
-    setSelectedUnit(unit);
+  const handleDeleteConfirm = (id: string) => {
+    // Delete logic handled by UnitTable component
+    setCurrentPage(1); // Reset to first page after deleting
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">Room Units</h1>
-          <Button onClick={() => {
-            resetForm();
-            setShowAddDialog(true);
-          }}>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Units</h1>
+        <div className="flex gap-2">
+          <ImportButton 
+            onImport={handleUnitImport} 
+            templateUrl={getTemplateUrl('units')}
+            validationFn={(data) => validateTemplate(data, 'units')}
+          />
+          <ExportButton 
+            data={units} 
+            filename="units" 
+            fields={['id', 'roomId', 'roomName', 'number', 'size', 'sizeUnit', 'status', 'description', 'createdAt', 'updatedAt']}
+          />
+          <Button onClick={() => setOpenAddDialog(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Unit
+            New Unit
           </Button>
         </div>
-
-        <UnitFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedRoom={selectedRoom}
-          selectedStatus={selectedStatus}
-          handleRoomFilterChange={handleRoomFilterChange}
-          handleStatusFilterChange={handleStatusFilterChange}
-          rooms={rooms}
-        />
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Units Directory ({filteredUnits.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <UnitTable
-              units={paginatedUnits}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              totalPages={totalPages}
-              onEdit={handleEditClick}
-              onView={handleViewUnit}
-              onDelete={handleDeleteUnit}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Dialogs and Sheets */}
-        <AddUnitDialog
-          showAddDialog={showAddDialog}
-          setShowAddDialog={setShowAddDialog}
-          formData={formData}
-          rooms={rooms}
-          handleInputChange={handleInputChange}
-          handleSelectChange={handleSelectChange}
-          handleAddUnit={handleAddUnit}
-        />
-        
-        <EditUnitDialog
-          showEditDialog={showEditDialog}
-          setShowEditDialog={setShowEditDialog}
-          formData={formData}
-          rooms={rooms}
-          handleInputChange={handleInputChange}
-          handleSelectChange={handleSelectChange}
-          handleEditUnit={handleEditUnit}
-        />
-
-        <UnitDetails
-          unit={selectedUnit}
-          isOpen={!!selectedUnit && !showEditDialog}
-          onClose={() => setSelectedUnit(null)}
-          onEdit={handleEditClick}
-          onDelete={handleDeleteUnit}
-        />
       </div>
+
+      <UnitFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        roomFilter={roomFilter}
+        onRoomFilterChange={setRoomFilter}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        rooms={rooms}
+      />
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Storage Units</CardTitle>
+          <CardDescription>
+            Manage individual storage units within rooms
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <UnitTable 
+            units={paginatedUnits}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+            onEdit={(unit) => {
+              setSelectedUnit(unit);
+              setOpenEditDialog(true);
+            }}
+            onView={(unit) => {
+              setSelectedUnit(unit);
+              setOpenDetailsDialog(true);
+            }}
+            onDelete={handleDeleteConfirm}
+          />
+        </CardContent>
+      </Card>
+
+      <AddUnitDialog open={openAddDialog} onOpenChange={setOpenAddDialog} />
+      
+      {selectedUnit && (
+        <>
+          <EditUnitDialog 
+            open={openEditDialog} 
+            onOpenChange={setOpenEditDialog} 
+            unit={selectedUnit} 
+          />
+          
+          <UnitDetails
+            open={openDetailsDialog}
+            onOpenChange={setOpenDetailsDialog}
+            unit={selectedUnit}
+          />
+        </>
+      )}
     </DashboardLayout>
   );
 };

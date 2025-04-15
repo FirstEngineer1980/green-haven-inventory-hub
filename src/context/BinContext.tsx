@@ -127,12 +127,10 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return bins.find(bin => bin.id === id);
   };
   
-  // Add the missing function to get bins by unit matrix ID
+  // Get bins by unit matrix ID
   const getBinsByUnitMatrix = (unitMatrixId: string): Bin[] => {
     if (!unitMatrixId) return [];
-    // For now, just returning all bins since we don't have a unitMatrixId property in bins
-    // In a real implementation, you'd filter by unitMatrixId
-    return bins;
+    return bins.filter(bin => bin.unitMatrixId === unitMatrixId);
   };
 
   return (

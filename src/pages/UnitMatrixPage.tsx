@@ -13,9 +13,12 @@ import FlexibleUnitMatrix from '@/components/unit-matrix/FlexibleUnitMatrix';
 import AddUnitMatrixDialog from '@/components/unit-matrix/AddUnitMatrixDialog';
 import EditUnitMatrixDialog from '@/components/unit-matrix/EditUnitMatrixDialog';
 import { UnitMatrix } from '@/types';
+import ExportButton from '@/components/shared/ExportButton';
+import ImportButton from '@/components/shared/ImportButton';
+import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const UnitMatrixPage = () => {
-  const { unitMatrices, deleteUnitMatrix } = useUnitMatrix();
+  const { unitMatrices, deleteUnitMatrix, addUnitMatrix } = useUnitMatrix();
   const { rooms } = useRooms();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -23,6 +26,32 @@ const UnitMatrixPage = () => {
   const [selectedRoom, setSelectedRoom] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
+
+  const handleMatrixImport = (data: any[]) => {
+    try {
+      data.forEach(matrixData => {
+        const matrix = {
+          roomId: matrixData.roomId,
+          name: matrixData.name,
+          rows: matrixData.rows || []
+        };
+        addUnitMatrix(matrix);
+      });
+      
+      toast({
+        title: "Unit Matrices imported",
+        description: `${data.length} unit matrices have been imported successfully`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Error importing unit matrices:', error);
+      toast({
+        title: "Import failed",
+        description: "An error occurred while importing unit matrices",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Filter unit matrices based on search and filters
   const filteredUnitMatrices = unitMatrices.filter(unitMatrix => 
@@ -50,10 +79,22 @@ const UnitMatrixPage = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">Unit Matrix</h1>
-          <Button onClick={() => setShowAddDialog(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Unit Matrix
-          </Button>
+          <div className="flex gap-2">
+            <ImportButton 
+              onImport={handleMatrixImport} 
+              templateUrl={getTemplateUrl('unitMatrices')}
+              validationFn={(data) => validateTemplate(data, 'unitMatrices')}
+            />
+            <ExportButton 
+              data={unitMatrices} 
+              filename="unit_matrices" 
+              fields={['id', 'roomId', 'roomName', 'name', 'rows', 'createdAt', 'updatedAt']}
+            />
+            <Button onClick={() => setShowAddDialog(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Unit Matrix
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row">
