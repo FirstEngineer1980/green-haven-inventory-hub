@@ -106,12 +106,12 @@ const Products = () => {
       name: product.name,
       sku: product.sku,
       description: product.description,
-      category: product.category,
+      category: product.category || '',
       price: product.price,
-      costPrice: product.costPrice,
-      quantity: product.quantity,
-      threshold: product.threshold,
-      location: product.location,
+      costPrice: product.costPrice || 0,
+      quantity: product.quantity || 0,
+      threshold: product.threshold || 0,
+      location: product.location || '',
       image: product.image || ''
     });
     setIsEditDialogOpen(true);
@@ -125,10 +125,23 @@ const Products = () => {
   
   // Save new product
   const handleAddProduct = () => {
+    // Map the form data to the required Product shape
     addProduct({
-      ...formData,
-      image: formData.image || `https://placehold.co/400x400?text=${encodeURIComponent(formData.name)}`
+      name: formData.name,
+      sku: formData.sku,
+      description: formData.description,
+      cost: formData.costPrice, // Map costPrice to cost
+      price: formData.price,
+      quantity: formData.quantity,
+      threshold: formData.threshold,
+      image: formData.image || `https://placehold.co/400x400?text=${encodeURIComponent(formData.name)}`,
+      category: formData.category, // For mock data
+      costPrice: formData.costPrice, // For mock data
+      location: formData.location, // For mock data
+      categoryId: mockCategories.find(c => c.name === formData.category)?.id || '1',
+      vendorId: '1' // Default vendor ID
     });
+    
     resetFormData();
     setIsAddDialogOpen(false);
   };
@@ -136,7 +149,22 @@ const Products = () => {
   // Save edited product
   const handleSaveEdit = () => {
     if (currentProduct) {
-      updateProduct(currentProduct.id, formData);
+      // Map the form data to the required Product shape
+      updateProduct(currentProduct.id, {
+        name: formData.name,
+        sku: formData.sku,
+        description: formData.description,
+        cost: formData.costPrice, // Map costPrice to cost
+        price: formData.price,
+        quantity: formData.quantity,
+        threshold: formData.threshold,
+        image: formData.image,
+        category: formData.category, // For mock data
+        costPrice: formData.costPrice, // For mock data
+        location: formData.location, // For mock data
+        categoryId: mockCategories.find(c => c.name === formData.category)?.id || currentProduct.categoryId,
+        vendorId: currentProduct.vendorId
+      });
       setIsEditDialogOpen(false);
     }
   };
@@ -153,7 +181,7 @@ const Products = () => {
   const filteredProducts = products.filter(product => 
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    (product.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   return (

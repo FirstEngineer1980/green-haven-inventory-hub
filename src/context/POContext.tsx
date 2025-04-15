@@ -12,6 +12,7 @@ const mockVendors: Vendor[] = [
     email: 'contact@officesupply.com',
     phone: '555-123-4567',
     address: '123 Business St, Commerce City',
+    contact: 'Office Supply Co.',
     contactPerson: 'Jane Smith',
     createdAt: new Date(Date.now() - 7000000000).toISOString(),
     updatedAt: new Date(Date.now() - 2000000000).toISOString()
@@ -22,6 +23,7 @@ const mockVendors: Vendor[] = [
     email: 'orders@techdist.com',
     phone: '555-987-6543',
     address: '456 Industry Ave, Tech Park',
+    contact: 'Tech Distributors Inc.',
     contactPerson: 'Mike Johnson',
     notes: 'Preferred supplier for electronics',
     createdAt: new Date(Date.now() - 5000000000).toISOString(),
@@ -33,6 +35,7 @@ const mockVendors: Vendor[] = [
     email: 'sales@globalimports.com',
     phone: '555-789-0123',
     address: '789 Trade Blvd, Port City',
+    contact: 'Global Imports Ltd.',
     contactPerson: 'Sarah Lee',
     notes: 'International shipping available',
     createdAt: new Date(Date.now() - 3000000000).toISOString(),
@@ -234,6 +237,7 @@ export const POProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const now = new Date().toISOString();
     const newVendor: Vendor = {
       ...vendor,
+      contact: vendor.name, // Default contact to name if not provided
       id: Date.now().toString(),
       createdAt: now,
       updatedAt: now

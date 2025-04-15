@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useCustomers } from '@/context/CustomerContext';
@@ -49,8 +48,8 @@ const ClientStep = () => {
       phone: formData.phone,
       address: formData.address,
       company: formData.company,
-      notes: formData.notes
-      // contact is now optional in the type definition
+      notes: formData.notes,
+      contact: formData.name // Set contact to name for compatibility
     };
     
     addCustomer(customerData);

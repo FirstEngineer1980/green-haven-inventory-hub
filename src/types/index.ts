@@ -1,5 +1,4 @@
 
-
 export interface User {
   id: string;
   name: string;
@@ -13,7 +12,7 @@ export interface User {
 }
 
 export type Permission = 'manage_users' | 'manage_products' | 'view_reports' | 'manage_inventory' | 'manage_notifications';
-export type Role = 'admin' | 'manager' | 'staff' | 'viewer';
+export type Role = 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
 
 export interface Notification {
   id: string;
@@ -58,7 +57,7 @@ export interface Category {
 export interface Vendor {
   id: string;
   name: string;
-  contact: string;
+  contact?: string;
   email: string;
   phone: string;
   address: string;
@@ -229,4 +228,3 @@ export interface DashboardStats {
   productsByCategory: { category: string; count: number }[];
   stockTrend: { date: string; inStock: number }[];
 }
-
