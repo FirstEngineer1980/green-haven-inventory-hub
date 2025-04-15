@@ -3,14 +3,14 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Notification } from '../types';
 import { mockNotifications } from '../data/mockData';
 import { useAuth } from './AuthContext';
-import { toast } from '@/hooks/use-toast';
 
 interface NotificationContextType {
   notifications: Notification[];
   unreadCount: number;
+  addNotification: (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => void;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
-  addNotification: (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => void;
+  deleteNotification: (id: string) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType>({} as NotificationContextType);
@@ -18,62 +18,65 @@ const NotificationContext = createContext<NotificationContextType>({} as Notific
 export const useNotifications = () => useContext(NotificationContext);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const { currentUser } = useAuth();
-  
-  useEffect(() => {
-    if (currentUser) {
-      // Filter notifications that are for the current user
-      const userNotifications = mockNotifications.filter(
-        notification => notification.for.includes(currentUser.id)
-      );
-      setNotifications(userNotifications);
-    } else {
-      setNotifications([]);
-    }
-  }, [currentUser]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  // Filter notifications for the current user based on role
+  const userNotifications = notifications.filter(notification => {
+    if (!currentUser) return false;
+    
+    // Check if this notification is for the current user based on role or ID
+    return notification.for.includes(currentUser.role) || 
+           notification.for.includes(currentUser.id) ||
+           notification.for.includes('all');
+  });
 
+  // Count unread notifications
+  const unreadCount = userNotifications.filter(n => !n.read).length;
+
+  // Add a new notification
+  const addNotification = (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      read: false,
+    };
+    
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  // Mark a notification as read
   const markAsRead = (id: string) => {
     setNotifications(prev => 
       prev.map(notification => 
-        notification.id === id ? { ...notification, read: true } : notification
+        notification.id === id 
+          ? { ...notification, read: true } 
+          : notification
       )
     );
   };
 
+  // Mark all notifications as read
   const markAllAsRead = () => {
     setNotifications(prev => 
       prev.map(notification => ({ ...notification, read: true }))
     );
   };
 
-  const addNotification = (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
-    const newNotification: Notification = {
-      ...notification,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      read: false
-    };
-    
-    setNotifications(prev => [newNotification, ...prev]);
-    
-    // Show a toast for new notifications
-    toast({
-      title: notification.title,
-      description: notification.message,
-      variant: notification.type === 'error' ? 'destructive' : 'default'
-    });
+  // Delete a notification
+  const deleteNotification = (id: string) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id));
   };
 
   return (
-    <NotificationContext.Provider value={{ 
-      notifications, 
-      unreadCount, 
-      markAsRead, 
-      markAllAsRead, 
-      addNotification 
+    <NotificationContext.Provider value={{
+      notifications: userNotifications,
+      unreadCount,
+      addNotification,
+      markAsRead,
+      markAllAsRead,
+      deleteNotification,
     }}>
       {children}
     </NotificationContext.Provider>

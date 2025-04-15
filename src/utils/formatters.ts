@@ -1,26 +1,33 @@
 
-/**
- * Format a number as currency
- * @param value Number to format
- * @param currency Currency code (default: USD)
- * @returns Formatted currency string
- */
-export const formatCurrency = (value: number, currency = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(value);
+import { format, formatDistance, parseISO } from 'date-fns';
+
+export const formatDate = (dateString: string): string => {
+  try {
+    const date = parseISO(dateString);
+    return format(date, 'MMM d, yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString;
+  }
 };
 
-/**
- * Format a date string to a localized date string
- * @param dateString ISO date string
- * @returns Formatted date string
- */
-export const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
+};
+
+export const formatRelativeTime = (dateString: string): string => {
+  try {
+    const date = parseISO(dateString);
+    return formatDistance(date, new Date(), { addSuffix: true });
+  } catch (error) {
+    console.error('Error formatting relative time:', error);
+    return 'Unknown date';
+  }
+};
+
+export const formatPercentage = (value: number): string => {
+  return `${(value * 100).toFixed(1)}%`;
 };

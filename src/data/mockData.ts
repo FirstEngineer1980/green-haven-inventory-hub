@@ -4,44 +4,43 @@ import { Product, StockMovement, User, Notification, Category } from '../types';
 export const mockUsers: User[] = [
   {
     id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
+    name: 'Admin User',
+    email: 'admin@example.com',
     role: 'admin',
     permissions: ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'],
     avatar: 'https://i.pravatar.cc/150?img=1',
-    createdAt: new Date(2023, 0, 1).toISOString(),
-    lastActive: new Date().toISOString()
+    createdAt: '2024-01-01T00:00:00.000Z',
+    lastActive: '2024-04-14T14:00:00.000Z'
   },
   {
     id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
+    name: 'Manager User',
+    email: 'manager@example.com',
     role: 'manager',
     permissions: ['manage_products', 'view_reports', 'manage_inventory'],
     avatar: 'https://i.pravatar.cc/150?img=2',
-    createdAt: new Date(2023, 0, 15).toISOString(),
-    lastActive: new Date().toISOString()
+    createdAt: '2024-01-15T00:00:00.000Z',
+    lastActive: '2024-04-13T09:30:00.000Z'
   },
   {
     id: '3',
-    name: 'Alice Johnson',
-    email: 'alice.johnson@example.com',
+    name: 'Staff User',
+    email: 'staff@example.com',
     role: 'staff',
     permissions: ['view_reports', 'manage_inventory'],
     avatar: 'https://i.pravatar.cc/150?img=3',
-    createdAt: new Date(2023, 1, 1).toISOString(),
-    lastActive: new Date().toISOString()
+    createdAt: '2024-02-01T00:00:00.000Z',
+    lastActive: '2024-04-14T11:45:00.000Z'
   },
   {
     id: '4',
-    name: 'Bob Williams',
-    email: 'bob.williams@example.com',
+    name: 'Viewer User',
+    email: 'viewer@example.com',
     role: 'viewer',
     permissions: ['view_reports'],
-    avatar: 'https://i.pravatar.cc/150?img=4',
-    createdAt: new Date(2023, 1, 15).toISOString(),
-    lastActive: new Date().toISOString()
-  },
+    createdAt: '2024-03-01T00:00:00.000Z',
+    lastActive: '2024-04-10T16:20:00.000Z'
+  }
 ];
 
 // Mock product data
@@ -262,39 +261,39 @@ export const mockNotifications: Notification[] = [
   {
     id: '1',
     title: 'Low Stock Alert',
-    message: 'Laptop is running low on stock',
+    message: 'Product "Widget A" has reached its threshold limit',
     type: 'warning',
-    for: ['1', '2'], // Admin, Manager
-    createdAt: new Date(2023, 3, 1).toISOString(),
-    read: false
+    for: ['admin', 'manager', 'staff'],
+    read: false,
+    createdAt: '2024-04-14T09:00:00.000Z'
   },
   {
     id: '2',
-    title: 'New Order Received',
-    message: 'Order #1234 has been placed',
-    type: 'success',
-    for: ['1', '2', '3'], // Admin, Manager, Staff
-    createdAt: new Date(2023, 3, 5).toISOString(),
-    read: false
+    title: 'New Order',
+    message: 'A new order #12345 has been placed',
+    type: 'info',
+    for: ['admin', 'manager'],
+    read: true,
+    createdAt: '2024-04-13T14:30:00.000Z'
   },
   {
     id: '3',
-    title: 'Inventory Updated',
-    message: 'Quantity of Notebook has been updated',
+    title: 'System Update',
+    message: 'The system will be undergoing maintenance on Saturday night',
     type: 'info',
-    for: ['1', '3'], // Admin, Staff
-    createdAt: new Date(2023, 3, 10).toISOString(),
-    read: true
+    for: ['all'],
+    read: false,
+    createdAt: '2024-04-12T11:00:00.000Z'
   },
   {
     id: '4',
-    title: 'Low Stock Alert',
-    message: 'Low Stock Product is running low on stock',
-    type: 'warning',
-    for: ['1', '2'], // Admin, Manager
-    createdAt: new Date(2023, 3, 1).toISOString(),
-    read: false
-  },
+    title: 'User Added',
+    message: 'New user John Doe has been added to the system',
+    type: 'success',
+    for: ['admin'],
+    read: false,
+    createdAt: '2024-04-11T16:45:00.000Z'
+  }
 ];
 
 // Add mock categories if they don't already exist

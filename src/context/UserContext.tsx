@@ -51,7 +51,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'User Added',
         message: `New user ${newUser.name} has been added to the system`,
         type: 'info',
-        for: ['1'], // Admin only
+        for: ['admin'], // Admin only
       });
     }
   };
@@ -73,7 +73,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'User Updated',
         message: `User ${userToUpdate.name} has been updated`,
         type: 'info',
-        for: ['1'], // Admin only
+        for: ['admin'], // Admin only
       });
     }
   };
@@ -94,7 +94,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'User Deleted',
         message: `User ${userToDelete.name} has been removed from the system`,
         type: 'info',
-        for: ['1'], // Admin only
+        for: ['admin'], // Admin only
       });
     }
   };

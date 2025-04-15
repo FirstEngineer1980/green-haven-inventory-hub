@@ -8,13 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Role, User } from '@/types';
 import UserTable from '@/components/users/UserTable';
 import AddUserDialog from '@/components/users/AddUserDialog';
 import EditUserDialog from '@/components/users/EditUserDialog';
 import ExportButton from '@/components/shared/ExportButton';
 import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
+import { User, Role } from '@/types';
 
 const Users = () => {
   const { users, addUser } = useUsers();
