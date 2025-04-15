@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -26,7 +25,7 @@ class Bin extends Model
         'unit_matrix_id',
         'status',
     ];
-    
+
     /**
      * Get the unit matrix associated with this bin.
      */
@@ -34,7 +33,7 @@ class Bin extends Model
     {
         return $this->belongsTo(UnitMatrix::class);
     }
-    
+
     /**
      * Get the inventory items in this bin.
      */
