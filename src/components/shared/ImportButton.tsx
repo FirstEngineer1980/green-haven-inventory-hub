@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
 
 interface ImportButtonProps {
   onImport: (data: any[]) => void;
@@ -28,9 +29,49 @@ const ImportButton: React.FC<ImportButtonProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      const validTypes = [
+        'application/json',
+        'text/csv',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel'
+      ];
+      
+      if (!validTypes.includes(selectedFile.type)) {
+        setErrors(['Please upload a valid JSON, CSV, or Excel file']);
+        return;
+      }
+      
+      setFile(selectedFile);
       setErrors([]);
     }
+  };
+
+  const parseFile = async (file: File): Promise<any[]> => {
+    if (file.type === 'application/json') {
+      const content = await file.text();
+      return JSON.parse(content);
+    }
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          const workbook = XLSX.read(data, { type: 'binary' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          resolve(jsonData);
+        } catch (error) {
+          reject(new Error('Failed to parse file'));
+        }
+      };
+
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsBinaryString(file);
+    });
   };
 
   const handleImport = async () => {
@@ -43,8 +84,7 @@ const ImportButton: React.FC<ImportButtonProps> = ({
     setErrors([]);
 
     try {
-      const content = await file.text();
-      const data = JSON.parse(content);
+      const data = await parseFile(file);
       
       // Validate the data if a validation function is provided
       if (validationFn) {
@@ -65,7 +105,7 @@ const ImportButton: React.FC<ImportButtonProps> = ({
       });
     } catch (error) {
       console.error('Import error:', error);
-      setErrors(['Invalid JSON format or file content']);
+      setErrors(['Failed to parse file. Please ensure the file format is correct']);
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +129,7 @@ const ImportButton: React.FC<ImportButtonProps> = ({
           <DialogHeader>
             <DialogTitle>Import Data</DialogTitle>
             <DialogDescription>
-              Upload a JSON file with the data you want to import.
+              Upload a JSON, CSV, or Excel file with the data you want to import.
               {templateUrl && (
                 <div className="mt-2">
                   <Button 
@@ -107,14 +147,14 @@ const ImportButton: React.FC<ImportButtonProps> = ({
           <div className="space-y-4 py-4">
             <input
               type="file"
-              accept=".json"
+              accept=".json,.csv,.xlsx,.xls"
               onChange={handleFileChange}
               className="block w-full text-sm text-gray-500
-                         file:mr-4 file:py-2 file:px-4
-                         file:rounded-full file:border-0
-                         file:text-sm file:font-semibold
-                         file:bg-violet-50 file:text-violet-700
-                         hover:file:bg-violet-100"
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-full file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-violet-50 file:text-violet-700
+                       hover:file:bg-violet-100"
             />
 
             {errors.length > 0 && (
