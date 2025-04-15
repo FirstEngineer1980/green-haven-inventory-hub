@@ -2,9 +2,10 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { Permission } from '@/types';
 
 interface ProtectedRouteProps {
-  requiredPermission?: string;
+  requiredPermission?: Permission;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredPermission }) => {
@@ -16,7 +17,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredPermission }) =
   }
   
   // If a specific permission is required, check if the user has it
-  if (requiredPermission && !hasPermission(requiredPermission as any)) {
+  if (requiredPermission && !hasPermission(requiredPermission)) {
     return <Navigate to="/unauthorized" replace />;
   }
   
