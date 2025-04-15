@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { Room } from '@/types';
@@ -10,9 +9,9 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 
 interface RoomTableProps {
   rooms: Room[];
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-  totalPages: number;
+  currentPage?: number;
+  setCurrentPage?: (page: number) => void;
+  totalPages?: number;
   onEdit: (room: Room) => void;
   onView: (room: Room) => void;
   onDelete: (id: string) => void;
@@ -20,9 +19,9 @@ interface RoomTableProps {
 
 const RoomTable = ({
   rooms,
-  currentPage,
-  setCurrentPage,
-  totalPages,
+  currentPage = 1,
+  setCurrentPage = () => {},
+  totalPages = 1,
   onEdit,
   onView,
   onDelete

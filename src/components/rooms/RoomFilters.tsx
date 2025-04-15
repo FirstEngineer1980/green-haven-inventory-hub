@@ -7,17 +7,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface RoomFiltersProps {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
-  selectedCustomer: string;
-  handleCustomerFilterChange: (value: string) => void;
+  onSearchChange: (value: string) => void; // Update to match what's being passed
+  customerFilter: string;
+  onCustomerFilterChange: (value: string) => void; // Update to match what's being passed
   customers: Customer[];
 }
 
 const RoomFilters = ({
   searchTerm,
-  setSearchTerm,
-  selectedCustomer,
-  handleCustomerFilterChange,
+  onSearchChange,
+  customerFilter,
+  onCustomerFilterChange,
   customers
 }: RoomFiltersProps) => {
   return (
@@ -29,11 +29,11 @@ const RoomFilters = ({
           placeholder="Search rooms..."
           className="pl-8"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
       <div className="w-48">
-        <Select value={selectedCustomer} onValueChange={handleCustomerFilterChange}>
+        <Select value={customerFilter} onValueChange={onCustomerFilterChange}>
           <SelectTrigger>
             <SelectValue placeholder="All Customers" />
           </SelectTrigger>

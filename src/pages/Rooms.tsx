@@ -18,10 +18,11 @@ import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const Rooms = () => {
-  const { rooms, addRoom } = useRooms();
+  const { rooms, addRoom, deleteRoom } = useRooms();
   const { customers } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
   const [customerFilter, setCustomerFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -62,6 +63,23 @@ const Rooms = () => {
     return matchesSearch && matchesCustomer;
   });
 
+  // Calculate pagination
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
+  const paginatedRooms = filteredRooms.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleDeleteRoom = (id: string) => {
+    deleteRoom(id);
+    toast({
+      title: "Room Deleted",
+      description: "The room has been successfully deleted",
+      variant: "default",
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="flex items-center justify-between mb-6">
@@ -101,7 +119,10 @@ const Rooms = () => {
         </CardHeader>
         <CardContent>
           <RoomTable 
-            rooms={filteredRooms}
+            rooms={paginatedRooms}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
             onView={(room) => {
               setSelectedRoom(room);
               setOpenDetailsDialog(true);
@@ -110,11 +131,15 @@ const Rooms = () => {
               setSelectedRoom(room);
               setOpenEditDialog(true);
             }}
+            onDelete={handleDeleteRoom}
           />
         </CardContent>
       </Card>
 
-      <AddRoomDialog open={openAddDialog} onOpenChange={setOpenAddDialog} />
+      <AddRoomDialog 
+        open={openAddDialog} 
+        onOpenChange={setOpenAddDialog}
+      />
       
       {selectedRoom && (
         <>
@@ -128,6 +153,12 @@ const Rooms = () => {
             open={openDetailsDialog}
             onOpenChange={setOpenDetailsDialog}
             room={selectedRoom}
+            onEdit={(room) => {
+              setSelectedRoom(room);
+              setOpenDetailsDialog(false);
+              setOpenEditDialog(true);
+            }}
+            onDelete={handleDeleteRoom}
           />
         </>
       )}

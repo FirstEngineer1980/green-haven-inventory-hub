@@ -6,30 +6,38 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import RoomForm from './RoomForm';
 
 interface AddRoomDialogProps {
-  showAddDialog: boolean;
-  setShowAddDialog: (show: boolean) => void;
-  formData: {
+  open?: boolean; // Added to match usage in Rooms.tsx
+  onOpenChange?: (open: boolean) => void; // Added to match usage in Rooms.tsx
+  showAddDialog?: boolean; // Keep for backward compatibility
+  setShowAddDialog?: (show: boolean) => void; // Keep for backward compatibility
+  formData?: {
     customerId: string;
     name: string;
     unit: number;
   };
-  customers: Customer[];
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleCustomerChange: (value: string) => void;
-  handleAddRoom: () => void;
+  customers?: Customer[];
+  handleInputChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCustomerChange?: (value: string) => void;
+  handleAddRoom?: () => void;
 }
 
 const AddRoomDialog = ({
+  open,
+  onOpenChange,
   showAddDialog,
   setShowAddDialog,
-  formData,
-  customers,
-  handleInputChange,
-  handleCustomerChange,
-  handleAddRoom
+  formData = { customerId: '', name: '', unit: 0 },
+  customers = [],
+  handleInputChange = () => {},
+  handleCustomerChange = () => {},
+  handleAddRoom = () => {}
 }: AddRoomDialogProps) => {
+  // Determine which props to use based on what's provided
+  const isOpen = open !== undefined ? open : showAddDialog;
+  const onOpenChangeHandler = onOpenChange || setShowAddDialog;
+  
   return (
-    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+    <Dialog open={isOpen} onOpenChange={onOpenChangeHandler}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Room</DialogTitle>
@@ -44,7 +52,7 @@ const AddRoomDialog = ({
           handleCustomerChange={handleCustomerChange}
         />
         <DialogFooter>
-          <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChangeHandler?.(false)}>Cancel</Button>
           <Button onClick={handleAddRoom}>Add Room</Button>
         </DialogFooter>
       </DialogContent>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext } from 'react';
 import { Customer } from '../types';
 import { useNotifications } from './NotificationContext';
@@ -46,6 +45,7 @@ interface CustomerContextType {
   updateCustomer: (id: string, updates: Partial<Customer>) => void;
   deleteCustomer: (id: string) => void;
   getCustomerById: (id: string) => Customer | undefined;
+  toggleCustomerStatus: (id: string, status: 'active' | 'paused' | 'inactive') => void;
 }
 
 const CustomerContext = createContext<CustomerContextType>({} as CustomerContextType);
@@ -108,13 +108,24 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const toggleCustomerStatus = (id: string, newStatus: 'active' | 'paused' | 'inactive') => {
+    setCustomers(prev => 
+      prev.map(customer => 
+        customer.id === id 
+          ? { ...customer, status: newStatus, updatedAt: new Date().toISOString() } 
+          : customer
+      )
+    );
+  };
+
   return (
     <CustomerContext.Provider value={{ 
       customers, 
       addCustomer, 
       updateCustomer, 
       deleteCustomer,
-      getCustomerById
+      getCustomerById,
+      toggleCustomerStatus
     }}>
       {children}
     </CustomerContext.Provider>

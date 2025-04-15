@@ -7,17 +7,31 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 
 interface RoomDetailsProps {
   room: Room | null;
-  isOpen: boolean;
-  onClose: () => void;
+  open?: boolean; // Added to match usage in Rooms.tsx
+  onOpenChange?: (open: boolean) => void; // Added to match usage in Rooms.tsx
+  isOpen?: boolean; // Keep for backward compatibility
+  onClose?: () => void; // Keep for backward compatibility
   onEdit: (room: Room) => void;
   onDelete: (id: string) => void;
 }
 
-const RoomDetails = ({ room, isOpen, onClose, onEdit, onDelete }: RoomDetailsProps) => {
+const RoomDetails = ({ 
+  room, 
+  open, 
+  onOpenChange, 
+  isOpen, 
+  onClose, 
+  onEdit, 
+  onDelete 
+}: RoomDetailsProps) => {
   if (!room) return null;
   
+  // Determine which props to use based on what's provided
+  const isSheetOpen = open !== undefined ? open : isOpen;
+  const handleOpenChange = onOpenChange || (onClose ? (open: boolean) => !open && onClose() : undefined);
+  
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet open={isSheetOpen} onOpenChange={handleOpenChange}>
       <SheetContent className="sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Room Details</SheetTitle>
@@ -55,7 +69,8 @@ const RoomDetails = ({ room, isOpen, onClose, onEdit, onDelete }: RoomDetailsPro
               variant="destructive" 
               onClick={() => {
                 onDelete(room.id);
-                onClose();
+                if (onClose) onClose();
+                if (onOpenChange) onOpenChange(false);
               }}
             >
               Delete Room

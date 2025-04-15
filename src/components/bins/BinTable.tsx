@@ -17,22 +17,28 @@ import { EditBinDialog } from './EditBinDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 interface BinTableProps {
+  bins?: Bin[]; // Made optional with default from context
   unitMatrixId?: string;
+  onEdit: (bin: Bin) => void;
 }
 
-export const BinTable: React.FC<BinTableProps> = ({ unitMatrixId }) => {
-  const { bins, deleteBin, getBinsByUnitMatrix } = useBins();
+export const BinTable: React.FC<BinTableProps> = ({ bins: propBins, unitMatrixId, onEdit }) => {
+  const { bins: contextBins, deleteBin, getBinsByUnitMatrix } = useBins();
   const [editBin, setEditBin] = useState<Bin | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [binToDelete, setBinToDelete] = useState<Bin | null>(null);
 
-  // Filter bins by unit matrix if provided
-  const displayBins = unitMatrixId 
+  // Use bins from props if provided, otherwise use filtered bins from context
+  const bins = propBins ?? (unitMatrixId 
     ? getBinsByUnitMatrix(unitMatrixId) 
-    : bins;
+    : contextBins);
 
   const handleEdit = (bin: Bin) => {
-    setEditBin(bin);
+    if (onEdit) {
+      onEdit(bin);
+    } else {
+      setEditBin(bin);
+    }
   };
 
   const handleDeleteClick = (bin: Bin) => {
@@ -63,14 +69,14 @@ export const BinTable: React.FC<BinTableProps> = ({ unitMatrixId }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {displayBins.length === 0 ? (
+          {bins.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 No bins found
               </TableCell>
             </TableRow>
           ) : (
-            displayBins.map((bin) => (
+            bins.map((bin) => (
               <TableRow key={bin.id}>
                 <TableCell className="font-medium">{bin.name}</TableCell>
                 <TableCell>{bin.length}</TableCell>
@@ -100,7 +106,7 @@ export const BinTable: React.FC<BinTableProps> = ({ unitMatrixId }) => {
         </TableBody>
       </Table>
 
-      {editBin && (
+      {editBin && !onEdit && (
         <EditBinDialog
           open={!!editBin}
           onOpenChange={(open) => !open && setEditBin(null)}

@@ -44,6 +44,7 @@ export interface Category {
   id: string;
   name: string;
   description: string;
+  productCount?: number; // Added property
   createdAt: string;
   updatedAt: string;
 }
@@ -69,6 +70,8 @@ export interface Customer {
   notes?: string;
   company?: string; // Added for implementation
   totalOrders?: number; // Added for implementation
+  totalSpent?: number; // Added for implementation
+  status?: 'active' | 'paused' | 'inactive'; // Added for implementation
   createdAt: string;
   updatedAt: string;
 }
