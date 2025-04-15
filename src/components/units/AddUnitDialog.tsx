@@ -9,6 +9,7 @@ interface AddUnitDialogProps {
   showAddDialog: boolean;
   setShowAddDialog: (show: boolean) => void;
   formData: {
+    name: string;
     roomId: string;
     number: string;
     size: number;

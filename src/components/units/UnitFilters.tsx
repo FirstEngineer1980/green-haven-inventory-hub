@@ -6,36 +6,36 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface UnitFiltersProps {
   searchTerm: string;
-  setSearchTerm: (value: string) => void;
-  selectedRoom: string;
-  selectedStatus: string;
-  handleRoomFilterChange: (value: string) => void;
-  handleStatusFilterChange: (value: string) => void;
+  onSearchChange: (value: string) => void;
+  roomFilter: string;
+  onRoomFilterChange: (value: string) => void;
+  statusFilter: string;
+  onStatusFilterChange: (value: string) => void;
   rooms: Room[];
 }
 
 const UnitFilters = ({
   searchTerm,
-  setSearchTerm,
-  selectedRoom,
-  selectedStatus,
-  handleRoomFilterChange,
-  handleStatusFilterChange,
+  onSearchChange,
+  roomFilter,
+  onRoomFilterChange,
+  statusFilter,
+  onStatusFilterChange,
   rooms
 }: UnitFiltersProps) => {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row">
-      <div className="flex-1">
-        <Input 
-          placeholder="Search units..." 
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div>
+        <Input
+          placeholder="Search by unit number..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full"
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="max-w-sm"
         />
       </div>
       
-      <div className="w-full sm:w-48">
-        <Select value={selectedRoom} onValueChange={handleRoomFilterChange}>
+      <div>
+        <Select value={roomFilter} onValueChange={onRoomFilterChange}>
           <SelectTrigger>
             <SelectValue placeholder="Filter by room" />
           </SelectTrigger>
@@ -50,8 +50,8 @@ const UnitFilters = ({
         </Select>
       </div>
       
-      <div className="w-full sm:w-48">
-        <Select value={selectedStatus} onValueChange={handleStatusFilterChange}>
+      <div>
+        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
           <SelectTrigger>
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>

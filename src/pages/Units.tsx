@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +33,7 @@ const Units = () => {
     try {
       data.forEach(unitData => {
         const unit = {
+          name: unitData.name || `Unit ${unitData.number}`,
           roomId: unitData.roomId,
           number: unitData.number,
           size: unitData.size,
@@ -59,7 +59,6 @@ const Units = () => {
     }
   };
 
-  // Filter units by search term, room, and status
   const filteredUnits = units.filter(unit => {
     const matchesSearch = unit.number.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRoom = roomFilter === 'all' || unit.roomId === roomFilter;
@@ -68,7 +67,6 @@ const Units = () => {
     return matchesSearch && matchesRoom && matchesStatus;
   });
   
-  // Pagination
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredUnits.length / itemsPerPage);
   const paginatedUnits = filteredUnits.slice(
@@ -77,8 +75,7 @@ const Units = () => {
   );
 
   const handleDeleteConfirm = (id: string) => {
-    // Delete logic handled by UnitTable component
-    setCurrentPage(1); // Reset to first page after deleting
+    setCurrentPage(1);
   };
 
   return (
@@ -105,11 +102,11 @@ const Units = () => {
 
       <UnitFilters 
         searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
+        onSearchChange={(value) => setSearchTerm(value)}
         roomFilter={roomFilter}
-        onRoomFilterChange={setRoomFilter}
+        onRoomFilterChange={(value) => setRoomFilter(value)}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(value) => setStatusFilter(value)}
         rooms={rooms}
       />
 
@@ -139,20 +136,54 @@ const Units = () => {
         </CardContent>
       </Card>
 
-      <AddUnitDialog open={openAddDialog} onOpenChange={setOpenAddDialog} />
+      <AddUnitDialog 
+        showAddDialog={openAddDialog} 
+        setShowAddDialog={setOpenAddDialog}
+        formData={{
+          name: '',
+          roomId: '',
+          number: '',
+          size: 0,
+          sizeUnit: 'sqft',
+          status: 'available',
+          description: ''
+        }}
+        rooms={rooms}
+        handleInputChange={() => {}}
+        handleSelectChange={() => {}}
+        handleAddUnit={() => {}}
+      />
       
       {selectedUnit && (
         <>
           <EditUnitDialog 
-            open={openEditDialog} 
-            onOpenChange={setOpenEditDialog} 
-            unit={selectedUnit} 
+            showEditDialog={openEditDialog} 
+            setShowEditDialog={setOpenEditDialog} 
+            formData={{
+              name: selectedUnit.name,
+              roomId: selectedUnit.roomId,
+              number: selectedUnit.number,
+              size: selectedUnit.size || 0,
+              sizeUnit: selectedUnit.sizeUnit || 'sqft',
+              status: selectedUnit.status || 'available',
+              description: selectedUnit.description || ''
+            }}
+            rooms={rooms}
+            handleInputChange={() => {}}
+            handleSelectChange={() => {}}
+            handleEditUnit={() => {}}
           />
           
           <UnitDetails
-            open={openDetailsDialog}
-            onOpenChange={setOpenDetailsDialog}
             unit={selectedUnit}
+            isOpen={openDetailsDialog}
+            onClose={() => setOpenDetailsDialog(false)}
+            onEdit={(unit) => {
+              setSelectedUnit(unit);
+              setOpenDetailsDialog(false);
+              setOpenEditDialog(true);
+            }}
+            onDelete={() => {}}
           />
         </>
       )}

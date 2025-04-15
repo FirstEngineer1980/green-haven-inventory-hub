@@ -1,3 +1,4 @@
+
 import { Product, StockMovement, User, Notification, Category } from '../types';
 
 // Mock user data
@@ -217,6 +218,7 @@ export const mockStockMovements: StockMovement[] = [
   {
     id: '1',
     productId: '1',
+    productName: 'Laptop',
     type: 'in',
     quantity: 20,
     date: new Date(2023, 3, 1).toISOString(),
@@ -225,6 +227,7 @@ export const mockStockMovements: StockMovement[] = [
   {
     id: '2',
     productId: '2',
+    productName: 'Office Chair',
     type: 'in',
     quantity: 10,
     date: new Date(2023, 3, 5).toISOString(),
@@ -233,6 +236,7 @@ export const mockStockMovements: StockMovement[] = [
   {
     id: '3',
     productId: '1',
+    productName: 'Laptop',
     type: 'out',
     quantity: 5,
     date: new Date(2023, 3, 10).toISOString(),
@@ -241,6 +245,7 @@ export const mockStockMovements: StockMovement[] = [
   {
     id: '4',
     productId: '3',
+    productName: 'Notebook',
     type: 'in',
     quantity: 50,
     date: new Date(2023, 3, 15).toISOString(),
@@ -249,6 +254,7 @@ export const mockStockMovements: StockMovement[] = [
   {
     id: '5',
     productId: '11',
+    productName: 'Low Stock Product',
     type: 'out',
     quantity: 2,
     date: new Date(2023, 3, 20).toISOString(),

@@ -39,10 +39,11 @@ const UnitDetails = ({ unit, isOpen, onClose, onEdit, onDelete }: UnitDetailsPro
         </SheetHeader>
         <div className="py-6 space-y-6">
           <div className="space-y-1">
-            <h3 className="text-lg font-semibold">Unit {unit.number}</h3>
+            <h3 className="text-lg font-semibold">{unit.name}</h3>
+            <p>Unit {unit.number}</p>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-muted-foreground">{unit.size} {unit.sizeUnit}</p>
-              {getStatusBadge(unit.status)}
+              {unit.status && getStatusBadge(unit.status)}
             </div>
           </div>
           

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useUnits } from '@/context/UnitContext';
@@ -21,6 +20,7 @@ const UnitStep = () => {
   // Initialize unitForms with an empty array for each room
   const [unitsByRoom, setUnitsByRoom] = useState<{
     [roomId: string]: {
+      name: string;
       number: string;
       size: number;
       sizeUnit: 'sqft' | 'sqm' | 'm²';
@@ -31,6 +31,7 @@ const UnitStep = () => {
     createdRooms.reduce((acc, room) => ({
       ...acc,
       [room.id]: [{
+        name: '',
         number: '',
         size: 0,
         sizeUnit: 'sqft',
@@ -67,6 +68,7 @@ const UnitStep = () => {
     setUnitsByRoom(prev => ({
       ...prev,
       [roomId]: [...prev[roomId], {
+        name: '',
         number: '',
         size: 0,
         sizeUnit: 'sqft',
@@ -112,6 +114,11 @@ const UnitStep = () => {
     // Add all units for all rooms
     createdRooms.forEach(room => {
       unitsByRoom[room.id].forEach(unitData => {
+        // Set default name if empty
+        if (!unitData.name) {
+          unitData.name = `Unit ${unitData.number}`;
+        }
+        
         addUnit({
           roomId: room.id,
           ...unitData
@@ -173,6 +180,19 @@ const UnitStep = () => {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
+                            <Label htmlFor={`name-${room.id}-${unitIndex}`}>
+                              Unit Name
+                            </Label>
+                            <Input 
+                              id={`name-${room.id}-${unitIndex}`}
+                              name="name"
+                              placeholder="Enter unit name"
+                              value={unit.name}
+                              onChange={(e) => handleInputChange(room.id, unitIndex, e)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
                             <Label htmlFor={`number-${room.id}-${unitIndex}`}>
                               Unit Number <span className="text-red-500">*</span>
                             </Label>
@@ -214,9 +234,7 @@ const UnitStep = () => {
                             </div>
                           </div>
                           
-                          <div className="space
-
--y-2">
+                          <div className="space-y-2">
                             <Label htmlFor={`status-${room.id}-${unitIndex}`}>Status</Label>
                             <Select
                               value={unit.status}

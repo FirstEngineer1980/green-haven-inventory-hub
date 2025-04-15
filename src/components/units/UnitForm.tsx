@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 interface UnitFormProps {
   rooms: Room[];
   formData: {
+    name: string;
     roomId: string;
     number: string;
     size: number;
@@ -46,6 +47,17 @@ const UnitForm = ({
             )}
           </SelectContent>
         </Select>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="name">Unit Name</Label>
+        <Input 
+          id="name" 
+          name="name" 
+          value={formData.name} 
+          onChange={handleInputChange} 
+          placeholder="Unit name (e.g. Storage Unit A1)"
+        />
       </div>
       
       <div className="space-y-2">
