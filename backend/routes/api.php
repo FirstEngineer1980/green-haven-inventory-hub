@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmailLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,11 +116,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/settings/{key}', [SettingController::class, 'show']);
     Route::post('/settings', [SettingController::class, 'store']);
     Route::put('/settings/{key}', [SettingController::class, 'update']);
+    Route::delete('/settings/{key}', [SettingController::class, 'destroy']);
 
     // Notification routes
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
     // Report routes
     Route::apiResource('reports', ReportController::class);
@@ -131,4 +136,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/products-by-category', [DashboardController::class, 'productsByCategory']);
     Route::get('/dashboard/stock-trend', [DashboardController::class, 'stockTrend']);
     Route::get('/dashboard/upcoming-orders', [DashboardController::class, 'upcomingOrders']);
+    
+    // Email Log routes
+    Route::get('/email-logs', [EmailLogController::class, 'index']);
+    Route::get('/email-logs/{emailLog}', [EmailLogController::class, 'show']);
+    Route::delete('/email-logs/{emailLog}', [EmailLogController::class, 'destroy']);
+    Route::delete('/email-logs', [EmailLogController::class, 'clearAll']);
 });
