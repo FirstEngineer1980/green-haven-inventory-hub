@@ -26,7 +26,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const rolePermissions: Record<Role, Permission[]> = {
     admin: ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'],
     manager: ['manage_products', 'view_reports', 'manage_inventory'],
-    employee: ['view_reports', 'manage_inventory'], // Added the missing 'employee' role with appropriate permissions
     staff: ['view_reports', 'manage_inventory'],
     viewer: ['view_reports']
   };

@@ -9,9 +9,9 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import SkuMatrixTable from '@/components/sku-matrix/SkuMatrixTable';
-import AddSkuMatrixDialog from '@/components/sku-matrix/AddSkuMatrixDialog';
-import EditSkuMatrixDialog from '@/components/sku-matrix/EditSkuMatrixDialog';
+import FlexibleUnitMatrix from '@/components/unit-matrix/FlexibleUnitMatrix';
+import AddUnitMatrixDialog from '@/components/unit-matrix/AddUnitMatrixDialog';
+import EditUnitMatrixDialog from '@/components/unit-matrix/EditUnitMatrixDialog';
 import { UnitMatrix } from '@/types';
 
 const UnitMatrixPage = () => {
@@ -93,8 +93,10 @@ const UnitMatrixPage = () => {
             ) : (
               filteredUnitMatrices.map(unitMatrix => (
                 <div key={unitMatrix.id} className="mb-8">
-                  <SkuMatrixTable 
-                    unitMatrix={unitMatrix}
+                  <FlexibleUnitMatrix 
+                    unitMatrix={unitMatrix} 
+                    onEdit={handleEditClick}
+                    onDelete={handleDeleteUnitMatrix}
                   />
                 </div>
               ))
@@ -102,13 +104,13 @@ const UnitMatrixPage = () => {
           </CardContent>
         </Card>
 
-        <AddSkuMatrixDialog 
+        <AddUnitMatrixDialog 
           open={showAddDialog} 
           onOpenChange={setShowAddDialog} 
         />
         
         {selectedUnitMatrix && (
-          <EditSkuMatrixDialog 
+          <EditUnitMatrixDialog 
             open={showEditDialog} 
             onOpenChange={setShowEditDialog}
             unitMatrix={selectedUnitMatrix}

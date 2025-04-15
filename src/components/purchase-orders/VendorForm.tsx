@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -50,10 +51,7 @@ export const VendorForm: React.FC<VendorFormProps> = ({
   });
 
   const handleSubmit = (data: VendorFormValues) => {
-    onSubmit({
-      ...data as Omit<Vendor, 'id' | 'createdAt' | 'updatedAt'>,
-      contact: data.name
-    });
+    onSubmit(data as Omit<Vendor, 'id' | 'createdAt' | 'updatedAt'>);
   };
 
   return (

@@ -1,177 +1,220 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react"
-import { 
-  LayoutDashboard, 
-  LayoutGrid, 
-  Users, 
-  Package, 
-  ListChecks, 
-  DoorOpen, 
-  Table, 
-  ShoppingCart, 
-  Truck, 
-  Bell, 
-  Box, 
-  FileText, 
-  Grid2X2, 
-  Settings as SettingIcon, 
-  Wand 
+import {
+  BarChart3,
+  Package,
+  Users,
+  ShoppingCart,
+  LayoutDashboard,
+  Bell,
+  Settings,
+  Building2,
+  Home,
+  Grid3X3,
+  Table,
+  Menu,
+  Database,
+  Archive,
+  Wand2
 } from 'lucide-react';
-import { cn } from "@/lib/utils";
 
-const Sidebar = () => {
+import {
+  Sidebar as ShadcnSidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarTrigger,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarFooter,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+
+const Sidebar = ({ className }: { className?: string }) => {
   const { pathname } = useLocation();
+  const { isMobile, setOpenMobile, openMobile } = useSidebar();
 
-  const linkClass =
-    "flex items-center space-x-2 rounded-md p-2 text-sm font-medium hover:bg-secondary hover:text-accent-foreground";
-  const activeClass = "bg-secondary text-accent-foreground";
+  const navItems = [
+    {
+      title: 'Dashboard',
+      href: '/dashboard',
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+    {
+      title: 'Products',
+      href: '/products',
+      icon: <Package className="h-5 w-5" />,
+    },
+    {
+      title: 'Inventory',
+      icon: <ShoppingCart className="h-5 w-5" />,
+      subItems: [
+        {
+          title: 'Stock Items',
+          href: '/inventory',
+        },
+        {
+          title: 'Stock Movements',
+          href: '/stock-movements',
+        },
+        {
+          title: 'Bins',
+          href: '/bins',
+        },
+      ],
+    },
+    {
+      title: 'Reports',
+      href: '/reports',
+      icon: <BarChart3 className="h-5 w-5" />,
+    },
+    {
+      title: 'Users',
+      href: '/users',
+      icon: <Users className="h-5 w-5" />,
+    },
+    {
+      title: 'Customers',
+      icon: <Building2 className="h-5 w-5" />,
+      subItems: [
+        {
+          title: 'Manage Customers',
+          href: '/customers',
+        },
+        {
+          title: 'Customer Products',
+          href: '/customer-products',
+        },
+      ],
+    },
+    {
+      title: 'Rooms',
+      href: '/rooms',
+      icon: <Home className="h-5 w-5" />,
+    },
+    {
+      title: 'Units',
+      href: '/units',
+      icon: <Grid3X3 className="h-5 w-5" />,
+    },
+    {
+      title: 'Unit Matrix',
+      href: '/unit-matrix',
+      icon: <Table className="h-5 w-5" />,
+    },
+    {
+      title: 'SKU Matrix',
+      href: '/sku-matrix',
+      icon: <Database className="h-5 w-5" />,
+    },
+    {
+      title: 'Notifications',
+      href: '/notifications',
+      icon: <Bell className="h-5 w-5" />,
+    },
+    {
+      title: 'Settings',
+      href: '/settings',
+      icon: <Settings className="h-5 w-5" />,
+    },
+    {
+      title: 'Setup Wizard',
+      href: '/wizard',
+      icon: <Wand2 className="h-5 w-5" />,
+    },
+  ];
+
+  const handleMenuItemClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  const MobileMenuButton = () => {
+    if (!isMobile) return null;
+
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden fixed top-4 left-4 z-50"
+        onClick={() => setOpenMobile(!openMobile)}
+      >
+        <Menu className="h-6 w-6" />
+        <span className="sr-only">Toggle mobile menu</span>
+      </Button>
+    );
+  };
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="p-0 px-2">
-          <Menu className="h-4 w-4" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="pr-0">
-        <Link to="/dashboard" className="flex items-center space-x-2 px-4 py-6">
-          <LayoutDashboard className="h-6 w-6" />
-          <span className="text-lg font-bold">Storage Manager</span>
-        </Link>
-        <nav className="space-y-2">
-          <Link
-            to="/dashboard"
-            className={cn(linkClass, pathname === "/dashboard" && activeClass)}
-          >
-            <LayoutDashboard className="h-4 w-4 mr-2" />
-            Dashboard
-          </Link>
-          <Link
-            to="/products"
-            className={cn(linkClass, pathname === "/products" && activeClass)}
-          >
-            <Package className="h-4 w-4 mr-2" />
-            Products
-          </Link>
-          <Link
-            to="/inventory"
-            className={cn(linkClass, pathname === "/inventory" && activeClass)}
-          >
-            <ListChecks className="h-4 w-4 mr-2" />
-            Inventory
-          </Link>
-          <Link
-            to="/stock-items"
-            className={cn(linkClass, pathname === "/stock-items" && activeClass)}
-          >
-            <Box className="h-4 w-4 mr-2" />
-            Stock Items
-          </Link>
-          <Link
-            to="/stock-movements"
-            className={cn(linkClass, pathname === "/stock-movements" && activeClass)}
-          >
-            <Truck className="h-4 w-4 mr-2" />
-            Stock Movements
-          </Link>
-          <Link
-            to="/bins"
-            className={cn(linkClass, pathname === "/bins" && activeClass)}
-          >
-            <Box className="h-4 w-4 mr-2" />
-            Bins
-          </Link>
-          <Link
-            to="/reports"
-            className={cn(linkClass, pathname === "/reports" && activeClass)}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Reports
-          </Link>
-          <Link
-            to="/users"
-            className={cn(linkClass, pathname === "/users" && activeClass)}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            Users
-          </Link>
-          <Link
-            to="/customers"
-            className={cn(linkClass, pathname === "/customers" && activeClass)}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            Customers
-          </Link>
-          <Link
-            to="/customers/manage"
-            className={cn(linkClass, pathname === "/customers/manage" && activeClass)}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            Manage Customers
-          </Link>
-          <Link
-            to="/customer-products"
-            className={cn(linkClass, pathname === "/customer-products" && activeClass)}
-          >
-            <Package className="h-4 w-4 mr-2" />
-            Customer Products
-          </Link>
-          <Link
-            to="/rooms"
-            className={cn(linkClass, pathname === "/rooms" && activeClass)}
-          >
-            <DoorOpen className="h-4 w-4 mr-2" />
-            Rooms
-          </Link>
-          <Link
-            to="/units"
-            className={cn(linkClass, pathname === "/units" && activeClass)}
-          >
-            <Grid2X2 className="h-4 w-4 mr-2" />
-            Units
-          </Link>
-          <Link
-            to="/unit-matrix"
-            className={cn(linkClass, pathname === "/unit-matrix" && activeClass)}
-          >
-            <Table className="h-4 w-4 mr-2" />
-            Unit Matrix
-          </Link>
-          <Link
-            to="/sku-matrix"
-            className={cn(linkClass, pathname === "/sku-matrix" && activeClass)}
-          >
-            <Grid2X2 className="h-4 w-4 mr-2" />
-            SKU Matrix
-          </Link>
-          <Link
-            to="/notifications"
-            className={cn(linkClass, pathname === "/notifications" && activeClass)}
-          >
-            <Bell className="h-4 w-4 mr-2" />
-            Notifications
-          </Link>
-          <Link
-            to="/settings"
-            className={cn(linkClass, pathname === "/settings" && activeClass)}
-          >
-            <SettingIcon className="h-4 w-4 mr-2" />
-            Settings
-          </Link>
-          <Link
-            to="/wizard"
-            className={cn(linkClass, pathname === "/wizard" && activeClass)}
-          >
-            <Wand className="h-4 w-4 mr-2" />
-            Setup Wizard
-          </Link>
-        </nav>
-      </SheetContent>
-    </Sheet>
+    <>
+      <MobileMenuButton />
+      <ShadcnSidebar className={className}>
+        <SidebarHeader className="pb-2">
+          <h2 className="px-4 text-xl font-semibold tracking-tight truncate">
+            Storage Manager
+          </h2>
+        </SidebarHeader>
+        <SidebarContent className="overflow-y-auto">
+          <SidebarMenu>
+            {navItems.map((item, i) => {
+              if (item.subItems) {
+                const isSubItemActive = item.subItems.some(
+                  (subItem) => subItem.href === pathname
+                );
+                
+                return (
+                  <SidebarMenuItem key={i}>
+                    <SidebarMenuButton 
+                      isActive={isSubItemActive}
+                      tooltip={item.title}
+                    >
+                      {item.icon}
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                    
+                    <SidebarMenuSub>
+                      {item.subItems.map((subItem, j) => (
+                        <SidebarMenuSubButton
+                          key={j}
+                          asChild
+                          isActive={pathname === subItem.href}
+                        >
+                          <Link to={subItem.href} onClick={handleMenuItemClick}>
+                            {subItem.title}
+                          </Link>
+                        </SidebarMenuSubButton>
+                      ))}
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                );
+              }
+              
+              return (
+                <SidebarMenuItem key={i}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={item.title}
+                  >
+                    <Link to={item.href} onClick={handleMenuItemClick}>
+                      {item.icon}
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter>
+          <SidebarTrigger />
+        </SidebarFooter>
+      </ShadcnSidebar>
+    </>
   );
 };
 
