@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -69,7 +70,7 @@ const Customers = () => {
     });
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string = 'active') => {
     switch(status) {
       case 'active':
         return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Active</Badge>;
@@ -78,7 +79,7 @@ const Customers = () => {
       case 'inactive':
         return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300">Inactive</Badge>;
       default:
-        return null;
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Active</Badge>;
     }
   };
 
@@ -166,8 +167,8 @@ const Customers = () => {
                       <TableCell>{customer.phone}</TableCell>
                       <TableCell>{customer.company || '-'}</TableCell>
                       <TableCell>{getStatusBadge(customer.status)}</TableCell>
-                      <TableCell>{customer.totalOrders}</TableCell>
-                      <TableCell>${customer.totalSpent.toFixed(2)}</TableCell>
+                      <TableCell>{customer.totalOrders || 0}</TableCell>
+                      <TableCell>${(customer.totalSpent || 0).toFixed(2)}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -362,7 +363,7 @@ const Customers = () => {
                         <Card>
                           <CardContent className="pt-6">
                             <div className="text-center">
-                              <div className="text-2xl font-bold">{selectedCustomer.totalOrders}</div>
+                              <div className="text-2xl font-bold">{selectedCustomer.totalOrders || 0}</div>
                               <p className="text-sm text-muted-foreground">Total Orders</p>
                             </div>
                           </CardContent>
@@ -371,7 +372,7 @@ const Customers = () => {
                         <Card>
                           <CardContent className="pt-6">
                             <div className="text-center">
-                              <div className="text-2xl font-bold">${selectedCustomer.totalSpent.toFixed(2)}</div>
+                              <div className="text-2xl font-bold">${(selectedCustomer.totalSpent || 0).toFixed(2)}</div>
                               <p className="text-sm text-muted-foreground">Total Spent</p>
                             </div>
                           </CardContent>

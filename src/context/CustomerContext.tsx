@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext } from 'react';
 import { Customer } from '../types';
 import { useNotifications } from './NotificationContext';
@@ -12,6 +13,8 @@ const mockCustomers: Customer[] = [
     address: '123 Main St, Anytown',
     company: 'ABC Corporation',
     totalOrders: 15,
+    totalSpent: 2450.75,
+    status: 'active',
     createdAt: '2023-03-10T10:30:00Z',
     updatedAt: '2023-06-15T14:45:00Z'
   },
@@ -23,6 +26,8 @@ const mockCustomers: Customer[] = [
     address: '456 Oak Ave, Somewhere',
     company: 'XYZ Solutions',
     totalOrders: 8,
+    totalSpent: 1280.50,
+    status: 'active',
     createdAt: '2023-04-05T09:15:00Z',
     updatedAt: '2023-07-20T11:30:00Z'
   },
@@ -34,6 +39,8 @@ const mockCustomers: Customer[] = [
     address: '789 Pine Blvd, Nowhere',
     company: 'Tech Innovators',
     totalOrders: 22,
+    totalSpent: 3750.25,
+    status: 'active',
     createdAt: '2023-02-15T15:20:00Z',
     updatedAt: '2023-08-10T16:40:00Z'
   }
@@ -68,7 +75,9 @@ export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       id: Date.now().toString(),
       createdAt: now,
       updatedAt: now,
-      totalOrders: 0
+      totalOrders: customer.totalOrders || 0,
+      totalSpent: customer.totalSpent || 0,
+      status: customer.status || 'active'
     };
     
     setCustomers(prev => [...prev, newCustomer]);
