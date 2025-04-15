@@ -1,11 +1,18 @@
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: 'admin' | 'manager' | 'employee';
+  permissions?: Permission[];
+  avatar?: string;
   createdAt?: string;
   updatedAt?: string;
+  lastActive?: string;
 }
+
+export type Permission = 'manage_users' | 'manage_products' | 'view_reports' | 'manage_inventory' | 'manage_notifications';
+export type Role = 'admin' | 'manager' | 'staff' | 'viewer';
 
 export interface Notification {
   id: string;
@@ -14,6 +21,7 @@ export interface Notification {
   type: 'info' | 'success' | 'warning' | 'error';
   for: string[];
   createdAt: string;
+  read?: boolean;
 }
 
 export interface Product {
@@ -24,6 +32,8 @@ export interface Product {
   cost: number;
   price: number;
   image: string;
+  quantity?: number;
+  threshold?: number;
   categoryId: string;
   categoryName?: string;
   vendorId: string;
@@ -47,6 +57,8 @@ export interface Vendor {
   email: string;
   phone: string;
   address: string;
+  contactPerson?: string;
+  notes?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -58,6 +70,11 @@ export interface Customer {
   email: string;
   phone: string;
   address: string;
+  company?: string;
+  notes?: string;
+  status?: 'active' | 'paused' | 'inactive';
+  totalOrders?: number;
+  totalSpent?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -96,22 +113,28 @@ export interface Unit {
   updatedAt?: string;
 }
 
-export interface PO {
+export interface PurchaseOrder {
   id: string;
+  poNumber: string;
   vendorId: string;
   vendorName?: string;
-  items: POItem[];
+  status: 'draft' | 'pending' | 'approved' | 'received' | 'cancelled';
   total: number;
-  status: 'open' | 'closed';
+  notes?: string;
+  expectedDeliveryDate?: string;
+  items: PurchaseOrderItem[];
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface POItem {
+export interface PurchaseOrderItem {
+  id: string;
+  poId: string;
   productId: string;
   productName?: string;
   quantity: number;
-  price: number;
+  unitPrice: number;
+  total: number;
 }
 
 export interface InventoryItem {
@@ -129,11 +152,14 @@ export interface InventoryItem {
 
 export interface StockMovement {
   id: string;
-  inventoryItemId: string;
-  inventoryItemName?: string;
-  quantityChange: number;
+  productId: string;
+  productName?: string;
+  quantity: number;
+  quantityChange?: number;
   type: 'in' | 'out';
   reason: string;
+  performedBy?: string;
+  date?: string;
   createdAt?: string;
 }
 
@@ -141,6 +167,13 @@ export interface Bin {
   id: string;
   name: string;
   description: string;
+  length: number;
+  width: number;
+  height: number;
+  volumeCapacity: number;
+  unitMatrixId?: string;
+  unitMatrixName?: string;
+  status?: string;
   createdAt?: string;
   updatedAt?: string;
 }
