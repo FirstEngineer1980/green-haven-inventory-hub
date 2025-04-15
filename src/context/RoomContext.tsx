@@ -11,7 +11,7 @@ const mockRooms: Room[] = [
     customerId: '1',
     customerName: 'Jane Smith',
     name: 'Storage Room A',
-    unit: 101,
+    unit: '101',
     createdAt: '2023-04-15T08:30:00Z',
     updatedAt: '2023-07-10T11:45:00Z'
   },
@@ -20,7 +20,7 @@ const mockRooms: Room[] = [
     customerId: '3',
     customerName: 'Emily Davis',
     name: 'Warehouse Space',
-    unit: 203,
+    unit: '203',
     createdAt: '2023-05-22T09:15:00Z',
     updatedAt: '2023-08-05T14:20:00Z'
   },
@@ -29,7 +29,7 @@ const mockRooms: Room[] = [
     customerId: '2',
     customerName: 'Michael Johnson',
     name: 'Garden Shed',
-    unit: 105,
+    unit: '105',
     createdAt: '2023-06-18T13:40:00Z',
     updatedAt: '2023-09-02T10:30:00Z'
   }
@@ -41,6 +41,7 @@ interface RoomContextType {
   updateRoom: (id: string, updates: Partial<Room>) => void;
   deleteRoom: (id: string) => void;
   getRoomsByCustomerId: (customerId: string) => Room[];
+  getRoomById: (id: string) => Room | undefined;
 }
 
 const RoomContext = createContext<RoomContextType>({} as RoomContextType);
@@ -57,9 +58,13 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return customer ? customer.name : 'Unknown Customer';
   };
 
+  const getRoomById = (id: string): Room | undefined => {
+    return rooms.find(room => room.id === id);
+  };
+
   const addRoom = (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
-    const customerName = getCustomerName(room.customerId);
+    const customerName = getCustomerName(room.customerId || '');
     
     const newRoom: Room = {
       ...room,
@@ -93,30 +98,18 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
           : room
       )
     );
-    
-    // Get the updated room
-    const updatedRoom = rooms.find(r => r.id === id);
-    if (updatedRoom) {
-      // Send notification about update
-      addNotification({
-        title: 'Room Updated',
-        message: `Room "${updatedRoom.name}" has been updated`,
-        type: 'success',
-        for: ['1', '2'], // Admin, Manager
-      });
-    }
   };
 
   const deleteRoom = (id: string) => {
-    // Get the room before deleting
-    const roomToDelete = rooms.find(r => r.id === id);
-    
-    setRooms(prev => prev.filter(room => room.id !== id));
+    const roomToDelete = rooms.find(room => room.id === id);
     
     if (roomToDelete) {
+      setRooms(prev => prev.filter(room => room.id !== id));
+      
+      // Send notification about room deletion
       addNotification({
         title: 'Room Deleted',
-        message: `Room "${roomToDelete.name}" has been removed for ${roomToDelete.customerName}`,
+        message: `Room "${roomToDelete.name}" has been removed from the system`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
@@ -133,7 +126,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addRoom, 
       updateRoom, 
       deleteRoom,
-      getRoomsByCustomerId
+      getRoomsByCustomerId,
+      getRoomById
     }}>
       {children}
     </RoomContext.Provider>

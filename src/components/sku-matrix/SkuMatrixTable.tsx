@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { UnitMatrix } from '@/types';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -35,8 +36,8 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
             matrix.rows.forEach(row => {
               if (row && Array.isArray(row.cells)) {
                 row.cells.forEach(cell => {
-                  if (cell && cell.value && cell.value.trim() !== '') {
-                    options.add(cell.value);
+                  if (cell && cell.content && cell.content.trim() !== '') {
+                    options.add(cell.content);
                   }
                 });
               }
@@ -67,7 +68,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
       unitMatrix.rows.forEach(row => {
         if (row && Array.isArray(row.cells)) {
           row.cells.forEach(cell => {
-            initialTempCells[`${row.id}-${cell.columnId}`] = cell.value || '';
+            initialTempCells[`${row.id}-${cell.columnId}`] = cell.content || '';
           });
         }
       });
@@ -175,7 +176,7 @@ const SkuMatrixTable = ({ unitMatrix }: SkuMatrixTableProps) => {
     if (!row || !Array.isArray(row.cells)) return '';
     
     const cell = row.cells.find(c => c.columnId === columnId);
-    return cell ? cell.value : '';
+    return cell ? cell.content : '';
   };
 
   // Safety check for unitMatrix

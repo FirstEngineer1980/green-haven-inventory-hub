@@ -51,12 +51,12 @@ export interface Category {
 export interface StockMovement {
   id: string;
   productId: string;
-  productName: string; // Added to match implementation
+  productName: string; // Added for implementation
   type: 'in' | 'out';
   quantity: number;
   description?: string;
-  reason?: string; // Added to match implementation
-  performedBy?: string; // Added to match implementation
+  reason?: string; // Added for implementation
+  performedBy?: string; // Added for implementation
   date: string;
 }
 
@@ -67,6 +67,8 @@ export interface Customer {
   phone: string;
   address: string;
   notes?: string;
+  company?: string; // Added for implementation
+  totalOrders?: number; // Added for implementation
   createdAt: string;
   updatedAt: string;
 }
@@ -85,8 +87,9 @@ export interface Room {
   id: string;
   name: string;
   description?: string;
-  unit?: string; // Added to match implementation
-  customerName?: string; // Added to match implementation
+  unit?: string; // Changed to string to match implementation
+  customerName?: string; // Added for implementation
+  customerId?: string; // Added for implementation
   createdAt: string;
   updatedAt: string;
 }
@@ -94,6 +97,12 @@ export interface Room {
 export interface Unit {
   id: string;
   name: string;
+  number: string; // Added for implementation
+  roomId: string; // Added for implementation
+  roomName?: string; // Added for implementation
+  size?: number; // Added for implementation
+  sizeUnit?: 'sqft' | 'sqm' | 'm²'; // Added for implementation
+  status?: 'available' | 'occupied' | 'maintenance'; // Added for implementation
   description?: string;
   createdAt: string;
   updatedAt: string;
@@ -104,31 +113,36 @@ export interface Bin {
   name: string;
   roomId?: string;
   description?: string;
-  length: number; // Added to match implementation
-  width: number; // Added to match implementation
-  height: number; // Added to match implementation
-  volumeCapacity: number; // Added to match implementation
-  unitMatrixId?: string; // Added to match implementation
-  unitMatrixName?: string; // Added to match implementation
+  length: number; // Made sure it's present
+  width: number; // Made sure it's present
+  height: number; // Made sure it's present
+  volumeCapacity: number; // Made sure it's present
+  unitMatrixId?: string; // Made sure it's present
+  unitMatrixName?: string; // Added for implementation
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UnitMatrixColumn {
+  id: string;
+  label: string;
 }
 
 export interface UnitMatrix {
   id: string;
   productId?: string;
-  name?: string; // Added to match implementation
-  roomId?: string; // Added to match implementation
-  roomName?: string; // Added to match implementation
+  name: string; // Made sure it's present
+  roomId?: string; // Made sure it's present
+  roomName?: string; // Made sure it's present
   unitId?: string;
   quantity?: number;
   price?: number;
-  rows?: UnitMatrixRow[]; // Added to match implementation
+  rows?: UnitMatrixRow[]; // Made sure it's present
   createdAt: string;
   updatedAt: string;
 }
 
-// Added to match implementation
+// Updated to match implementation
 export interface UnitMatrixRow {
   id: string;
   label: string;
@@ -136,12 +150,13 @@ export interface UnitMatrixRow {
   cells: UnitMatrixCell[];
 }
 
-// Added to match implementation
+// Updated to match implementation
 export interface UnitMatrixCell {
   id: string;
   rowId: string;
   columnId: string;
   content: string;
+  value?: string; // Added for backward compatibility
 }
 
 export interface PurchaseOrderItem {
@@ -156,14 +171,14 @@ export interface PurchaseOrderItem {
 
 export interface PurchaseOrder {
   id: string;
-  poNumber: string; // Added to match implementation
+  poNumber: string; // Made sure it's present
   vendorId: string;
-  vendorName: string; // Added to match implementation
+  vendorName: string; // Made sure it's present
   status: 'draft' | 'pending' | 'approved' | 'received' | 'cancelled'; // Updated to match implementation
-  total: number; // Added to match implementation
-  expectedDeliveryDate?: string; // Added to match implementation
-  notes?: string; // Added to match implementation
-  items: PurchaseOrderItem[]; // Added to match implementation
+  total: number; // Made sure it's present
+  expectedDeliveryDate?: string; // Made sure it's present
+  notes?: string; // Made sure it's present
+  items: PurchaseOrderItem[]; // Made sure it's present
   createdAt: string;
   updatedAt: string;
 }
@@ -174,7 +189,7 @@ export interface Vendor {
   email: string;
   phone: string;
   address: string;
-  contactPerson?: string; // Added to match implementation
+  contactPerson?: string; // Made sure it's present
   notes?: string;
   createdAt: string;
   updatedAt: string;

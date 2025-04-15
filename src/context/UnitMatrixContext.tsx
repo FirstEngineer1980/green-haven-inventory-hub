@@ -1,106 +1,121 @@
 
 import React, { createContext, useState, useContext } from 'react';
-import { UnitMatrix, UnitMatrixRow, UnitMatrixColumn, UnitMatrixCell } from '../types';
-import { useNotifications } from './NotificationContext';
+import { UnitMatrix, UnitMatrixRow, UnitMatrixCell } from '../types';
 import { useRooms } from './RoomContext';
+import { useNotifications } from './NotificationContext';
 
-// Mock column data
+// Column type definition for the matrix
+interface UnitMatrixColumn {
+  id: string;
+  label: string;
+}
+
+// Mock data for columns
 const mockColumns: UnitMatrixColumn[] = [
-  { id: 'bin1', label: 'Bin1' },
-  { id: 'bin2', label: 'Bin2' },
-  { id: 'bin3', label: 'Bin3' },
-  { id: 'bin4', label: 'Bin4' },
-  { id: 'bin5', label: 'Bin5' }
+  { id: 'col-1', label: 'Column 1' },
+  { id: 'col-2', label: 'Column 2' },
+  { id: 'col-3', label: 'Column 3' },
+  { id: 'col-4', label: 'Column 4' },
+  { id: 'col-5', label: 'Column 5' },
 ];
 
-// Mock unit matrix data
-const mockUnitMatrix: UnitMatrix[] = [
+// Mock data for unit matrices
+const mockUnitMatrices: UnitMatrix[] = [
   {
     id: '1',
+    name: 'SKU Matrix 1',
     roomId: '1',
     roomName: 'Storage Room A',
-    name: 'UnitA',
     rows: [
       {
-        id: 'shelf1',
-        label: 'Shelf1',
-        color: '#FF0000',
+        id: 'row-1',
+        label: 'A',
+        color: '#FF5722',
         cells: [
-          { id: 'shelf1-bin1', value: 'SKU18', columnId: 'bin1' },
-          { id: 'shelf1-bin2', value: 'SKU2', columnId: 'bin2' },
-          { id: 'shelf1-bin3', value: 'SKU3', columnId: 'bin3' },
-          { id: 'shelf1-bin4', value: 'SKU4', columnId: 'bin4' },
-          { id: 'shelf1-bin5', value: 'SKU5', columnId: 'bin5' }
+          { id: 'cell-1-1', rowId: 'row-1', columnId: 'col-1', content: 'SKU-001' },
+          { id: 'cell-1-2', rowId: 'row-1', columnId: 'col-2', content: 'SKU-002' },
+          { id: 'cell-1-3', rowId: 'row-1', columnId: 'col-3', content: 'SKU-003' },
+          { id: 'cell-1-4', rowId: 'row-1', columnId: 'col-4', content: 'SKU-004' },
+          { id: 'cell-1-5', rowId: 'row-1', columnId: 'col-5', content: 'SKU-005' },
         ]
       },
       {
-        id: 'shelf2',
-        label: 'Shelf2',
-        color: '#3498db',
+        id: 'row-2',
+        label: 'B',
+        color: '#4CAF50',
         cells: [
-          { id: 'shelf2-bin1', value: 'SKU6', columnId: 'bin1' },
-          { id: 'shelf2-bin2', value: 'SKU7', columnId: 'bin2' },
-          { id: 'shelf2-bin3', value: 'SKU8', columnId: 'bin3' },
-          { id: 'shelf2-bin4', value: 'SKU9', columnId: 'bin4' },
-          { id: 'shelf2-bin5', value: 'SKU10', columnId: 'bin5' }
+          { id: 'cell-2-1', rowId: 'row-2', columnId: 'col-1', content: 'SKU-101' },
+          { id: 'cell-2-2', rowId: 'row-2', columnId: 'col-2', content: 'SKU-102' },
+          { id: 'cell-2-3', rowId: 'row-2', columnId: 'col-3', content: 'SKU-103' },
+          { id: 'cell-2-4', rowId: 'row-2', columnId: 'col-4', content: 'SKU-104' },
+          { id: 'cell-2-5', rowId: 'row-2', columnId: 'col-5', content: 'SKU-105' },
         ]
       },
       {
-        id: 'shelf3',
-        label: 'Shelf3',
-        color: '#f1c40f',
+        id: 'row-3',
+        label: 'C',
+        color: '#2196F3',
         cells: [
-          { id: 'shelf3-bin1', value: 'SKU11', columnId: 'bin1' },
-          { id: 'shelf3-bin2', value: 'SKU12', columnId: 'bin2' },
-          { id: 'shelf3-bin3', value: 'SKU13', columnId: 'bin3' },
-          { id: 'shelf3-bin4', value: 'SKU14', columnId: 'bin4' },
-          { id: 'shelf3-bin5', value: '', columnId: 'bin5' }
-        ]
-      },
-      {
-        id: 'shelf4',
-        label: 'Shelf4',
-        color: '#2ecc71',
-        cells: [
-          { id: 'shelf4-bin1', value: 'SKU16', columnId: 'bin1' },
-          { id: 'shelf4-bin2', value: 'SKU17', columnId: 'bin2' },
-          { id: 'shelf4-bin3', value: '', columnId: 'bin3' },
-          { id: 'shelf4-bin4', value: '', columnId: 'bin4' },
-          { id: 'shelf4-bin5', value: '', columnId: 'bin5' }
-        ]
-      },
-      {
-        id: 'shelf5',
-        label: 'Shelf5',
-        color: '#ffff00',
-        cells: [
-          { id: 'shelf5-bin1', value: 'SKU17', columnId: 'bin1' },
-          { id: 'shelf5-bin2', value: 'SKU18', columnId: 'bin2' },
-          { id: 'shelf5-bin3', value: 'SKU19', columnId: 'bin3' },
-          { id: 'shelf5-bin4', value: '', columnId: 'bin4' },
-          { id: 'shelf5-bin5', value: '', columnId: 'bin5' }
+          { id: 'cell-3-1', rowId: 'row-3', columnId: 'col-1', content: 'SKU-201' },
+          { id: 'cell-3-2', rowId: 'row-3', columnId: 'col-2', content: 'SKU-202' },
+          { id: 'cell-3-3', rowId: 'row-3', columnId: 'col-3', content: 'SKU-203' },
+          { id: 'cell-3-4', rowId: 'row-3', columnId: 'col-4', content: 'SKU-204' },
+          { id: 'cell-3-5', rowId: 'row-3', columnId: 'col-5', content: 'SKU-205' },
         ]
       }
     ],
-    createdAt: '2023-05-15T09:30:00Z',
-    updatedAt: '2023-08-25T11:45:00Z'
+    createdAt: '2023-05-10T14:30:00Z',
+    updatedAt: '2023-09-15T09:45:00Z'
+  },
+  {
+    id: '2',
+    name: 'SKU Matrix 2',
+    roomId: '2',
+    roomName: 'Warehouse Space',
+    rows: [
+      {
+        id: 'row-4',
+        label: 'X',
+        color: '#9C27B0',
+        cells: [
+          { id: 'cell-4-1', rowId: 'row-4', columnId: 'col-1', content: 'SKU-301' },
+          { id: 'cell-4-2', rowId: 'row-4', columnId: 'col-2', content: 'SKU-302' },
+          { id: 'cell-4-3', rowId: 'row-4', columnId: 'col-3', content: 'SKU-303' },
+          { id: 'cell-4-4', rowId: 'row-4', columnId: 'col-4', content: 'SKU-304' },
+          { id: 'cell-4-5', rowId: 'row-4', columnId: 'col-5', content: 'SKU-305' },
+        ]
+      },
+      {
+        id: 'row-5',
+        label: 'Y',
+        color: '#E91E63',
+        cells: [
+          { id: 'cell-5-1', rowId: 'row-5', columnId: 'col-1', content: 'SKU-401' },
+          { id: 'cell-5-2', rowId: 'row-5', columnId: 'col-2', content: 'SKU-402' },
+          { id: 'cell-5-3', rowId: 'row-5', columnId: 'col-3', content: 'SKU-403' },
+          { id: 'cell-5-4', rowId: 'row-5', columnId: 'col-4', content: 'SKU-404' },
+          { id: 'cell-5-5', rowId: 'row-5', columnId: 'col-5', content: 'SKU-405' },
+        ]
+      }
+    ],
+    createdAt: '2023-06-20T11:15:00Z',
+    updatedAt: '2023-08-30T16:20:00Z'
   }
 ];
 
 interface UnitMatrixContextType {
   unitMatrices: UnitMatrix[];
   columns: UnitMatrixColumn[];
-  addUnitMatrix: (unitMatrix: Omit<UnitMatrix, 'id' | 'roomName' | 'createdAt' | 'updatedAt'>) => void;
+  addUnitMatrix: (matrix: Omit<UnitMatrix, 'id' | 'createdAt' | 'updatedAt' | 'roomName'>) => void;
   updateUnitMatrix: (id: string, updates: Partial<UnitMatrix>) => void;
   deleteUnitMatrix: (id: string) => void;
-  getUnitMatrixByRoomId: (roomId: string) => UnitMatrix[];
-  addColumn: (label: string) => void;
-  updateColumn: (id: string, label: string) => void;
-  deleteColumn: (id: string) => void;
   addRow: (unitMatrixId: string, label: string, color: string) => void;
   updateRow: (unitMatrixId: string, rowId: string, updates: Partial<UnitMatrixRow>) => void;
   deleteRow: (unitMatrixId: string, rowId: string) => void;
-  updateCell: (unitMatrixId: string, rowId: string, columnId: string, value: string) => void;
+  updateCell: (unitMatrixId: string, rowId: string, columnId: string, content: string) => void;
+  addColumn: (label: string) => void;
+  updateColumn: (id: string, label: string) => void;
+  deleteColumn: (id: string) => void;
 }
 
 const UnitMatrixContext = createContext<UnitMatrixContextType>({} as UnitMatrixContextType);
@@ -108,153 +123,176 @@ const UnitMatrixContext = createContext<UnitMatrixContextType>({} as UnitMatrixC
 export const useUnitMatrix = () => useContext(UnitMatrixContext);
 
 export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [unitMatrices, setUnitMatrices] = useState<UnitMatrix[]>(mockUnitMatrix);
+  const [unitMatrices, setUnitMatrices] = useState<UnitMatrix[]>(mockUnitMatrices);
   const [columns, setColumns] = useState<UnitMatrixColumn[]>(mockColumns);
+  const { getRoomById } = useRooms();
   const { addNotification } = useNotifications();
-  const { rooms } = useRooms();
 
-  const getRoomName = (roomId: string): string => {
-    const room = rooms.find(r => r.id === roomId);
-    return room ? room.name : 'Unknown Room';
-  };
-
-  const addUnitMatrix = (unitMatrix: Omit<UnitMatrix, 'id' | 'roomName' | 'createdAt' | 'updatedAt'>) => {
-    if (!unitMatrix || !unitMatrix.roomId || !unitMatrix.name) {
-      console.error('Invalid unit matrix data');
-      return;
-    }
-
+  const addUnitMatrix = (matrix: Omit<UnitMatrix, 'id' | 'createdAt' | 'updatedAt' | 'roomName'>) => {
     const now = new Date().toISOString();
-    const roomName = getRoomName(unitMatrix.roomId);
-    
-    // Ensure rows have cells based on existing columns
-    const rowsWithCells = Array.isArray(unitMatrix.rows) ? unitMatrix.rows.map(row => {
-      // If cells are not provided, create them
-      if (!Array.isArray(row.cells) || row.cells.length === 0) {
-        const cellsForRow = columns.map(column => ({
-          id: `${row.id}-${column.id}`,
-          value: '',
-          columnId: column.id
-        }));
-        
-        return {
-          ...row,
-          cells: cellsForRow
-        };
-      }
-      
-      return row;
-    }) : [];
+    const room = getRoomById(matrix.roomId || '');
     
     const newUnitMatrix: UnitMatrix = {
-      ...unitMatrix,
+      ...matrix,
       id: Date.now().toString(),
-      roomName,
-      rows: rowsWithCells,
+      roomName: room ? room.name : 'Unknown Room',
       createdAt: now,
       updatedAt: now
     };
     
     setUnitMatrices(prev => [...prev, newUnitMatrix]);
     
-    // Send notification about new unit matrix
     addNotification({
-      title: 'New Unit Matrix Added',
-      message: `Unit Matrix "${newUnitMatrix.name}" has been added to ${roomName}`,
-      type: 'info',
-      for: ['1', '2'], // Admin, Manager
+      title: 'New Unit Matrix Created',
+      message: `Unit matrix "${newUnitMatrix.name}" has been created`,
+      type: 'success',
+      for: ['1', '2'], // Admin, Manager IDs
     });
   };
 
   const updateUnitMatrix = (id: string, updates: Partial<UnitMatrix>) => {
-    if (!id) return;
-
     setUnitMatrices(prev => 
-      prev.map(unitMatrix => 
-        unitMatrix.id === id 
+      prev.map(matrix => 
+        matrix.id === id 
           ? { 
-              ...unitMatrix, 
-              ...updates, 
-              roomName: updates.roomId ? getRoomName(updates.roomId) : unitMatrix.roomName,
+              ...matrix, 
+              ...updates,
+              roomName: updates.roomId ? (getRoomById(updates.roomId)?.name || 'Unknown Room') : matrix.roomName,
               updatedAt: new Date().toISOString() 
             } 
-          : unitMatrix
+          : matrix
       )
     );
-    
-    // Get the updated unit matrix
-    const updatedUnitMatrix = unitMatrices.find(u => u.id === id);
-    if (updatedUnitMatrix) {
-      // Send notification about update
-      addNotification({
-        title: 'Unit Matrix Updated',
-        message: `Unit Matrix "${updatedUnitMatrix.name}" has been updated`,
-        type: 'success',
-        for: ['1', '2'], // Admin, Manager
-      });
-    }
   };
 
   const deleteUnitMatrix = (id: string) => {
-    if (!id) return;
-
-    // Get the unit matrix before deleting
-    const unitMatrixToDelete = unitMatrices.find(u => u.id === id);
+    const matrixToDelete = unitMatrices.find(matrix => matrix.id === id);
     
-    setUnitMatrices(prev => prev.filter(unitMatrix => unitMatrix.id !== id));
-    
-    if (unitMatrixToDelete) {
+    if (matrixToDelete) {
+      setUnitMatrices(prev => prev.filter(matrix => matrix.id !== id));
+      
       addNotification({
         title: 'Unit Matrix Deleted',
-        message: `Unit Matrix "${unitMatrixToDelete.name}" has been removed from ${unitMatrixToDelete.roomName}`,
+        message: `Unit matrix "${matrixToDelete.name}" has been deleted`,
         type: 'info',
-        for: ['1', '2'], // Admin, Manager
+        for: ['1', '2'], // Admin, Manager IDs
       });
     }
   };
 
-  const getUnitMatrixByRoomId = (roomId: string): UnitMatrix[] => {
-    if (!roomId) return [];
-    return unitMatrices.filter(unitMatrix => unitMatrix.roomId === roomId);
+  const addRow = (unitMatrixId: string, label: string, color: string) => {
+    setUnitMatrices(prev => 
+      prev.map(matrix => {
+        if (matrix.id !== unitMatrixId) return matrix;
+        
+        const rowId = `row-${Date.now()}`;
+        const newCells: UnitMatrixCell[] = columns.map(column => ({
+          id: `${rowId}-${column.id}`,
+          rowId,
+          columnId: column.id,
+          content: ''
+        }));
+        
+        const newRow: UnitMatrixRow = {
+          id: rowId,
+          label,
+          color,
+          cells: newCells
+        };
+        
+        return {
+          ...matrix,
+          rows: [...(matrix.rows || []), newRow],
+          updatedAt: new Date().toISOString()
+        };
+      })
+    );
+  };
+
+  const updateRow = (unitMatrixId: string, rowId: string, updates: Partial<UnitMatrixRow>) => {
+    setUnitMatrices(prev => 
+      prev.map(matrix => {
+        if (matrix.id !== unitMatrixId) return matrix;
+        
+        return {
+          ...matrix,
+          rows: (matrix.rows || []).map(row => 
+            row.id === rowId 
+              ? { ...row, ...updates } 
+              : row
+          ),
+          updatedAt: new Date().toISOString()
+        };
+      })
+    );
+  };
+
+  const deleteRow = (unitMatrixId: string, rowId: string) => {
+    setUnitMatrices(prev => 
+      prev.map(matrix => {
+        if (matrix.id !== unitMatrixId) return matrix;
+        
+        return {
+          ...matrix,
+          rows: (matrix.rows || []).filter(row => row.id !== rowId),
+          updatedAt: new Date().toISOString()
+        };
+      })
+    );
+  };
+
+  const updateCell = (unitMatrixId: string, rowId: string, columnId: string, content: string) => {
+    setUnitMatrices(prev => 
+      prev.map(matrix => {
+        if (matrix.id !== unitMatrixId) return matrix;
+        
+        return {
+          ...matrix,
+          rows: (matrix.rows || []).map(row => {
+            if (row.id !== rowId) return row;
+            
+            return {
+              ...row,
+              cells: row.cells.map(cell => 
+                cell.columnId === columnId 
+                  ? { ...cell, content } 
+                  : cell
+              )
+            };
+          }),
+          updatedAt: new Date().toISOString()
+        };
+      })
+    );
   };
 
   const addColumn = (label: string) => {
-    if (!label) return;
-
-    const newColumn: UnitMatrixColumn = {
-      id: `column-${Date.now()}`,
-      label
-    };
+    const newColumnId = `col-${Date.now()}`;
     
-    setColumns(prev => [...prev, newColumn]);
+    setColumns(prev => [...prev, { id: newColumnId, label }]);
     
-    // Add empty cells for the new column to all rows in all matrices
+    // Add a cell for this column to each row of each matrix
     setUnitMatrices(prev => 
-      prev.map(unitMatrix => ({
-        ...unitMatrix,
-        rows: Array.isArray(unitMatrix.rows) ? unitMatrix.rows.map(row => ({
+      prev.map(matrix => ({
+        ...matrix,
+        rows: (matrix.rows || []).map(row => ({
           ...row,
-          cells: Array.isArray(row.cells) ? [
+          cells: [
             ...row.cells,
             {
-              id: `${row.id}-${newColumn.id}`,
-              value: '',
-              columnId: newColumn.id
+              id: `${row.id}-${newColumnId}`,
+              rowId: row.id,
+              columnId: newColumnId,
+              content: ''
             }
-          ] : [{
-            id: `${row.id}-${newColumn.id}`,
-            value: '',
-            columnId: newColumn.id
-          }]
-        })) : [],
+          ]
+        })),
         updatedAt: new Date().toISOString()
       }))
     );
   };
 
   const updateColumn = (id: string, label: string) => {
-    if (!id || !label) return;
-
     setColumns(prev => 
       prev.map(column => 
         column.id === id 
@@ -265,139 +303,46 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const deleteColumn = (id: string) => {
-    if (!id) return;
-
+    // First check if there's at least one column left
+    if (columns.length <= 1) {
+      addNotification({
+        title: 'Error',
+        message: 'Cannot delete the last column',
+        type: 'error',
+        for: ['1', '2'], // Admin, Manager IDs
+      });
+      return;
+    }
+    
     setColumns(prev => prev.filter(column => column.id !== id));
     
-    // Remove cells for the deleted column from all rows in all matrices
+    // Remove this column's cell from each row of each matrix
     setUnitMatrices(prev => 
-      prev.map(unitMatrix => ({
-        ...unitMatrix,
-        rows: Array.isArray(unitMatrix.rows) ? unitMatrix.rows.map(row => ({
+      prev.map(matrix => ({
+        ...matrix,
+        rows: (matrix.rows || []).map(row => ({
           ...row,
-          cells: Array.isArray(row.cells) ? row.cells.filter(cell => cell.columnId !== id) : []
-        })) : [],
+          cells: row.cells.filter(cell => cell.columnId !== id)
+        })),
         updatedAt: new Date().toISOString()
       }))
     );
   };
 
-  const addRow = (unitMatrixId: string, label: string, color: string) => {
-    if (!unitMatrixId || !label) return;
-
-    const rowId = `row-${Date.now()}`;
-    
-    // Create cells for the new row based on existing columns
-    const cellsForRow = columns.map(column => ({
-      id: `${rowId}-${column.id}`,
-      value: '',
-      columnId: column.id
-    }));
-    
-    setUnitMatrices(prev => 
-      prev.map(unitMatrix => 
-        unitMatrix.id === unitMatrixId 
-          ? {
-              ...unitMatrix,
-              rows: Array.isArray(unitMatrix.rows) ? [
-                ...unitMatrix.rows,
-                {
-                  id: rowId,
-                  label,
-                  color,
-                  cells: cellsForRow
-                }
-              ] : [{
-                id: rowId,
-                label,
-                color,
-                cells: cellsForRow
-              }],
-              updatedAt: new Date().toISOString()
-            }
-          : unitMatrix
-      )
-    );
-  };
-
-  const updateRow = (unitMatrixId: string, rowId: string, updates: Partial<UnitMatrixRow>) => {
-    if (!unitMatrixId || !rowId) return;
-
-    setUnitMatrices(prev => 
-      prev.map(unitMatrix => 
-        unitMatrix.id === unitMatrixId 
-          ? {
-              ...unitMatrix,
-              rows: Array.isArray(unitMatrix.rows) ? unitMatrix.rows.map(row => 
-                row.id === rowId 
-                  ? { ...row, ...updates } 
-                  : row
-              ) : [],
-              updatedAt: new Date().toISOString()
-            }
-          : unitMatrix
-      )
-    );
-  };
-
-  const deleteRow = (unitMatrixId: string, rowId: string) => {
-    if (!unitMatrixId || !rowId) return;
-
-    setUnitMatrices(prev => 
-      prev.map(unitMatrix => 
-        unitMatrix.id === unitMatrixId 
-          ? {
-              ...unitMatrix,
-              rows: Array.isArray(unitMatrix.rows) ? unitMatrix.rows.filter(row => row.id !== rowId) : [],
-              updatedAt: new Date().toISOString()
-            }
-          : unitMatrix
-      )
-    );
-  };
-
-  const updateCell = (unitMatrixId: string, rowId: string, columnId: string, value: string) => {
-    if (!unitMatrixId || !rowId || !columnId) return;
-
-    setUnitMatrices(prev => 
-      prev.map(unitMatrix => 
-        unitMatrix.id === unitMatrixId 
-          ? {
-              ...unitMatrix,
-              rows: Array.isArray(unitMatrix.rows) ? unitMatrix.rows.map(row => 
-                row.id === rowId 
-                  ? {
-                      ...row,
-                      cells: Array.isArray(row.cells) ? row.cells.map(cell => 
-                        cell.columnId === columnId 
-                          ? { ...cell, value } 
-                          : cell
-                      ) : []
-                    } 
-                  : row
-              ) : [],
-              updatedAt: new Date().toISOString()
-            }
-          : unitMatrix
-      )
-    );
-  };
-
   return (
     <UnitMatrixContext.Provider value={{ 
-      unitMatrices, 
+      unitMatrices,
       columns,
-      addUnitMatrix, 
-      updateUnitMatrix, 
+      addUnitMatrix,
+      updateUnitMatrix,
       deleteUnitMatrix,
-      getUnitMatrixByRoomId,
-      addColumn,
-      updateColumn,
-      deleteColumn,
       addRow,
       updateRow,
       deleteRow,
-      updateCell
+      updateCell,
+      addColumn,
+      updateColumn,
+      deleteColumn
     }}>
       {children}
     </UnitMatrixContext.Provider>

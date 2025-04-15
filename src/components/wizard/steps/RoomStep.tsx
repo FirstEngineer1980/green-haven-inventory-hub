@@ -15,8 +15,8 @@ const RoomStep = () => {
   const { addRoom, rooms } = useRooms();
   const { toast } = useToast();
   
-  const [roomForms, setRoomForms] = useState<{ name: string; unit: number }[]>([
-    { name: '', unit: 0 }
+  const [roomForms, setRoomForms] = useState<{ name: string; unit: string }[]>([
+    { name: '', unit: '' }
   ]);
   
   const handleInputChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,13 +24,13 @@ const RoomStep = () => {
     const newForms = [...roomForms];
     newForms[index] = {
       ...newForms[index],
-      [name]: name === 'unit' ? parseInt(value) || 0 : value,
+      [name]: value,
     };
     setRoomForms(newForms);
   };
   
   const addRoomForm = () => {
-    setRoomForms([...roomForms, { name: '', unit: 0 }]);
+    setRoomForms([...roomForms, { name: '', unit: '' }]);
   };
 
   const removeRoomForm = (index: number) => {
@@ -139,9 +139,8 @@ const RoomStep = () => {
                   <Input 
                     id={`unit-${index}`}
                     name="unit"
-                    type="number"
                     placeholder="Enter unit number"
-                    value={room.unit.toString()}
+                    value={room.unit}
                     onChange={(e) => handleInputChange(index, e)}
                   />
                 </div>

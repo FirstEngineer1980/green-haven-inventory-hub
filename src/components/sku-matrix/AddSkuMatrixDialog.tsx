@@ -77,8 +77,9 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
       // Create cells for each column in this row
       const cellsForRow = columns.map(column => ({
         id: `${rowId}-${column.id}`,
-        value: '',
-        columnId: column.id
+        rowId: rowId,
+        columnId: column.id,
+        content: ''
       }));
       
       return {
