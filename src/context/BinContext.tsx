@@ -7,7 +7,6 @@ const initialBins: Bin[] = [
   {
     id: '1',
     name: 'Bin A1',
-    description: 'Storage bin A1',
     status: 'active',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -15,7 +14,6 @@ const initialBins: Bin[] = [
   {
     id: '2',
     name: 'Bin B2',
-    description: 'Storage bin B2',
     status: 'active',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -28,6 +26,7 @@ interface BinContextType {
   updateBin: (id: string, updates: Partial<Bin>) => void;
   deleteBin: (id: string) => void;
   getBinById: (id: string) => Bin | undefined;
+  getBinsByUnitMatrix: (unitMatrixId: string) => Bin[];
 }
 
 const BinContext = createContext<BinContextType>({
@@ -35,7 +34,8 @@ const BinContext = createContext<BinContextType>({
   addBin: () => {},
   updateBin: () => {},
   deleteBin: () => {},
-  getBinById: () => undefined
+  getBinById: () => undefined,
+  getBinsByUnitMatrix: () => []
 });
 
 export const useBins = () => useContext(BinContext);
@@ -120,6 +120,14 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!id) return undefined;
     return bins.find(bin => bin.id === id);
   };
+  
+  // Add the missing function to get bins by unit matrix ID
+  const getBinsByUnitMatrix = (unitMatrixId: string): Bin[] => {
+    if (!unitMatrixId) return [];
+    // For now, just returning all bins since we don't have a unitMatrixId property in bins
+    // In a real implementation, you'd filter by unitMatrixId
+    return bins;
+  };
 
   return (
     <BinContext.Provider value={{ 
@@ -127,7 +135,8 @@ export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addBin, 
       updateBin, 
       deleteBin,
-      getBinById
+      getBinById,
+      getBinsByUnitMatrix
     }}>
       {children}
     </BinContext.Provider>
