@@ -18,7 +18,7 @@ interface ComboboxCellProps {
 const ComboboxCell = ({ 
   value, 
   onChange, 
-  options, 
+  options = [], // Provide default empty array
   placeholder = "Select item...", 
   disabled = false 
 }: ComboboxCellProps) => {
@@ -33,9 +33,15 @@ const ComboboxCell = ({
   }, [value]);
 
   useEffect(() => {
-    // Ensure options is a valid array before setting it
-    const safeOptions = Array.isArray(options) ? options.filter(Boolean) : [];
-    setAllOptions(safeOptions);
+    try {
+      // Ensure options is a valid array before setting it
+      const safeOptions = Array.isArray(options) ? options.filter(Boolean) : [];
+      setAllOptions(safeOptions);
+      console.log("Setting options:", safeOptions);
+    } catch (error) {
+      console.error("Error setting options:", error);
+      setAllOptions([]);
+    }
   }, [options]);
 
   const handleSelect = (currentValue: string) => {
@@ -121,7 +127,7 @@ const ComboboxCell = ({
               className="h-9"
             />
             <CommandGroup className="max-h-[200px] overflow-y-auto">
-              {filteredOptions.length === 0 ? (
+              {!filteredOptions || filteredOptions.length === 0 ? (
                 <div className="py-6 text-center text-sm">
                   No item found.
                   <Button 

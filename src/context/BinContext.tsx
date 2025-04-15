@@ -7,14 +7,20 @@ const initialBins: Bin[] = [
   {
     id: '1',
     name: 'Bin A1',
-    status: 'active',
+    length: 10,
+    width: 10,
+    height: 10,
+    volumeCapacity: 1000,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
   {
     id: '2',
     name: 'Bin B2',
-    status: 'active',
+    length: 15,
+    width: 15,
+    height: 20,
+    volumeCapacity: 4500,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
