@@ -1,3 +1,4 @@
+
 {
     "name": "inventory/backend",
     "type": "project",
@@ -7,7 +8,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.0",
-        "maatwebsite/excel": "^3.1",
+        "maatwebsite/excel": "^3.1.50",
         "laravel/sanctum": "^4.0",
         "spatie/laravel-permission": "^6.0",
         "spatie/laravel-query-builder": "^5.0",
