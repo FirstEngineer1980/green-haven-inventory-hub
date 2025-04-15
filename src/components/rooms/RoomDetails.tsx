@@ -25,14 +25,16 @@ const RoomDetails = ({ room, isOpen, onClose, onEdit, onDelete }: RoomDetailsPro
         <div className="py-6 space-y-6">
           <div className="space-y-1">
             <h3 className="text-lg font-semibold">{room.name}</h3>
-            <p className="text-sm text-muted-foreground">Unit {room.unit}</p>
+            {room.unit && <p className="text-sm text-muted-foreground">Unit {room.unit}</p>}
           </div>
           
           <div className="space-y-4">
-            <div>
-              <h4 className="text-sm font-medium">Customer</h4>
-              <p>{room.customerName}</p>
-            </div>
+            {room.customerName && (
+              <div>
+                <h4 className="text-sm font-medium">Customer</h4>
+                <p>{room.customerName}</p>
+              </div>
+            )}
             
             <div>
               <h4 className="text-sm font-medium">Created</h4>

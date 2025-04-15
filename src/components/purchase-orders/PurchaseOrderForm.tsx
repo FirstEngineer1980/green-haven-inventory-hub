@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -97,7 +96,6 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
     }
   }, [selectedVendor, form]);
 
-  // Recalculate totals when items change
   useEffect(() => {
     const items = form.watch('items');
     const itemsWithTotals = items.map(item => {
@@ -124,7 +122,8 @@ export const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   };
 
   const handleSubmit = (data: PurchaseOrderFormValues) => {
-    onSubmit(data as Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>);
+    const formattedData = data as unknown as Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>;
+    onSubmit(formattedData);
   };
 
   const handleProductChange = (productId: string, index: number) => {

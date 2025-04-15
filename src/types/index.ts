@@ -1,3 +1,4 @@
+
 export interface Notification {
   id: string;
   title: string;
@@ -50,9 +51,12 @@ export interface Category {
 export interface StockMovement {
   id: string;
   productId: string;
+  productName: string; // Added to match implementation
   type: 'in' | 'out';
   quantity: number;
   description?: string;
+  reason?: string; // Added to match implementation
+  performedBy?: string; // Added to match implementation
   date: string;
 }
 
@@ -81,6 +85,8 @@ export interface Room {
   id: string;
   name: string;
   description?: string;
+  unit?: string; // Added to match implementation
+  customerName?: string; // Added to match implementation
   createdAt: string;
   updatedAt: string;
 }
@@ -96,30 +102,68 @@ export interface Unit {
 export interface Bin {
   id: string;
   name: string;
-  roomId: string;
+  roomId?: string;
   description?: string;
+  length: number; // Added to match implementation
+  width: number; // Added to match implementation
+  height: number; // Added to match implementation
+  volumeCapacity: number; // Added to match implementation
+  unitMatrixId?: string; // Added to match implementation
+  unitMatrixName?: string; // Added to match implementation
   createdAt: string;
   updatedAt: string;
 }
 
 export interface UnitMatrix {
   id: string;
-  productId: string;
-  unitId: string;
-  quantity: number;
-  price: number;
+  productId?: string;
+  name?: string; // Added to match implementation
+  roomId?: string; // Added to match implementation
+  roomName?: string; // Added to match implementation
+  unitId?: string;
+  quantity?: number;
+  price?: number;
+  rows?: UnitMatrixRow[]; // Added to match implementation
   createdAt: string;
   updatedAt: string;
 }
 
+// Added to match implementation
+export interface UnitMatrixRow {
+  id: string;
+  label: string;
+  color: string;
+  cells: UnitMatrixCell[];
+}
+
+// Added to match implementation
+export interface UnitMatrixCell {
+  id: string;
+  rowId: string;
+  columnId: string;
+  content: string;
+}
+
+export interface PurchaseOrderItem {
+  id: string;
+  poId: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
 export interface PurchaseOrder {
   id: string;
+  poNumber: string; // Added to match implementation
   vendorId: string;
-  productId: string;
-  quantity: number;
-  price: number;
-  date: string;
-  status: 'open' | 'closed';
+  vendorName: string; // Added to match implementation
+  status: 'draft' | 'pending' | 'approved' | 'received' | 'cancelled'; // Updated to match implementation
+  total: number; // Added to match implementation
+  expectedDeliveryDate?: string; // Added to match implementation
+  notes?: string; // Added to match implementation
+  items: PurchaseOrderItem[]; // Added to match implementation
   createdAt: string;
   updatedAt: string;
 }
@@ -130,6 +174,7 @@ export interface Vendor {
   email: string;
   phone: string;
   address: string;
+  contactPerson?: string; // Added to match implementation
   notes?: string;
   createdAt: string;
   updatedAt: string;

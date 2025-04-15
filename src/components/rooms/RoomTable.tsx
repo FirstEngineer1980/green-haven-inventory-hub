@@ -51,8 +51,8 @@ const RoomTable = ({
             rooms.map(room => (
               <TableRow key={room.id}>
                 <TableCell className="font-medium">{room.name}</TableCell>
-                <TableCell>{room.unit}</TableCell>
-                <TableCell>{room.customerName}</TableCell>
+                <TableCell>{room.unit || 'N/A'}</TableCell>
+                <TableCell>{room.customerName || 'N/A'}</TableCell>
                 <TableCell>{format(new Date(room.createdAt), 'MMM d, yyyy')}</TableCell>
                 <TableCell>{format(new Date(room.updatedAt), 'MMM d, yyyy')}</TableCell>
                 <TableCell className="text-right">

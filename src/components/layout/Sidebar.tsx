@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -22,6 +21,7 @@ import {
   Layers,
   FolderTree
 } from 'lucide-react';
+import { Permission } from '@/types';
 
 interface SidebarProps {
   className?: string;
@@ -142,7 +142,7 @@ const Sidebar = ({ className }: SidebarProps) => {
   const hasPermission = (permission?: string) => {
     if (!permission) return true;
     if (!currentUser) return false;
-    return currentUser.permissions.includes(permission);
+    return currentUser.permissions.includes(permission as Permission);
   };
 
   return (

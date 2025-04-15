@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { BinForm } from './BinForm';
 import { useBins } from '@/context/BinContext';
+import { Bin } from '@/types';
 
 interface AddBinDialogProps {
   open: boolean;
@@ -23,13 +24,13 @@ export const AddBinDialog: React.FC<AddBinDialogProps> = ({
 }) => {
   const { addBin } = useBins();
 
-  const handleSubmit = (data: Parameters<typeof addBin>[0]) => {
+  const handleSubmit = (data: Partial<Bin>) => {
     // If unitMatrixId is provided as a prop, use it as the default
     const binData = unitMatrixId 
       ? { ...data, unitMatrixId } 
       : data;
       
-    addBin(binData);
+    addBin(binData as any);
     onOpenChange(false);
   };
 

@@ -43,7 +43,7 @@ export const EditPurchaseOrderDialog: React.FC<EditPurchaseOrderDialogProps> = (
         
         <PurchaseOrderForm 
           onSubmit={onSubmit} 
-          defaultValues={purchaseOrder} 
+          defaultValues={purchaseOrder as any} 
           vendors={vendors} 
           products={products} 
           isEditing={true}

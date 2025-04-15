@@ -18,7 +18,7 @@ const binSchema = z.object({
 type BinFormValues = z.infer<typeof binSchema>;
 
 interface BinFormProps {
-  onSubmit: (data: Omit<Bin, 'id' | 'volumeCapacity' | 'unitMatrixName' | 'createdAt' | 'updatedAt'>) => void;
+  onSubmit: (data: Omit<Bin, 'id' | 'volumeCapacity' | 'createdAt' | 'updatedAt'>) => void;
   defaultValues?: Partial<Bin>;
   isEditing?: boolean;
 }
@@ -44,7 +44,8 @@ export const BinForm: React.FC<BinFormProps> = ({
       length: Number(values.length),
       width: Number(values.width),
       height: Number(values.height),
-      unitMatrixId: defaultValues.unitMatrixId
+      unitMatrixId: defaultValues.unitMatrixId,
+      roomId: defaultValues.roomId
     });
   };
 
