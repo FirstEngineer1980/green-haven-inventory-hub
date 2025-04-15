@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,9 +5,9 @@ import { useBins } from '@/context/BinContext';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import BinTable from '@/components/bins/BinTable';
-import AddBinDialog from '@/components/bins/AddBinDialog';
-import EditBinDialog from '@/components/bins/EditBinDialog';
+import { BinTable } from '@/components/bins/BinTable';
+import { AddBinDialog } from '@/components/bins/AddBinDialog';
+import { EditBinDialog } from '@/components/bins/EditBinDialog';
 import { Bin } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import ExportButton from '@/components/shared/ExportButton';
@@ -52,7 +51,6 @@ const Bins = () => {
     }
   };
 
-  // Filter bins by search term
   const filteredBins = bins.filter(bin => 
     bin.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
