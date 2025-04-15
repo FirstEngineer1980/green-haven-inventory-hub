@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -17,6 +16,7 @@ import { Customer } from '@/types';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ImportCustomersDialog } from '@/components/customers/ImportCustomersDialog';
 
 const Customers = () => {
   const { customers, toggleCustomerStatus, deleteCustomer } = useCustomers();
@@ -28,7 +28,6 @@ const Customers = () => {
   const { toast } = useToast();
   const itemsPerPage = 10;
 
-  // Filter customers based on search term and status
   const filteredCustomers = customers
     .filter(customer => 
       (statusFilter === 'all' || customer.status === statusFilter) &&
@@ -38,7 +37,6 @@ const Customers = () => {
       customer.phone.includes(searchTerm))
     );
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
   const paginatedCustomers = filteredCustomers.slice(
     (currentPage - 1) * itemsPerPage, 
@@ -90,6 +88,7 @@ const Customers = () => {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
           <div className="flex gap-3">
+            <ImportCustomersDialog />
             <Button variant="outline" onClick={() => navigate('/customers/manage')}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Customer
@@ -277,7 +276,6 @@ const Customers = () => {
         </Card>
       </div>
 
-      {/* Customer Details Sheet */}
       {selectedCustomer && (
         <Sheet open={!!selectedCustomer} onOpenChange={() => setSelectedCustomer(null)}>
           <SheetContent className="sm:max-w-xl">

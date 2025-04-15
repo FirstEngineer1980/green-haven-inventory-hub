@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Http\Request;
@@ -47,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
     
     // Customer routes
+    Route::post('/customers/import', [CustomerController::class, 'import']);
     Route::apiResource('customers', CustomerController::class);
     
     // Customer Product routes

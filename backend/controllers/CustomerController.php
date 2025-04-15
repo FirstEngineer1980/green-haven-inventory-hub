@@ -1,10 +1,11 @@
-
 <?php
 
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Imports\ClientsImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CustomerController extends Controller
 {
@@ -74,5 +75,33 @@ class CustomerController extends Controller
         $customer->delete();
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Import customers from Excel file.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:10240', // max 10MB
+        ]);
+
+        try {
+            Excel::import(new ClientsImport, $request->file('file'));
+
+            return response()->json([
+                'message' => 'Customers imported successfully'
+            ], 200);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->failures()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Import failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
