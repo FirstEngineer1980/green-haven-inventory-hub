@@ -44,86 +44,86 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::apiResource('users', UserController::class);
-    
+
     // Customer routes
     Route::post('/customers/import', [CustomerController::class, 'import']);
     Route::apiResource('customers', CustomerController::class);
-    
+
     // Customer Product routes
     Route::apiResource('customer-products', CustomerProductController::class);
     Route::get('/customers/{customer}/products', [CustomerProductController::class, 'getByCustomer']);
-    
+
     // Customer List routes
     Route::apiResource('customer-lists', CustomerListController::class);
     Route::get('/customers/{customer}/lists', [CustomerListController::class, 'getByCustomer']);
-    
+
     // Room routes
     Route::apiResource('rooms', RoomController::class);
     Route::get('/customers/{customer}/rooms', [RoomController::class, 'getByCustomer']);
-    
+
     // Unit routes
     Route::apiResource('units', UnitController::class);
     Route::get('/rooms/{room}/units', [UnitController::class, 'getByRoom']);
-    
+
     // Vendor routes
     Route::apiResource('vendors', VendorController::class);
-    
+
     // Purchase Order routes
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
     Route::patch('/purchase-orders/{purchaseOrder}/status', [PurchaseOrderController::class, 'updateStatus']);
     Route::post('/purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receiveItems']);
     Route::get('/vendors/{vendor}/purchase-orders', [PurchaseOrderController::class, 'getByVendor']);
     Route::post('/purchase-orders/process-recurring', [PurchaseOrderController::class, 'processRecurring']);
-    
+
     // Client Order Template routes
     Route::apiResource('client-order-templates', ClientOrderTemplateController::class);
     Route::get('/customers/{customer}/order-templates', [ClientOrderTemplateController::class, 'getByCustomer']);
     Route::post('/client-order-templates/process', [ClientOrderTemplateController::class, 'processTemplates']);
     Route::get('/client-order-templates/due', [ClientOrderTemplateController::class, 'getDueTemplates']);
     Route::post('/client-order-templates/{clientOrderTemplate}/create-order', [ClientOrderTemplateController::class, 'createOrder']);
-    
+
     // Product routes
     Route::apiResource('products', ProductController::class);
     Route::get('/products/low-stock', [ProductController::class, 'lowStock']);
     Route::post('/products/{product}/adjust-stock', [ProductController::class, 'adjustStock']);
-    
+
     // Category routes
     Route::apiResource('categories', CategoryController::class);
     Route::get('/categories/{category}/products', [CategoryController::class, 'getProducts']);
-    
+
     // Stock Movement routes
     Route::apiResource('stock-movements', StockMovementController::class);
     Route::get('/products/{product}/stock-movements', [StockMovementController::class, 'getByProduct']);
-    
+
     // Inventory Item routes
     Route::apiResource('inventory-items', InventoryItemController::class);
     Route::get('/units/{unit}/inventory', [InventoryItemController::class, 'getByUnit']);
     Route::get('/products/{product}/inventory', [InventoryItemController::class, 'getByProduct']);
-    
+
     // Bin routes
     Route::apiResource('bins', BinController::class);
-    
+
     // SKU Matrix routes
     Route::apiResource('sku-matrices', SkuMatrixController::class);
     Route::get('/rooms/{room}/sku-matrices', [SkuMatrixController::class, 'getByRoom']);
     Route::apiResource('sku-matrix-rows', 'SkuMatrixRowController');
     Route::apiResource('sku-matrix-cells', 'SkuMatrixCellController');
-    
+
     // Setting routes
     Route::get('/settings', [SettingController::class, 'index']);
     Route::get('/settings/{key}', [SettingController::class, 'show']);
     Route::post('/settings', [SettingController::class, 'store']);
     Route::put('/settings/{key}', [SettingController::class, 'update']);
-    
+
     // Notification routes
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
-    
+
     // Report routes
     Route::apiResource('reports', ReportController::class);
     Route::post('/reports/{report}/generate', [ReportController::class, 'generate']);
-    
+
     // Dashboard routes
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/dashboard/low-stock', [DashboardController::class, 'lowStock']);
