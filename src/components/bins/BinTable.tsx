@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -19,7 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 interface BinTableProps {
   bins?: Bin[]; // Made optional with default from context
   unitMatrixId?: string;
-  onEdit: (bin: Bin) => void;
+  onEdit?: (bin: Bin) => void; // Made optional to fix the TypeScript error
 }
 
 export const BinTable: React.FC<BinTableProps> = ({ bins: propBins, unitMatrixId, onEdit }) => {
