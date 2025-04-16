@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Bell, Search, Settings, UserRound, LogOut } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -20,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 const Header = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications = [], unreadCount = 0, markAsRead, markAllAsRead } = useNotifications() || {};
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const formatRelativeTime = (dateString: string) => {
@@ -84,7 +85,7 @@ const Header = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <ScrollArea className="h-80">
-                {notifications.length === 0 ? (
+                {!notifications || notifications.length === 0 ? (
                   <div className="py-4 px-2 text-center text-gray-500">
                     No notifications yet
                   </div>
