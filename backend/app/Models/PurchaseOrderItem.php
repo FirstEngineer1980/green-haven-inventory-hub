@@ -71,4 +71,17 @@ class PurchaseOrderItem extends Model
         }
         $this->save();
     }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
+    {
+        static::updated(function ($item) {
+            // If received_quantity changed, update the status
+            if ($item->isDirty('received_quantity')) {
+                $item->updateReceiptStatus();
+            }
+        });
+    }
 }

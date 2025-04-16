@@ -25,9 +25,16 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, partial, received
             $table->timestamps();
             $table->softDeletes();
-            
-            // Add the foreign key constraint separately to handle the nullable field properly
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
+        });
+
+        // Add foreign key in a separate statement to ensure the products table exists
+        Schema::table('purchase_order_items', function (Blueprint $table) {
+            if (Schema::hasTable('products')) {
+                $table->foreign('product_id')
+                      ->references('id')
+                      ->on('products')
+                      ->onDelete('set null');
+            }
         });
     }
 
