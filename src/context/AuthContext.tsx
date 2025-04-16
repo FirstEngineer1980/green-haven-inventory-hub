@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   hasPermission: (permission: Permission) => boolean;
+  updateUser: (userData: Partial<User>) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -130,6 +131,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Update user function
+  const updateUser = async (userData: Partial<User>): Promise<boolean> => {
+    try {
+      // For demo accounts, just update the local state
+      if (currentUser && currentUser.email.includes('@greenhaven.com') || currentUser?.email.includes('@example.com')) {
+        const updatedUser = { ...currentUser, ...userData };
+        setCurrentUser(updatedUser);
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        return true;
+      }
+      
+      // For non-demo accounts, call the API
+      const response = await axios.put(`/api/users/${currentUser?.id}`, userData);
+      const updatedUser = response.data;
+      
+      setCurrentUser(prev => prev ? { ...prev, ...updatedUser } : null);
+      localStorage.setItem('currentUser', JSON.stringify({ ...currentUser, ...updatedUser }));
+      
+      return true;
+    } catch (error) {
+      console.error('Update user error:', error);
+      return false;
+    }
+  };
+
   // Logout function
   const logout = () => {
     setCurrentUser(null);
@@ -153,7 +179,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentUser, 
       login, 
       logout,
-      hasPermission
+      hasPermission,
+      updateUser
     }}>
       {children}
     </AuthContext.Provider>

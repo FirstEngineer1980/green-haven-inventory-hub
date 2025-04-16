@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -41,6 +40,7 @@ import WizardPage from './pages/WizardPage';
 import Inventory from './pages/Inventory';
 import Unauthorized from './pages/Unauthorized';
 import Index from './pages/Index';
+import Profile from './pages/Profile';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -88,6 +88,7 @@ function App() {
                                     <Route path="/reports" element={<Reports />} />
                                     <Route path="/wizard" element={<WizardPage />} />
                                     <Route path="/inventory" element={<Inventory />} />
+                                    <Route path="/profile" element={<Profile />} />
                                   </Route>
                                   
                                   <Route path="*" element={<NotFound />} />

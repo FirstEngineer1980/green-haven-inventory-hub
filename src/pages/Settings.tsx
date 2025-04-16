@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +9,9 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Warehouse } from '@/types/warehouse';
 import { useAuth } from '@/context/AuthContext';
+import NotifyingExportButton from '@/components/shared/NotifyingExportButton';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock warehouse data
 const warehouses: Warehouse[] = [
@@ -51,12 +53,132 @@ const warehouses: Warehouse[] = [
   }
 ];
 
+// Mock data for export functionality
+const mockProducts = [
+  { id: 'p1', name: 'Product 1', sku: 'SKU001', category: 'Category A', stock: 120 },
+  { id: 'p2', name: 'Product 2', sku: 'SKU002', category: 'Category B', stock: 85 },
+  { id: 'p3', name: 'Product 3', sku: 'SKU003', category: 'Category A', stock: 42 },
+];
+
+const mockCustomers = [
+  { id: 'c1', name: 'Customer 1', email: 'customer1@example.com', company: 'Company A' },
+  { id: 'c2', name: 'Customer 2', email: 'customer2@example.com', company: 'Company B' },
+];
+
+const mockMovements = [
+  { id: 'm1', product: 'Product 1', quantity: 10, type: 'incoming', date: '2023-04-01' },
+  { id: 'm2', product: 'Product 2', quantity: 5, type: 'outgoing', date: '2023-04-02' },
+];
+
 const Settings = () => {
   const { currentUser } = useAuth();
+  const { toast } = useToast();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [lowStockAlerts, setLowStockAlerts] = useState(true);
   const [newProductNotifications, setNewProductNotifications] = useState(true);
   const [systemMaintenanceNotifications, setSystemMaintenanceNotifications] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSaveGeneralSettings = async () => {
+    setIsSubmitting(true);
+    try {
+      // Save company information settings
+      await axios.put('/api/settings/company', {
+        name: document.getElementById('company-name')?.value,
+        tax_id: document.getElementById('tax-id')?.value,
+        address: document.getElementById('address')?.value,
+        phone: document.getElementById('phone')?.value,
+        email: document.getElementById('email')?.value,
+      });
+      
+      toast({
+        title: "Settings saved",
+        description: "Your company information has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast({
+        title: "Save failed",
+        description: "There was an error saving your settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSaveNotificationPreferences = async () => {
+    setIsSubmitting(true);
+    try {
+      // Save notification preferences
+      await axios.put('/api/settings/notifications', {
+        email_notifications: emailNotifications,
+        low_stock_alerts: lowStockAlerts,
+        new_product_notifications: newProductNotifications,
+        system_maintenance_notifications: systemMaintenanceNotifications,
+      });
+      
+      toast({
+        title: "Preferences saved",
+        description: "Your notification preferences have been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      toast({
+        title: "Save failed",
+        description: "There was an error saving your preferences. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetSystem = async () => {
+    if (window.confirm('WARNING: This will reset all system data. This action cannot be undone. Are you sure you want to proceed?')) {
+      setIsSubmitting(true);
+      try {
+        await axios.post('/api/settings/reset-system');
+        
+        toast({
+          title: "System reset",
+          description: "The system has been reset successfully.",
+        });
+      } catch (error) {
+        console.error('Error resetting system:', error);
+        toast({
+          title: "Reset failed",
+          description: "There was an error resetting the system. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const handleClearAllData = async () => {
+    if (window.confirm('WARNING: This will clear all data from the system. This action cannot be undone. Are you sure you want to proceed?')) {
+      setIsSubmitting(true);
+      try {
+        await axios.post('/api/settings/clear-data');
+        
+        toast({
+          title: "Data cleared",
+          description: "All data has been cleared from the system.",
+        });
+      } catch (error) {
+        console.error('Error clearing data:', error);
+        toast({
+          title: "Clear failed",
+          description: "There was an error clearing the data. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -124,7 +246,9 @@ const Settings = () => {
                 </div>
                 
                 <div className="pt-2">
-                  <Button>Save Changes</Button>
+                  <Button onClick={handleSaveGeneralSettings} disabled={isSubmitting}>
+                    {isSubmitting ? "Saving..." : "Save Changes"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -166,7 +290,9 @@ const Settings = () => {
                 </div>
                 
                 <div className="pt-2">
-                  <Button>Save Changes</Button>
+                  <Button onClick={handleSaveGeneralSettings} disabled={isSubmitting}>
+                    {isSubmitting ? "Saving..." : "Save Changes"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -233,7 +359,9 @@ const Settings = () => {
                 </div>
                 
                 <div className="pt-2">
-                  <Button>Save Preferences</Button>
+                  <Button onClick={handleSaveNotificationPreferences} disabled={isSubmitting}>
+                    {isSubmitting ? "Saving..." : "Save Preferences"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -323,10 +451,25 @@ const Settings = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <p className="text-sm">Export inventory data for backup or reporting purposes.</p>
-                  <div className="flex gap-3">
-                    <Button variant="outline">Export Products</Button>
-                    <Button variant="outline">Export Customers</Button>
-                    <Button variant="outline">Export Movements</Button>
+                  <div className="flex gap-3 flex-wrap">
+                    <NotifyingExportButton 
+                      data={mockProducts} 
+                      filename="products" 
+                      notificationType="products"
+                      label="Export Products"
+                    />
+                    <NotifyingExportButton 
+                      data={mockCustomers} 
+                      filename="customers" 
+                      notificationType="customers"
+                      label="Export Customers"
+                    />
+                    <NotifyingExportButton 
+                      data={mockMovements} 
+                      filename="movements" 
+                      notificationType="movements"
+                      label="Export Movements"
+                    />
                   </div>
                 </div>
                 
@@ -344,8 +487,20 @@ const Settings = () => {
                       The following actions cannot be undone.
                     </p>
                     <div className="flex gap-3">
-                      <Button variant="destructive">Reset System</Button>
-                      <Button variant="destructive">Clear All Data</Button>
+                      <Button 
+                        variant="destructive" 
+                        onClick={handleResetSystem}
+                        disabled={isSubmitting}
+                      >
+                        Reset System
+                      </Button>
+                      <Button 
+                        variant="destructive"
+                        onClick={handleClearAllData}
+                        disabled={isSubmitting}
+                      >
+                        Clear All Data
+                      </Button>
                     </div>
                   </div>
                 )}

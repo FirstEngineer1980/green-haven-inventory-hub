@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Http\Request;
@@ -23,6 +22,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailLogController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ExportNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,20 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::apiResource('users', UserController::class);
+
+    // Profile routes
+    Route::put('/profile', [ProfileController::class, 'updateProfile']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+    Route::post('/profile/avatar', [ProfileController::class, 'uploadAvatar']);
+
+    // Export notification routes
+    Route::post('/export-notifications', [ExportNotificationController::class, 'store']);
+
+    // Settings routes
+    Route::put('/settings/company', [SettingController::class, 'updateCompanySettings']);
+    Route::put('/settings/notifications', [SettingController::class, 'updateNotificationSettings']);
+    Route::post('/settings/reset-system', [SettingController::class, 'resetSystem']);
+    Route::post('/settings/clear-data', [SettingController::class, 'clearData']);
 
     // Customer routes
     Route::post('/customers/import', [CustomerController::class, 'import']);
