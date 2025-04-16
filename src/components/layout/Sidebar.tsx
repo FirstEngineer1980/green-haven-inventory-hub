@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Sheet,
@@ -7,7 +8,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { SidebarClose, SidebarOpen } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 import {
   NavigationMenu,
@@ -15,6 +15,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
+import { Button } from "@/components/ui/button"
 import { useAuth } from '@/context/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -22,7 +23,7 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   ShoppingCart,
-  Category,
+  Tag,
   Users,
   ShoppingBag,
   Store,
@@ -34,7 +35,6 @@ import {
   User,
   HelpCircle,
   BadgePercent,
-  Tag,
   Eye
 } from 'lucide-react';
 
@@ -60,133 +60,133 @@ const Sidebar: React.FC = () => {
   const sidebarSections: SidebarSection[] = [
     {
       name: 'General',
-      icon: LayoutDashboard,
+      icon: <LayoutDashboard className="h-4 w-4" />,
       permissions: ['admin', 'manager', 'staff', 'customer'],
       submenus: [
         {
           name: 'Dashboard',
           path: '/dashboard',
-          icon: LayoutDashboard,
+          icon: <LayoutDashboard className="h-4 w-4" />,
         },
       ]
     },
     {
       name: 'E-Commerce',
-      icon: ShoppingCart,
+      icon: <ShoppingCart className="h-4 w-4" />,
       permissions: ['admin', 'manager', 'staff'],
       submenus: [
         {
           name: 'Products',
           path: '/products',
-          icon: ShoppingBag,
+          icon: <ShoppingBag className="h-4 w-4" />,
         },
         {
           name: 'Categories',
           path: '/categories',
-          icon: Category,
+          icon: <Tag className="h-4 w-4" />,
         },
         {
           name: 'Promotions',
           path: '/promotions',
-          icon: BadgePercent,
+          icon: <BadgePercent className="h-4 w-4" />,
         },
         {
           name: 'Orders',
           path: '/orders',
-          icon: ShoppingCart,
+          icon: <ShoppingCart className="h-4 w-4" />,
         },
       ]
     },
     {
       name: 'Inventory',
-      icon: Store,
+      icon: <Store className="h-4 w-4" />,
       permissions: ['admin', 'manager'],
       submenus: [
         {
           name: 'Stock Control',
           path: '/inventory',
-          icon: Boxes,
+          icon: <Boxes className="h-4 w-4" />,
         },
         {
           name: 'Stock Movements',
           path: '/stock-movements',
-          icon: Package,
+          icon: <Package className="h-4 w-4" />,
         },
         {
           name: 'Purchase Orders',
           path: '/purchase-orders',
-          icon: ShoppingCart,
+          icon: <ShoppingCart className="h-4 w-4" />,
         },
         {
           name: 'Bins',
           path: '/bins',
-          icon: Store,
+          icon: <Store className="h-4 w-4" />,
         },
         {
           name: 'SKU Matrix',
           path: '/sku-matrix',
-          icon: Boxes,
+          icon: <Boxes className="h-4 w-4" />,
         },
       ]
     },
     {
       name: 'Customers',
-      icon: Users,
+      icon: <Users className="h-4 w-4" />,
       permissions: ['admin', 'manager'],
       submenus: [
         {
           name: 'Customer List',
           path: '/customer-list',
-          icon: Users,
+          icon: <Users className="h-4 w-4" />,
         },
         {
           name: 'Customer Products',
           path: '/customer-products',
-          icon: ShoppingCart,
+          icon: <ShoppingCart className="h-4 w-4" />,
         },
       ]
     },
     {
       name: 'Administration',
-      icon: Settings,
+      icon: <Settings className="h-4 w-4" />,
       permissions: ['admin'],
       submenus: [
         {
           name: 'Users',
           path: '/users',
-          icon: Users,
+          icon: <Users className="h-4 w-4" />,
         },
         {
           name: 'Notifications',
           path: '/notifications',
-          icon: Bell,
+          icon: <Bell className="h-4 w-4" />,
         },
         {
           name: 'Settings',
           path: '/settings',
-          icon: Settings,
+          icon: <Settings className="h-4 w-4" />,
         },
         {
           name: 'Reports',
           path: '/reports',
-          icon: BarChart,
+          icon: <BarChart className="h-4 w-4" />,
         },
       ]
     },
     {
       name: 'Marketing',
-      icon: BadgePercent,
+      icon: <BadgePercent className="h-4 w-4" />,
       permissions: ['admin', 'manager'],
       submenus: [
         {
           name: 'Manage Promotions',
           path: '/manage-promotions',
-          icon: Tag,
+          icon: <Tag className="h-4 w-4" />,
         },
         {
           name: 'View Promotions',
           path: '/promotions',
-          icon: Eye,
+          icon: <Eye className="h-4 w-4" />,
         }
       ]
     },
@@ -197,7 +197,7 @@ const Sidebar: React.FC = () => {
       <div className="px-6 py-4">
         <h1 className="text-lg font-semibold">Inventory System</h1>
         <p className="text-sm text-muted-foreground">
-          {user ? `Welcome, ${user.firstName}!` : 'Welcome!'}
+          {user?.firstName ? `Welcome, ${user.firstName}!` : 'Welcome!'}
         </p>
       </div>
 
@@ -206,7 +206,7 @@ const Sidebar: React.FC = () => {
       <NavigationMenu className="flex-1">
         {sidebarSections.map((section, index) => (
           <div key={index}>
-            {hasPermission('admin') || section.permissions.some(permission => hasPermission(permission)) ? (
+            {hasPermission(section.permissions[0]) || section.permissions.some(permission => hasPermission(permission)) ? (
               <>
                 <div className="px-6 py-2 text-sm font-semibold text-muted-foreground">
                   {section.name}
@@ -266,7 +266,25 @@ const Sidebar: React.FC = () => {
     return (
       <Sheet>
         <SheetTrigger asChild>
-          <SidebarOpen />
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6"
+            >
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+            <span className="sr-only">Open menu</span>
+          </Button>
         </SheetTrigger>
         <SheetContent className="w-80 border-0 bg-secondary pt-0 text-foreground">
           <SheetHeader className="pl-0 pr-6">
@@ -276,7 +294,24 @@ const Sidebar: React.FC = () => {
             </SheetDescription>
           </SheetHeader>
           {renderSidebarContent()}
-          <SidebarClose className="absolute right-4 top-4" />
+          <Button variant="ghost" size="icon" className="absolute right-4 top-4" onClick={() => document.querySelector('[data-radix-collection-item]')?.click()}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+            <span className="sr-only">Close menu</span>
+          </Button>
         </SheetContent>
       </Sheet>
     );

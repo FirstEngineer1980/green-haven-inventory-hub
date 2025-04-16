@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -375,7 +374,7 @@ const ManagePromotions = () => {
                 <Label>Start Date</Label>
                 <DatePicker
                   date={formData.startDate ? new Date(formData.startDate) : undefined}
-                  onSelect={(date) => handleDateChange(date, 'startDate')}
+                  setDate={(date) => handleDateChange(date, 'startDate')}
                 />
               </div>
               
@@ -383,7 +382,7 @@ const ManagePromotions = () => {
                 <Label>End Date</Label>
                 <DatePicker
                   date={formData.endDate ? new Date(formData.endDate) : undefined}
-                  onSelect={(date) => handleDateChange(date, 'endDate')}
+                  setDate={(date) => handleDateChange(date, 'endDate')}
                 />
               </div>
             </div>
@@ -500,7 +499,7 @@ const ManagePromotions = () => {
                 <Label>Start Date</Label>
                 <DatePicker
                   date={formData.startDate ? new Date(formData.startDate) : undefined}
-                  onSelect={(date) => handleDateChange(date, 'startDate')}
+                  setDate={(date) => handleDateChange(date, 'startDate')}
                 />
               </div>
               
@@ -508,7 +507,7 @@ const ManagePromotions = () => {
                 <Label>End Date</Label>
                 <DatePicker
                   date={formData.endDate ? new Date(formData.endDate) : undefined}
-                  onSelect={(date) => handleDateChange(date, 'endDate')}
+                  setDate={(date) => handleDateChange(date, 'endDate')}
                 />
               </div>
             </div>
