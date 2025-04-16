@@ -1,8 +1,11 @@
 
 import React, { useState } from 'react';
-import { Bell, Search, Settings, UserRound, LogOut } from 'lucide-react';
+import { Bell, Search, Settings, UserRound, LogOut, Heart, BarChart2, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/context/NotificationContext';
+import { useFavorites } from '@/context/FavoritesContext';
+import { useComparison } from '@/context/ComparisonContext';
+import { useCart } from '@/context/CartContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +26,9 @@ const Header = () => {
   const navigate = useNavigate();
   const { notifications = [], unreadCount = 0, markAsRead, markAllAsRead } = useNotifications() || {};
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const { favorites } = useFavorites();
+  const { comparisonList } = useComparison();
+  const { totalItems } = useCart();
 
   const formatRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -63,6 +69,51 @@ const Header = () => {
         </div>
         
         <div className="flex items-center space-x-4">
+          {/* Favorites Button */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative"
+            onClick={() => navigate('/favorites')}
+          >
+            <Heart className="h-5 w-5" />
+            {favorites.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-gh-green text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
+          </Button>
+          
+          {/* Compare Button */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative"
+            onClick={() => navigate('/compare')}
+          >
+            <BarChart2 className="h-5 w-5" />
+            {comparisonList.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-gh-blue text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                {comparisonList.length}
+              </span>
+            )}
+          </Button>
+          
+          {/* Cart Button */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative"
+            onClick={() => navigate('/cart')}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </Button>
+        
           <DropdownMenu open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
@@ -148,6 +199,10 @@ const Header = () => {
               <DropdownMenuItem onClick={handleSettingsClick}>
                 <Settings className="mr-2 h-4 w-4" />
                 Account Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/orders')}>
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                My Orders
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
