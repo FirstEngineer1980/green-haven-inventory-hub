@@ -13,9 +13,9 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             CategorySeeder::class,
+            ProductSeeder::class, // Ensuring this runs before purchase orders
             VendorSeeder::class,
             CustomerSeeder::class,
-            ProductSeeder::class,
             RoomSeeder::class,
             UnitSeeder::class,
             SkuMatrixSeeder::class,

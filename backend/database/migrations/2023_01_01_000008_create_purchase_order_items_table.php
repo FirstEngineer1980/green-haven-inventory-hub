@@ -27,15 +27,15 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // Add foreign key in a separate statement to ensure the products table exists
-        Schema::table('purchase_order_items', function (Blueprint $table) {
-            if (Schema::hasTable('products')) {
+        // Only add the foreign key constraint if the products table exists
+        if (Schema::hasTable('products')) {
+            Schema::table('purchase_order_items', function (Blueprint $table) {
                 $table->foreign('product_id')
                       ->references('id')
                       ->on('products')
                       ->onDelete('set null');
-            }
-        });
+            });
+        }
     }
 
     /**
