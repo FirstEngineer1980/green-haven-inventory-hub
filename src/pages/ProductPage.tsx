@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -9,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useProducts } from '@/context/ProductContext';
+import { useCart } from '@/context/CartContext';
 import { ArrowLeft, Heart, BarChart2, ShoppingCart, Scale } from 'lucide-react';
 
 const ProductPage = () => {
@@ -16,6 +16,7 @@ const ProductPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { products } = useProducts();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
   
@@ -29,10 +30,13 @@ const ProductPage = () => {
   }, [id, products, navigate]);
   
   const handleAddToCart = () => {
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart`,
-    });
+    if (product) {
+      addToCart(product, quantity);
+      toast({
+        title: "Added to cart",
+        description: `${quantity}x ${product.name} has been added to your cart`,
+      });
+    }
   };
   
   const handleAddToFavorites = () => {
