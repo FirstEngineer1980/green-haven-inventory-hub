@@ -138,6 +138,7 @@ return [
          * Package Service Providers...
          */
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Illuminate\Filesystem\FilesystemServiceProvider::class,
 
         // ... keep existing code (other service providers)
     ],
