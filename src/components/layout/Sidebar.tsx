@@ -196,29 +196,29 @@ const Sidebar: React.FC = () => {
   const renderSidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="px-6 py-4">
-        <h1 className="text-lg font-semibold">Inventory System</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-lg font-semibold text-white">Inventory System</h1>
+        <p className="text-sm text-blue-100">
           {currentUser?.name ? `Welcome, ${currentUser.name.split(' ')[0]}!` : 'Welcome!'}
         </p>
       </div>
 
-      <Separator />
+      <Separator className="bg-blue-400" />
 
       <NavigationMenu className="flex-1">
         {sidebarSections.map((section, index) => (
           <div key={index}>
             {section.permissions.some(permission => hasPermission(permission)) ? (
               <>
-                <div className="px-6 py-2 text-sm font-semibold text-muted-foreground">
+                <div className="px-6 py-2 text-sm font-semibold text-blue-100">
                   {section.name}
                 </div>
-                <NavigationMenuList>
-                  {section.submenus.map((item, index) => (
-                    <NavigationMenuItem key={index}>
+                <NavigationMenuList className="flex-col">
+                  {section.submenus.map((item, idx) => (
+                    <NavigationMenuItem key={idx}>
                       <NavigationMenuLink
                         className={cn(
-                          "group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground data-[active]:bg-secondary data-[active]:text-accent-foreground",
-                          location.pathname === item.path ? "bg-secondary text-accent-foreground" : "text-foreground"
+                          "group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-blue-600 hover:text-white data-[active]:bg-blue-600 data-[active]:text-white",
+                          location.pathname === item.path ? "bg-blue-600 text-white" : "text-blue-100"
                         )}
                         onClick={() => navigate(item.path)}
                       >
@@ -228,7 +228,7 @@ const Sidebar: React.FC = () => {
                     </NavigationMenuItem>
                   ))}
                 </NavigationMenuList>
-                <Separator />
+                <Separator className="bg-blue-400 my-2" />
               </>
             ) : null}
           </div>
@@ -236,12 +236,12 @@ const Sidebar: React.FC = () => {
       </NavigationMenu>
 
       <div className="mt-auto px-6 py-4">
-        <Separator />
+        <Separator className="bg-blue-400 mb-2" />
         <NavigationMenu>
-          <NavigationMenuList>
+          <NavigationMenuList className="flex-col">
             <NavigationMenuItem>
               <NavigationMenuLink
-                className="group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground data-[active]:bg-secondary data-[active]:text-accent-foreground"
+                className="group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-blue-600 hover:text-white text-blue-100"
                 onClick={() => navigate('/profile')}
               >
                 <User className="w-4 h-4" />
@@ -250,7 +250,7 @@ const Sidebar: React.FC = () => {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink
-                className="group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground data-[active]:bg-secondary data-[active]:text-accent-foreground"
+                className="group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-blue-600 hover:text-white text-blue-100"
                 onClick={() => navigate('/help')}
               >
                 <HelpCircle className="w-4 h-4" />
@@ -287,10 +287,10 @@ const Sidebar: React.FC = () => {
             <span className="sr-only">Open menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent className="w-80 border-0 bg-secondary pt-0 text-foreground">
+        <SheetContent className="w-80 border-0 bg-blue-500 pt-0 text-white">
           <SheetHeader className="pl-0 pr-6">
-            <SheetTitle>Menu</SheetTitle>
-            <SheetDescription>
+            <SheetTitle className="text-white">Menu</SheetTitle>
+            <SheetDescription className="text-blue-100">
               Navigate through the inventory system.
             </SheetDescription>
           </SheetHeader>
@@ -298,7 +298,7 @@ const Sidebar: React.FC = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute right-4 top-4" 
+            className="absolute right-4 top-4 text-white hover:bg-blue-600" 
             onClick={() => {
               const closeButton = document.querySelector('[data-radix-collection-item]');
               if (closeButton instanceof HTMLElement) {
@@ -329,7 +329,7 @@ const Sidebar: React.FC = () => {
   }
 
   return (
-    <aside className="hidden border-r bg-secondary w-60 flex-col md:flex">
+    <aside className="hidden border-r bg-blue-500 w-60 flex-col md:flex">
       {renderSidebarContent()}
     </aside>
   );
