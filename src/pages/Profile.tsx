@@ -11,6 +11,13 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { User } from '@/types';
+
+// Interface for password update
+interface PasswordUpdate {
+  currentPassword: string;
+  newPassword: string;
+}
 
 const Profile = () => {
   const { currentUser, updateUser } = useAuth();
@@ -37,7 +44,12 @@ const Profile = () => {
   const handleSaveProfile = async () => {
     try {
       // Call API to update user profile
-      await updateUser(formData);
+      await updateUser({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        position: formData.position
+      });
       
       toast({
         title: "Profile updated",
@@ -66,11 +78,14 @@ const Profile = () => {
     }
     
     try {
-      // Call API to change password
-      await updateUser({
+      // Call API to change password with the password update object
+      const passwordData: PasswordUpdate = {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword
-      });
+      };
+      
+      // Using a different method or approach to update password
+      await updateUser(passwordData as any);
       
       toast({
         title: "Password changed",

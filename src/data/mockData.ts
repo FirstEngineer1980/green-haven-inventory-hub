@@ -1,4 +1,4 @@
-import { Product, StockMovement, User, Notification, Category } from '../types';
+import { Product, StockMovement, User, Notification, Category, Warehouse } from '../types';
 
 // Mock user data
 export const mockUsers: User[] = [

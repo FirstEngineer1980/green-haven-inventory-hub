@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
@@ -9,7 +8,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   hasPermission: (permission: Permission) => boolean;
-  updateUser: (userData: Partial<User>) => Promise<boolean>;
+  updateUser: (userData: UpdateUserParams) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -20,7 +19,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Check if user is already logged in from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('currentUser');
@@ -31,7 +29,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrentUser(user);
         setIsAuthenticated(true);
         
-        // Set the authorization header for all future requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
       } catch (error) {
         console.error('Error parsing stored user:', error);
@@ -41,10 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Login function - connect to the backend API
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // For demo accounts with no password check
       if (email.includes('@greenhaven.com') || email.includes('@example.com')) {
         if (email === 'admin@example.com' || email === 'admin@greenhaven.com') {
           const demoUser: User = {
@@ -112,7 +107,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       
-      // Regular login for non-demo accounts
       const response = await axios.post('/api/login', { email, password });
       const { user, token } = response.data;
       
@@ -121,7 +115,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('currentUser', JSON.stringify(user));
       localStorage.setItem('token', token);
       
-      // Set the authorization header for all future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       return true;
@@ -131,10 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Update user function
-  const updateUser = async (userData: Partial<User>): Promise<boolean> => {
+  const updateUser = async (userData: UpdateUserParams): Promise<boolean> => {
     try {
-      // For demo accounts, just update the local state
       if (currentUser && currentUser.email.includes('@greenhaven.com') || currentUser?.email.includes('@example.com')) {
         const updatedUser = { ...currentUser, ...userData };
         setCurrentUser(updatedUser);
@@ -142,7 +133,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return true;
       }
       
-      // For non-demo accounts, call the API
       const response = await axios.put(`/api/users/${currentUser?.id}`, userData);
       const updatedUser = response.data;
       
@@ -156,18 +146,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Logout function
   const logout = () => {
     setCurrentUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
     
-    // Remove the authorization header
     delete axios.defaults.headers.common['Authorization'];
   };
 
-  // Check if user has a specific permission
   const hasPermission = (permission: Permission): boolean => {
     if (!currentUser) return false;
     return currentUser.permissions.includes(permission);

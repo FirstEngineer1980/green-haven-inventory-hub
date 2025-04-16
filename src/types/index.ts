@@ -20,6 +20,8 @@ export interface User {
   role: Role;
   permissions: Permission[];
   avatar?: string;
+  phone?: string;
+  position?: string;
   createdAt: string;
   lastActive: string;
 }
