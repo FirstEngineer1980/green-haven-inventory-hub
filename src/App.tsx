@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -46,6 +47,16 @@ import Index from './pages/Index';
 import Profile from './pages/Profile';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import LandingPage from './pages/LandingPage';
+import ProductsPage from './pages/ProductsPage';
+import ProductPage from './pages/ProductPage';
+import FavoritesPage from './pages/FavoritesPage';
+import ComparePage from './pages/ComparePage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import PromotionsPage from './pages/PromotionsPage';
+import OrdersPage from './pages/OrdersPage';
+import OrderDetailsPage from './pages/OrderDetailsPage';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
