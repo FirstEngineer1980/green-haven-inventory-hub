@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('purchase_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->string('sku');
             $table->string('name');
             $table->integer('quantity');
@@ -25,6 +25,9 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, partial, received
             $table->timestamps();
             $table->softDeletes();
+            
+            // Add the foreign key constraint separately to handle the nullable field properly
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
         });
     }
 
