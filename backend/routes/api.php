@@ -151,7 +151,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/products-by-category', [DashboardController::class, 'productsByCategory']);
     Route::get('/dashboard/stock-trend', [DashboardController::class, 'stockTrend']);
     Route::get('/dashboard/upcoming-orders', [DashboardController::class, 'upcomingOrders']);
-    
+
     // Email Log routes
     Route::get('/email-logs', [EmailLogController::class, 'index']);
     Route::get('/email-logs/{emailLog}', [EmailLogController::class, 'show']);
