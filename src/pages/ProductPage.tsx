@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -93,6 +94,26 @@ const ProductPage = () => {
             <p className="text-muted-foreground mb-6">{product.description}</p>
             
             <div className="flex flex-col space-y-4 mb-8">
+              <div className="flex items-center mb-4">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="mr-2"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                >
+                  <span className="text-lg">-</span>
+                </Button>
+                <div className="w-12 text-center">{quantity}</div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="ml-2"
+                  onClick={() => setQuantity(quantity + 1)}
+                >
+                  <span className="text-lg">+</span>
+                </Button>
+              </div>
+              
               <div className="flex space-x-4">
                 <Button 
                   className="flex-1"

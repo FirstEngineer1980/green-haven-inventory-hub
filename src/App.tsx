@@ -17,7 +17,7 @@ import { FavoritesProvider } from './context/FavoritesContext';
 import { ComparisonProvider } from './context/ComparisonContext';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -124,7 +124,7 @@ function App() {
                                         
                                         <Route path="*" element={<NotFound />} />
                                       </Routes>
-                                      <Toaster position="top-right" />
+                                      <Toaster />
                                     </BrowserRouter>
                                   </CartProvider>
                                 </ComparisonProvider>
