@@ -1,4 +1,3 @@
-
 import { Product, StockMovement, User, Notification, Category } from '../types';
 
 // Mock user data
@@ -331,5 +330,44 @@ export const mockCategories: Category[] = [
     description: 'Food and household items',
     createdAt: new Date(2023, 1, 10).toISOString(),
     updatedAt: new Date(2023, 1, 10).toISOString()
+  }
+];
+
+export const warehouses: Warehouse[] = [
+  {
+    id: '1',
+    name: 'Main Warehouse',
+    address: '123 Storage Ave, Warehouse District',
+    location: '123 Storage Ave, Warehouse District',
+    capacity: 10000,
+    currentCapacity: 7650,
+    description: 'Primary storage facility',
+    manager: 'John Smith',
+    createdAt: new Date(2023, 0, 1).toISOString(),
+    updatedAt: new Date(2023, 2, 15).toISOString()
+  },
+  {
+    id: '2',
+    name: 'Downtown Storage',
+    address: '456 City Center, Downtown',
+    location: '456 City Center, Downtown',
+    capacity: 5000,
+    currentCapacity: 3210,
+    description: 'Central distribution point',
+    manager: 'Emma Wilson',
+    createdAt: new Date(2023, 0, 15).toISOString(),
+    updatedAt: new Date(2023, 2, 10).toISOString()
+  },
+  {
+    id: '3',
+    name: 'North Distribution Center',
+    address: '789 Industrial Pkwy, North District',
+    location: '789 Industrial Pkwy, North District',
+    capacity: 15000,
+    currentCapacity: 9870,
+    description: 'Regional distribution hub',
+    manager: 'Michael Chen',
+    createdAt: new Date(2023, 1, 1).toISOString(),
+    updatedAt: new Date(2023, 2, 5).toISOString()
   }
 ];
