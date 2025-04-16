@@ -20,9 +20,9 @@ class SkuMatrixCell extends Model
         'column_id',
         'value',
     ];
-    
+
     /**
-     * Get the row that owns this cell.
+     * Get the row that owns the cell.
      */
     public function row()
     {

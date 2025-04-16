@@ -6,44 +6,50 @@ namespace App\Http\Controllers;
 use App\Models\StockMovement;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StockMovementController extends Controller
 {
     public function index()
     {
-        return StockMovement::with(['product', 'user'])->latest()->get();
+        return StockMovement::with(['product', 'performer'])->get();
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
             'type' => 'required|in:in,out',
             'reason' => 'required|string',
+            'reference_type' => 'nullable|string',
+            'reference_id' => 'nullable|integer',
             'notes' => 'nullable|string',
         ]);
 
-        $movement = StockMovement::create([
-            ...$validated,
-            'performed_by' => auth()->id(),
-        ]);
+        // Add the current user as performer
+        $data['performed_by'] = Auth::id();
+
+        $stockMovement = StockMovement::create($data);
 
         // Update product quantity
-        $product = Product::find($validated['product_id']);
-        $product->quantity += $validated['type'] === 'in' ? $validated['quantity'] : -$validated['quantity'];
-        $product->save();
+        $product = Product::findOrFail($request->product_id);
+        $newQuantity = $request->type === 'in'
+            ? $product->quantity + $request->quantity
+            : $product->quantity - $request->quantity;
+        
+        $product->update(['quantity' => max(0, $newQuantity)]);
 
-        return $movement->load(['product', 'user']);
+        return $stockMovement->load(['product', 'performer']);
     }
 
     public function show(StockMovement $stockMovement)
     {
-        return $stockMovement->load(['product', 'user']);
+        return $stockMovement->load(['product', 'performer']);
     }
 
     public function getByProduct(Product $product)
     {
-        return $product->stockMovements()->with(['user'])->latest()->get();
+        return $product->stockMovements()->with('performer')->get();
     }
 }

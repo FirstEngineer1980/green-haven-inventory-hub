@@ -5,10 +5,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SkuMatrixRow extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -20,17 +21,17 @@ class SkuMatrixRow extends Model
         'label',
         'color',
     ];
-    
+
     /**
-     * Get the SKU matrix that owns this row.
+     * Get the SKU matrix that owns the row.
      */
     public function skuMatrix()
     {
         return $this->belongsTo(SkuMatrix::class);
     }
-    
+
     /**
-     * Get the cells for this row.
+     * Get the cells for the row.
      */
     public function cells()
     {

@@ -20,33 +20,33 @@ class StockMovement extends Model
         'quantity',
         'type',
         'reason',
-        'reference_id',
         'reference_type',
+        'reference_id',
         'performed_by',
         'notes',
     ];
-    
+
     /**
-     * Get the product associated with this movement.
+     * Get the product that owns the stock movement.
      */
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
-    
+
     /**
-     * Get the user who performed this movement.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'performed_by');
-    }
-    
-    /**
-     * Get the related model that caused this movement.
+     * Get the reference model (polymorphic).
      */
     public function reference()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the user who performed the movement.
+     */
+    public function performer()
+    {
+        return $this->belongsTo(User::class, 'performed_by');
     }
 }

@@ -27,7 +27,7 @@ class SkuMatrixController extends Controller
 
     public function show(SkuMatrix $skuMatrix)
     {
-        return $skuMatrix->load(['room', 'rows.cells', 'inventoryItems']);
+        return $skuMatrix->load(['room', 'rows.cells']);
     }
 
     public function update(Request $request, SkuMatrix $skuMatrix)
@@ -44,11 +44,11 @@ class SkuMatrixController extends Controller
     public function destroy(SkuMatrix $skuMatrix)
     {
         $skuMatrix->delete();
-        return response()->json(['message' => 'SKU Matrix deleted successfully']);
+        return response()->json(['message' => 'SKU matrix deleted successfully']);
     }
 
     public function getByRoom(Room $room)
     {
-        return $room->skuMatrices()->with(['rows.cells'])->get();
+        return $room->skuMatrices()->with('rows.cells')->get();
     }
 }
