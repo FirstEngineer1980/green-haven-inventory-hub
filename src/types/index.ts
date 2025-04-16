@@ -1,4 +1,3 @@
-
 export interface Notification {
   id: string;
   title: string;
@@ -38,6 +37,7 @@ export interface Product {
   threshold: number;
   location?: string;
   image?: string;
+  promotion?: string; // Added this property
   createdAt: string;
   updatedAt: string;
 }
