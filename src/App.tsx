@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -58,7 +57,6 @@ import PromotionsPage from './pages/PromotionsPage';
 import OrdersPage from './pages/OrdersPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
-import ManagePromotions from './pages/ManagePromotions';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -114,7 +112,6 @@ function App() {
                                           <Route path="/wizard" element={<WizardPage />} />
                                           <Route path="/inventory" element={<Inventory />} />
                                           <Route path="/profile" element={<Profile />} />
-                                          <Route path="/manage-promotions" element={<ManagePromotions />} />
                                           
                                           <Route path="/favorites" element={<FavoritesPage />} />
                                           <Route path="/compare" element={<ComparePage />} />
