@@ -3,12 +3,20 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ShoppingBag, Truck, CreditCard, Award } from 'lucide-react';
+import MainNav from '@/components/layout/MainNav';
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      <header className="bg-gh-blue">
+        <div className="container mx-auto py-4 px-4">
+          <MainNav />
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-gh-blue to-gh-green py-20 px-4">
         <div className="container mx-auto max-w-6xl">
