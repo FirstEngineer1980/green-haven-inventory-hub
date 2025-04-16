@@ -1,6 +1,17 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
+
+// Define the interface for updating user profile
+interface UpdateUserParams {
+  name?: string;
+  email?: string;
+  phone?: string;
+  position?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
