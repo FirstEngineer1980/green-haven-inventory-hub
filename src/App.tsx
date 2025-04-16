@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -57,6 +56,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import PromotionsPage from './pages/PromotionsPage';
 import OrdersPage from './pages/OrdersPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -87,6 +87,7 @@ function App() {
                                         <Route path="/unauthorized" element={<Unauthorized />} />
                                         <Route path="/about" element={<AboutPage />} />
                                         <Route path="/contact" element={<ContactPage />} />
+                                        <Route path="/order-success" element={<OrderSuccessPage />} />
                                         
                                         <Route element={<ProtectedRoute />}>
                                           <Route path="/dashboard" element={<Dashboard />} />
@@ -112,7 +113,6 @@ function App() {
                                           <Route path="/inventory" element={<Inventory />} />
                                           <Route path="/profile" element={<Profile />} />
                                           
-                                          {/* E-commerce Routes */}
                                           <Route path="/favorites" element={<FavoritesPage />} />
                                           <Route path="/compare" element={<ComparePage />} />
                                           <Route path="/cart" element={<CartPage />} />

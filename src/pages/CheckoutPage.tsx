@@ -1,26 +1,57 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, ShoppingCart, Loader2 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { redirectToCheckout } from '@/utils/stripeService';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { cartItems, totalItems, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleStripeCheckout = async () => {
+    if (cartItems.length === 0) {
+      toast({
+        title: "Cart is empty",
+        description: "Please add items to your cart before checking out",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      await redirectToCheckout(cartItems);
+      
+      // Note: The user will be redirected to Stripe, so the code below
+      // will only execute if there's an error with the redirect
+      toast({
+        title: "Redirecting to payment gateway",
+        description: "You'll be redirected to complete your payment",
+      });
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      toast({
+        title: "Checkout failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const handlePlaceOrder = () => {
-    toast({
-      title: "Order placed successfully",
-      description: "Thank you for your purchase!",
-    });
-    clearCart();
-    navigate('/orders');
+    // We'll replace this with Stripe checkout
+    handleStripeCheckout();
   };
   
   return (
@@ -105,7 +136,7 @@ const CheckoutPage = () => {
               <Card className="mt-6">
                 <CardHeader>
                   <CardTitle>Payment Method</CardTitle>
-                  <CardDescription>Select your payment method</CardDescription>
+                  <CardDescription>Your payment will be processed securely via Stripe</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -113,41 +144,15 @@ const CheckoutPage = () => {
                       <input type="radio" id="credit-card" name="payment" defaultChecked />
                       <label htmlFor="credit-card" className="flex items-center">
                         <CreditCard className="h-5 w-5 mr-2" />
-                        Credit Card
+                        Credit Card (via Stripe)
                       </label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <input type="radio" id="paypal" name="payment" />
-                      <label htmlFor="paypal">PayPal</label>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6 space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Card Number</label>
-                      <input 
-                        type="text" 
-                        className="w-full p-2 border rounded-md" 
-                        placeholder="1234 5678 9012 3456"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Expiration Date</label>
-                        <input 
-                          type="text" 
-                          className="w-full p-2 border rounded-md" 
-                          placeholder="MM/YY"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">CVV</label>
-                        <input 
-                          type="text" 
-                          className="w-full p-2 border rounded-md" 
-                          placeholder="123"
-                        />
-                      </div>
+                    
+                    <div className="mt-4 p-4 bg-muted rounded-md">
+                      <p className="text-sm text-muted-foreground">
+                        You will be redirected to Stripe's secure payment page to complete your purchase.
+                        Your payment information is encrypted and secure.
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -196,8 +201,16 @@ const CheckoutPage = () => {
                       className="w-full mt-4" 
                       size="lg"
                       onClick={handlePlaceOrder}
+                      disabled={isLoading}
                     >
-                      Place Order
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>Pay with Stripe</>
+                      )}
                     </Button>
                   </div>
                 </CardContent>

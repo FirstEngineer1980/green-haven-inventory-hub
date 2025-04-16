@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExportNotificationController;
+use App\Http\Controllers\StripeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +41,10 @@ use App\Http\Controllers\ExportNotificationController;
 // Public routes
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
+
+// Stripe routes
+Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
+Route::get('/checkout-success', [StripeController::class, 'handleSuccess']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -158,3 +164,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/email-logs/{emailLog}', [EmailLogController::class, 'destroy']);
     Route::delete('/email-logs', [EmailLogController::class, 'clearAll']);
 });
+
