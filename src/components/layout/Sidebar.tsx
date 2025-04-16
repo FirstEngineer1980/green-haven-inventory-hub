@@ -1,410 +1,292 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from "@/lib/utils";
-import { BarChart3, Box, Boxes, ChevronDown, ChevronRight, CircleDollarSign, ClipboardList, CreditCard, FolderOpen, Heart, Home, LayoutList, Menu, Package, PanelLeft, Percent, ShoppingBag, ShoppingCart, Tag, Truck, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import React from 'react';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { SidebarClose, SidebarOpen } from "@/components/ui/sidebar"
+import { Separator } from "@/components/ui/separator"
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu"
 import { useAuth } from '@/context/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Category,
+  Users,
+  ShoppingBag,
+  Store,
+  Package,
+  Boxes,
+  BarChart,
+  Settings,
+  Bell,
+  User,
+  HelpCircle,
+  BadgePercent,
+  Tag,
+  Eye
+} from 'lucide-react';
 
-interface SidebarProps {
-  className?: string;
+interface NavItemProps {
+  name: string;
+  path: string;
+  icon: React.ReactNode;
 }
 
-export default function Sidebar({ className }: SidebarProps) {
-  const location = useLocation();
-  const { currentUser } = useAuth();
-  
-  return (
-    <div className={cn("pb-12", className)}>
-      <div className="py-4 hidden lg:block">
-        <div className="px-4 py-2">
-          <h2 className="mb-2 px-2 text-lg font-semibold">Dashboard</h2>
-          <div className="space-y-1">
-            <SidebarItem 
-              Icon={Home} 
-              label="Dashboard" 
-              href="/dashboard" 
-              isActive={location.pathname === '/dashboard'} 
-            />
-          </div>
-        </div>
-        <SidebarCategory title="E-commerce">
-          <SidebarItem 
-            Icon={ShoppingBag} 
-            label="Products" 
-            href="/products" 
-            isActive={location.pathname.startsWith('/products')} 
-          />
-          <SidebarItem 
-            Icon={Tag} 
-            label="Categories" 
-            href="/categories" 
-            isActive={location.pathname === '/categories'} 
-          />
-          <SidebarItem 
-            Icon={Heart} 
-            label="Favorites" 
-            href="/favorites" 
-            isActive={location.pathname === '/favorites'} 
-          />
-          <SidebarItem 
-            Icon={ShoppingCart} 
-            label="Shopping Cart" 
-            href="/cart" 
-            isActive={location.pathname === '/cart'} 
-          />
-          <SidebarItem 
-            Icon={CreditCard} 
-            label="Checkout" 
-            href="/checkout" 
-            isActive={location.pathname === '/checkout'} 
-          />
-          <SidebarItem 
-            Icon={Percent} 
-            label="Promotions" 
-            href="/promotions" 
-            isActive={location.pathname === '/promotions'} 
-          />
-          <SidebarItem 
-            Icon={ClipboardList} 
-            label="Orders" 
-            href="/orders" 
-            isActive={location.pathname.startsWith('/orders')} 
-          />
-        </SidebarCategory>
-        <SidebarCategory title="Customers">
-          <SidebarItem 
-            Icon={Users} 
-            label="Customers" 
-            href="/customers" 
-            isActive={location.pathname === '/customers'} 
-          />
-          <SidebarItem 
-            Icon={Package} 
-            label="Customer Products" 
-            href="/customer-products" 
-            isActive={location.pathname === '/customer-products'} 
-          />
-          <SidebarItem 
-            Icon={LayoutList} 
-            label="Customer Lists" 
-            href="/customer-list" 
-            isActive={location.pathname === '/customer-list'} 
-          />
-        </SidebarCategory>
-        <SidebarCategory title="Inventory">
-          <SidebarItem 
-            Icon={Box} 
-            label="Inventory" 
-            href="/inventory" 
-            isActive={location.pathname === '/inventory'} 
-          />
-          <SidebarItem 
-            Icon={CircleDollarSign} 
-            label="Purchase Orders" 
-            href="/purchase-orders" 
-            isActive={location.pathname === '/purchase-orders'} 
-          />
-          <SidebarItem 
-            Icon={Users} 
-            label="Vendors" 
-            href="/vendors" 
-            isActive={location.pathname === '/vendors'} 
-          />
-          <SidebarItem 
-            Icon={Truck} 
-            label="Stock Movements" 
-            href="/stock-movements" 
-            isActive={location.pathname === '/stock-movements'} 
-          />
-        </SidebarCategory>
-        <SidebarCategory title="Organization">
-          <SidebarItem 
-            Icon={FolderOpen} 
-            label="Rooms" 
-            href="/rooms" 
-            isActive={location.pathname === '/rooms'} 
-          />
-          <SidebarItem 
-            Icon={Boxes} 
-            label="Units" 
-            href="/units" 
-            isActive={location.pathname === '/units'} 
-          />
-          <SidebarItem 
-            Icon={Box} 
-            label="Bins" 
-            href="/bins" 
-            isActive={location.pathname === '/bins'} 
-          />
-          <SidebarItem 
-            Icon={LayoutList} 
-            label="SKU Matrix" 
-            href="/sku-matrix" 
-            isActive={location.pathname === '/sku-matrix'} 
-          />
-        </SidebarCategory>
-        {currentUser?.permissions.includes('manage_users') && (
-          <SidebarCategory title="Administration">
-            <SidebarItem 
-              Icon={Users} 
-              label="Users" 
-              href="/users" 
-              isActive={location.pathname === '/users'} 
-            />
-            <SidebarItem 
-              Icon={BarChart3} 
-              label="Reports" 
-              href="/reports" 
-              isActive={location.pathname === '/reports'} 
-            />
-          </SidebarCategory>
-        )}
-      </div>
-      <div className="lg:hidden">
-        <MobileSidebar />
-      </div>
-    </div>
-  );
+interface SidebarSection {
+  name: string;
+  icon: React.ReactNode;
+  permissions: string[];
+  submenus: NavItemProps[];
 }
 
-const SidebarCategory = ({ 
-  title, 
-  children 
-}: { 
-  title: string, 
-  children: React.ReactNode 
-}) => {
-  const [isOpen, setIsOpen] = useState(true);
-  
-  return (
-    <div className="px-4 py-2">
-      <div 
-        className="mb-2 flex items-center justify-between px-2 cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
-          {isOpen ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
-      <div className={cn("space-y-1 transition-all duration-300", 
-                         isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden")}>
-        {children}
-      </div>
-    </div>
-  );
-};
-
-const SidebarItem = ({ 
-  Icon, 
-  label, 
-  href, 
-  isActive 
-}: { 
-  Icon: React.ElementType, 
-  label: string, 
-  href: string, 
-  isActive: boolean 
-}) => {
-  return (
-    <Link 
-      to={href}
-      className={cn(
-        "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
-        isActive ? "bg-accent text-accent-foreground" : "transparent"
-      )}
-    >
-      <Icon className="mr-2 h-4 w-4" />
-      <span>{label}</span>
-    </Link>
-  );
-};
-
-const MobileSidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="absolute left-4 top-4">
-          <Menu className="h-6 w-6" />
-          <span className="sr-only">Toggle Menu</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-[240px] p-0">
-        <ScrollArea className="h-full px-1">
-          <div className="p-4">
-            <SheetClose asChild>
-              <Link to="/" className="flex items-center gap-2">
-                <PanelLeft className="h-5 w-5" />
-                <span className="font-semibold">GreenHaven</span>
-              </Link>
-            </SheetClose>
-          </div>
-          <MobileSidebarContent />
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
-  );
-};
-
-const MobileSidebarContent = () => {
+const Sidebar: React.FC = () => {
+  const { user, hasPermission } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
-  const { currentUser } = useAuth();
-  
-  return (
-    <div className="pb-12">
-      <div className="py-4">
-        <div className="px-4 py-2">
-          <h2 className="mb-2 px-2 text-lg font-semibold">Dashboard</h2>
-          <div className="space-y-1">
-            <SidebarItem 
-              Icon={Home} 
-              label="Dashboard" 
-              href="/dashboard" 
-              isActive={location.pathname === '/dashboard'} 
-            />
+  const isMobile = useIsMobile();
+
+  const sidebarSections: SidebarSection[] = [
+    {
+      name: 'General',
+      icon: LayoutDashboard,
+      permissions: ['admin', 'manager', 'staff', 'customer'],
+      submenus: [
+        {
+          name: 'Dashboard',
+          path: '/dashboard',
+          icon: LayoutDashboard,
+        },
+      ]
+    },
+    {
+      name: 'E-Commerce',
+      icon: ShoppingCart,
+      permissions: ['admin', 'manager', 'staff'],
+      submenus: [
+        {
+          name: 'Products',
+          path: '/products',
+          icon: ShoppingBag,
+        },
+        {
+          name: 'Categories',
+          path: '/categories',
+          icon: Category,
+        },
+        {
+          name: 'Promotions',
+          path: '/promotions',
+          icon: BadgePercent,
+        },
+        {
+          name: 'Orders',
+          path: '/orders',
+          icon: ShoppingCart,
+        },
+      ]
+    },
+    {
+      name: 'Inventory',
+      icon: Store,
+      permissions: ['admin', 'manager'],
+      submenus: [
+        {
+          name: 'Stock Control',
+          path: '/inventory',
+          icon: Boxes,
+        },
+        {
+          name: 'Stock Movements',
+          path: '/stock-movements',
+          icon: Package,
+        },
+        {
+          name: 'Purchase Orders',
+          path: '/purchase-orders',
+          icon: ShoppingCart,
+        },
+        {
+          name: 'Bins',
+          path: '/bins',
+          icon: Store,
+        },
+        {
+          name: 'SKU Matrix',
+          path: '/sku-matrix',
+          icon: Boxes,
+        },
+      ]
+    },
+    {
+      name: 'Customers',
+      icon: Users,
+      permissions: ['admin', 'manager'],
+      submenus: [
+        {
+          name: 'Customer List',
+          path: '/customer-list',
+          icon: Users,
+        },
+        {
+          name: 'Customer Products',
+          path: '/customer-products',
+          icon: ShoppingCart,
+        },
+      ]
+    },
+    {
+      name: 'Administration',
+      icon: Settings,
+      permissions: ['admin'],
+      submenus: [
+        {
+          name: 'Users',
+          path: '/users',
+          icon: Users,
+        },
+        {
+          name: 'Notifications',
+          path: '/notifications',
+          icon: Bell,
+        },
+        {
+          name: 'Settings',
+          path: '/settings',
+          icon: Settings,
+        },
+        {
+          name: 'Reports',
+          path: '/reports',
+          icon: BarChart,
+        },
+      ]
+    },
+    {
+      name: 'Marketing',
+      icon: BadgePercent,
+      permissions: ['admin', 'manager'],
+      submenus: [
+        {
+          name: 'Manage Promotions',
+          path: '/manage-promotions',
+          icon: Tag,
+        },
+        {
+          name: 'View Promotions',
+          path: '/promotions',
+          icon: Eye,
+        }
+      ]
+    },
+  ];
+
+  const renderSidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="px-6 py-4">
+        <h1 className="text-lg font-semibold">Inventory System</h1>
+        <p className="text-sm text-muted-foreground">
+          {user ? `Welcome, ${user.firstName}!` : 'Welcome!'}
+        </p>
+      </div>
+
+      <Separator />
+
+      <NavigationMenu className="flex-1">
+        {sidebarSections.map((section, index) => (
+          <div key={index}>
+            {hasPermission('admin') || section.permissions.some(permission => hasPermission(permission)) ? (
+              <>
+                <div className="px-6 py-2 text-sm font-semibold text-muted-foreground">
+                  {section.name}
+                </div>
+                <NavigationMenuList>
+                  {section.submenus.map((item, index) => (
+                    <NavigationMenuItem key={index}>
+                      <NavigationMenuLink
+                        className={cn(
+                          "group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground data-[active]:bg-secondary data-[active]:text-accent-foreground",
+                          location.pathname === item.path ? "bg-secondary text-accent-foreground" : "text-foreground"
+                        )}
+                        onClick={() => navigate(item.path)}
+                      >
+                        {item.icon}
+                        <span>{item.name}</span>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
+                </NavigationMenuList>
+                <Separator />
+              </>
+            ) : null}
           </div>
-        </div>
-        <SidebarCategory title="E-commerce">
-          <SidebarItem 
-            Icon={ShoppingBag} 
-            label="Products" 
-            href="/products" 
-            isActive={location.pathname.startsWith('/products')} 
-          />
-          <SidebarItem 
-            Icon={Tag} 
-            label="Categories" 
-            href="/categories" 
-            isActive={location.pathname === '/categories'} 
-          />
-          <SidebarItem 
-            Icon={Heart} 
-            label="Favorites" 
-            href="/favorites" 
-            isActive={location.pathname === '/favorites'} 
-          />
-          <SidebarItem 
-            Icon={ShoppingCart} 
-            label="Shopping Cart" 
-            href="/cart" 
-            isActive={location.pathname === '/cart'} 
-          />
-          <SidebarItem 
-            Icon={CreditCard} 
-            label="Checkout" 
-            href="/checkout" 
-            isActive={location.pathname === '/checkout'} 
-          />
-          <SidebarItem 
-            Icon={Percent} 
-            label="Promotions" 
-            href="/promotions" 
-            isActive={location.pathname === '/promotions'} 
-          />
-          <SidebarItem 
-            Icon={ClipboardList} 
-            label="Orders" 
-            href="/orders" 
-            isActive={location.pathname.startsWith('/orders')} 
-          />
-        </SidebarCategory>
-        <SidebarCategory title="Customers">
-          <SidebarItem 
-            Icon={Users} 
-            label="Customers" 
-            href="/customers" 
-            isActive={location.pathname === '/customers'} 
-          />
-          <SidebarItem 
-            Icon={Package} 
-            label="Customer Products" 
-            href="/customer-products" 
-            isActive={location.pathname === '/customer-products'} 
-          />
-          <SidebarItem 
-            Icon={LayoutList} 
-            label="Customer Lists" 
-            href="/customer-list" 
-            isActive={location.pathname === '/customer-list'} 
-          />
-        </SidebarCategory>
-        <SidebarCategory title="Inventory">
-          <SidebarItem 
-            Icon={Box} 
-            label="Inventory" 
-            href="/inventory" 
-            isActive={location.pathname === '/inventory'} 
-          />
-          <SidebarItem 
-            Icon={CircleDollarSign} 
-            label="Purchase Orders" 
-            href="/purchase-orders" 
-            isActive={location.pathname === '/purchase-orders'} 
-          />
-          <SidebarItem 
-            Icon={Users} 
-            label="Vendors" 
-            href="/vendors" 
-            isActive={location.pathname === '/vendors'} 
-          />
-          <SidebarItem 
-            Icon={Truck} 
-            label="Stock Movements" 
-            href="/stock-movements" 
-            isActive={location.pathname === '/stock-movements'} 
-          />
-        </SidebarCategory>
-        <SidebarCategory title="Organization">
-          <SidebarItem 
-            Icon={FolderOpen} 
-            label="Rooms" 
-            href="/rooms" 
-            isActive={location.pathname === '/rooms'} 
-          />
-          <SidebarItem 
-            Icon={Boxes} 
-            label="Units" 
-            href="/units" 
-            isActive={location.pathname === '/units'} 
-          />
-          <SidebarItem 
-            Icon={Box} 
-            label="Bins" 
-            href="/bins" 
-            isActive={location.pathname === '/bins'} 
-          />
-          <SidebarItem 
-            Icon={LayoutList} 
-            label="SKU Matrix" 
-            href="/sku-matrix" 
-            isActive={location.pathname === '/sku-matrix'} 
-          />
-        </SidebarCategory>
-        {currentUser?.permissions.includes('manage_users') && (
-          <SidebarCategory title="Administration">
-            <SidebarItem 
-              Icon={Users} 
-              label="Users" 
-              href="/users" 
-              isActive={location.pathname === '/users'} 
-            />
-            <SidebarItem 
-              Icon={BarChart3} 
-              label="Reports" 
-              href="/reports" 
-              isActive={location.pathname === '/reports'} 
-            />
-          </SidebarCategory>
-        )}
+        ))}
+      </NavigationMenu>
+
+      <div className="mt-auto px-6 py-4">
+        <Separator />
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                className="group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground data-[active]:bg-secondary data-[active]:text-accent-foreground"
+                onClick={() => navigate('/profile')}
+              >
+                <User className="w-4 h-4" />
+                <span>Profile</span>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                className="group flex items-center gap-2 rounded-md px-6 py-2 text-sm font-medium transition-colors hover:bg-secondary hover:text-accent-foreground data-[active]:bg-secondary data-[active]:text-accent-foreground"
+                onClick={() => navigate('/help')}
+              >
+                <HelpCircle className="w-4 h-4" />
+                <span>Help</span>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
     </div>
   );
+
+  if (isMobile) {
+    return (
+      <Sheet>
+        <SheetTrigger asChild>
+          <SidebarOpen />
+        </SheetTrigger>
+        <SheetContent className="w-80 border-0 bg-secondary pt-0 text-foreground">
+          <SheetHeader className="pl-0 pr-6">
+            <SheetTitle>Menu</SheetTitle>
+            <SheetDescription>
+              Navigate through the inventory system.
+            </SheetDescription>
+          </SheetHeader>
+          {renderSidebarContent()}
+          <SidebarClose className="absolute right-4 top-4" />
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <aside className="hidden border-r bg-secondary w-60 flex-col md:flex">
+      {renderSidebarContent()}
+    </aside>
+  );
 };
+
+export default Sidebar;
