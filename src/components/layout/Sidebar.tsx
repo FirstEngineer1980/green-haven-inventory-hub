@@ -37,6 +37,7 @@ import {
   BadgePercent,
   Eye
 } from 'lucide-react';
+import { Permission } from '@/types';
 
 interface NavItemProps {
   name: string;
@@ -47,12 +48,12 @@ interface NavItemProps {
 interface SidebarSection {
   name: string;
   icon: React.ReactNode;
-  permissions: string[];
+  permissions: Permission[];
   submenus: NavItemProps[];
 }
 
 const Sidebar: React.FC = () => {
-  const { user, hasPermission } = useAuth();
+  const { currentUser, hasPermission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -61,7 +62,7 @@ const Sidebar: React.FC = () => {
     {
       name: 'General',
       icon: <LayoutDashboard className="h-4 w-4" />,
-      permissions: ['admin', 'manager', 'staff', 'customer'],
+      permissions: ['manage_users', 'manage_products', 'view_reports', 'manage_inventory'],
       submenus: [
         {
           name: 'Dashboard',
@@ -73,7 +74,7 @@ const Sidebar: React.FC = () => {
     {
       name: 'E-Commerce',
       icon: <ShoppingCart className="h-4 w-4" />,
-      permissions: ['admin', 'manager', 'staff'],
+      permissions: ['manage_products'],
       submenus: [
         {
           name: 'Products',
@@ -100,7 +101,7 @@ const Sidebar: React.FC = () => {
     {
       name: 'Inventory',
       icon: <Store className="h-4 w-4" />,
-      permissions: ['admin', 'manager'],
+      permissions: ['manage_inventory'],
       submenus: [
         {
           name: 'Stock Control',
@@ -132,7 +133,7 @@ const Sidebar: React.FC = () => {
     {
       name: 'Customers',
       icon: <Users className="h-4 w-4" />,
-      permissions: ['admin', 'manager'],
+      permissions: ['manage_users'],
       submenus: [
         {
           name: 'Customer List',
@@ -149,7 +150,7 @@ const Sidebar: React.FC = () => {
     {
       name: 'Administration',
       icon: <Settings className="h-4 w-4" />,
-      permissions: ['admin'],
+      permissions: ['manage_users'],
       submenus: [
         {
           name: 'Users',
@@ -176,7 +177,7 @@ const Sidebar: React.FC = () => {
     {
       name: 'Marketing',
       icon: <BadgePercent className="h-4 w-4" />,
-      permissions: ['admin', 'manager'],
+      permissions: ['manage_products'],
       submenus: [
         {
           name: 'Manage Promotions',
@@ -197,7 +198,7 @@ const Sidebar: React.FC = () => {
       <div className="px-6 py-4">
         <h1 className="text-lg font-semibold">Inventory System</h1>
         <p className="text-sm text-muted-foreground">
-          {user?.firstName ? `Welcome, ${user.firstName}!` : 'Welcome!'}
+          {currentUser?.name ? `Welcome, ${currentUser.name.split(' ')[0]}!` : 'Welcome!'}
         </p>
       </div>
 
@@ -206,7 +207,7 @@ const Sidebar: React.FC = () => {
       <NavigationMenu className="flex-1">
         {sidebarSections.map((section, index) => (
           <div key={index}>
-            {hasPermission(section.permissions[0]) || section.permissions.some(permission => hasPermission(permission)) ? (
+            {section.permissions.some(permission => hasPermission(permission)) ? (
               <>
                 <div className="px-6 py-2 text-sm font-semibold text-muted-foreground">
                   {section.name}
@@ -294,7 +295,17 @@ const Sidebar: React.FC = () => {
             </SheetDescription>
           </SheetHeader>
           {renderSidebarContent()}
-          <Button variant="ghost" size="icon" className="absolute right-4 top-4" onClick={() => document.querySelector('[data-radix-collection-item]')?.click()}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-4 top-4" 
+            onClick={() => {
+              const closeButton = document.querySelector('[data-radix-collection-item]');
+              if (closeButton instanceof HTMLElement) {
+                closeButton.click();
+              }
+            }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
