@@ -1,3 +1,4 @@
+
 <?php
 
 namespace Database\Seeders;
@@ -5,11 +6,16 @@ namespace Database\Seeders;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Database\Seeder;
+use Spatie\Activitylog\Models\Activity;
 
 class PurchaseOrderSeeder extends Seeder
 {
     public function run(): void
     {
+        // Temporarily disable activity logging
+        $originalLogging = Activity::$recordEvents;
+        Activity::$recordEvents = false;
+        
         // Create Purchase Order
         $po = PurchaseOrder::create([
             'order_number' => 'PO-2024001',
@@ -44,5 +50,8 @@ class PurchaseOrderSeeder extends Seeder
             'total_price' => 199.99,
             'status' => 'pending'
         ]);
+        
+        // Re-enable activity logging
+        Activity::$recordEvents = $originalLogging;
     }
 }
