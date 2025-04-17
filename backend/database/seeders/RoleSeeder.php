@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Database\Seeders;
@@ -36,7 +35,7 @@ class RoleSeeder extends Seeder
 
         // Assign all permissions to admin
         $admin->givePermissionTo(Permission::all());
-        
+
         // Assign specific permissions to manager
         $manager->givePermissionTo([
             'view_dashboard',
