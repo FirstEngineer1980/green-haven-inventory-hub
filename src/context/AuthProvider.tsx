@@ -41,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check if user is authenticated on mount
   useEffect(() => {
     const checkAuth = async () => {
+      setIsLoading(true);
       const token = localStorage.getItem('token');
       if (token) {
         try {
@@ -66,8 +67,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(response.data.user);
       toast({
         title: "Login successful",
-        description: `Welcome back, ${response.data.user.name}!`,
+        description: `Welcome back, ${response.data.user?.name || ''}!`,
       });
+      return response.data;
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
