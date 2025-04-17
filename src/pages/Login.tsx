@@ -18,12 +18,11 @@ const Login = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!isLoading && isAuthenticated) {
       console.log("User is authenticated, redirecting to dashboard");
-      // Force navigation to dashboard with replace to prevent back navigation
-      window.location.href = '/dashboard';
+      navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +32,11 @@ const Login = () => {
       const result = await login(email, password);
       if (result) {
         console.log("Login successful, redirecting to dashboard");
-        // Force navigation to dashboard to prevent issues with React Router
-        window.location.href = '/dashboard';
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        });
+        navigate('/dashboard', { replace: true });
       }
     } catch (error) {
       console.error('Login error:', error);

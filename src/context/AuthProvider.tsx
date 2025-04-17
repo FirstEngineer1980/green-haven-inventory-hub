@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
@@ -43,20 +44,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       console.log("Checking authentication status...");
       const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          console.log("Token found, fetching current user");
-          const response = await authAPI.getCurrentUser();
-          console.log("User data received:", response.data);
-          setUser(response.data);
-        } catch (error) {
-          console.error('Authentication error:', error);
-          localStorage.removeItem('token');
-        }
-      } else {
+      
+      if (!token) {
         console.log("No token found");
+        setUser(null);
+        setIsLoading(false);
+        return;
       }
-      setIsLoading(false);
+      
+      try {
+        console.log("Token found, fetching current user");
+        const response = await authAPI.getCurrentUser();
+        console.log("User data received:", response.data);
+        setUser(response.data);
+      } catch (error) {
+        console.error('Authentication error:', error);
+        localStorage.removeItem('token');
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     checkAuth();
@@ -79,7 +86,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: `Welcome back, ${response.data.user?.name || ''}!`,
       });
       
-      setIsLoading(false);
       return true;
     } catch (error: any) {
       console.error('Login error:', error);
@@ -88,8 +94,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.response?.data?.message || "Invalid credentials",
         variant: "destructive",
       });
-      setIsLoading(false);
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 

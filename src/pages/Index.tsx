@@ -13,15 +13,13 @@ const Index = () => {
       console.log("Auth check complete, authenticated:", isAuthenticated);
       if (isAuthenticated) {
         console.log("Redirecting to dashboard");
-        // Force navigation to dashboard
-        window.location.href = '/dashboard';
+        navigate('/dashboard', { replace: true });
       } else {
         console.log("Redirecting to login");
-        // Force navigation to login
-        window.location.href = '/login';
+        navigate('/login', { replace: true });
       }
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, navigate]);
   
   // Return a loading state while checking auth
   return (

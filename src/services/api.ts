@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 // Create a custom axios instance
@@ -19,19 +18,27 @@ api.interceptors.request.use(config => {
   return config;
 });
 
+// Track authentication redirections to prevent loops
+let isRedirecting = false;
+
 // Add response interceptor to handle common errors
 api.interceptors.response.use(
   response => response,
   error => {
     // Handle authentication errors
     if (error.response) {
-      if (error.response.status === 401) {
+      if (error.response.status === 401 && !isRedirecting) {
         console.log("401 Unauthorized response received, clearing token");
         localStorage.removeItem('token');
         // Only redirect if not already on login page
         if (window.location.pathname !== '/login') {
           console.log("Redirecting to login page");
+          isRedirecting = true;
           window.location.href = '/login';
+          // Reset the flag after navigation completes
+          setTimeout(() => {
+            isRedirecting = false;
+          }, 1000);
         }
       } else if (error.response.status === 403) {
         // Forbidden - user doesn't have permission
