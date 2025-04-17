@@ -24,12 +24,26 @@ api.interceptors.response.use(
   response => response,
   error => {
     // Handle authentication errors
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token');
-      // Only redirect if not already on login page
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+    if (error.response) {
+      if (error.response.status === 401) {
+        localStorage.removeItem('token');
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      } else if (error.response.status === 403) {
+        // Forbidden - user doesn't have permission
+        console.error('Permission denied:', error.response.data.message);
+      } else if (error.response.status === 500) {
+        // Server error
+        console.error('Server error:', error.response.data.message);
       }
+    } else if (error.request) {
+      // Request was made but no response
+      console.error('Network error: No response received from server');
+    } else {
+      // Error in setting up request
+      console.error('Request error:', error.message);
     }
     return Promise.reject(error);
   }
