@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -25,7 +24,7 @@ class InventoryItem extends Model
         'status',
         'notes',
     ];
-    
+
     /**
      * Get the product associated with this inventory item.
      */
@@ -33,7 +32,7 @@ class InventoryItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
-    
+
     /**
      * Get the unit associated with this inventory item.
      */
@@ -41,7 +40,7 @@ class InventoryItem extends Model
     {
         return $this->belongsTo(Unit::class);
     }
-    
+
     /**
      * Get the bin associated with this inventory item.
      */
@@ -49,7 +48,7 @@ class InventoryItem extends Model
     {
         return $this->belongsTo(Bin::class);
     }
-    
+
     /**
      * Get the SKU matrix associated with this inventory item.
      */
@@ -57,7 +56,7 @@ class InventoryItem extends Model
     {
         return $this->belongsTo(SkuMatrix::class);
     }
-    
+
     /**
      * Get the stock movements for this inventory item.
      */
