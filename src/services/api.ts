@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create a custom axios instance
 const api = axios.create({
-  baseURL: 'https://backend.myphr.io/api',
+  baseURL: 'https://backend.myphr.io/backend/api',
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
