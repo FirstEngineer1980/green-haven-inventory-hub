@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('status')->default('active');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes(); // Adding softDeletes which creates deleted_at column
         });
     }
 
