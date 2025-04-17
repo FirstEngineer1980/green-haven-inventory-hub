@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -17,9 +18,11 @@ class Customer extends Model
      */
     protected $fillable = [
         'name',
+        'contact_name',
         'email',
         'phone',
         'address',
+        'status',
         'user_id',
     ];
 
