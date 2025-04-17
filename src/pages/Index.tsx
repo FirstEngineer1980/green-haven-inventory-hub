@@ -10,20 +10,25 @@ const Index = () => {
   useEffect(() => {
     // Only redirect after we've checked authentication status
     if (!isLoading) {
+      console.log("Auth check complete, authenticated:", isAuthenticated);
       if (isAuthenticated) {
-        navigate('/dashboard', { replace: true });
+        console.log("Redirecting to dashboard");
+        // Force navigation to dashboard
+        window.location.href = '/dashboard';
       } else {
-        navigate('/login', { replace: true });
+        console.log("Redirecting to login");
+        // Force navigation to login
+        window.location.href = '/login';
       }
     }
-  }, [navigate, isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading]);
   
-  // Return a loading state or null while checking auth
-  return isLoading ? (
+  // Return a loading state while checking auth
+  return (
     <div className="flex min-h-screen items-center justify-center">
       <p className="text-lg">Loading...</p>
     </div>
-  ) : null;
+  );
 };
 
 export default Index;

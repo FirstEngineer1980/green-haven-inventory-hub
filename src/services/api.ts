@@ -26,9 +26,11 @@ api.interceptors.response.use(
     // Handle authentication errors
     if (error.response) {
       if (error.response.status === 401) {
+        console.log("401 Unauthorized response received, clearing token");
         localStorage.removeItem('token');
         // Only redirect if not already on login page
         if (window.location.pathname !== '/login') {
+          console.log("Redirecting to login page");
           window.location.href = '/login';
         }
       } else if (error.response.status === 403) {

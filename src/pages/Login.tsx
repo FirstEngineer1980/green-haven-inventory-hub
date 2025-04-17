@@ -12,30 +12,30 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      console.log("User is authenticated, redirecting to dashboard");
+      // Force navigation to dashboard with replace to prevent back navigation
+      window.location.href = '/dashboard';
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-      // Explicitly redirect to dashboard after successful login
-      // Use replace: true to prevent back navigation to login page
-      navigate('/dashboard', { replace: true });
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
+      const result = await login(email, password);
+      if (result) {
+        console.log("Login successful, redirecting to dashboard");
+        // Force navigation to dashboard to prevent issues with React Router
+        window.location.href = '/dashboard';
+      }
     } catch (error) {
       console.error('Login error:', error);
       // Toast is already handled in the AuthContext
@@ -43,6 +43,15 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Return loading if checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-lg">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 to-green-100 p-4">

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +15,7 @@ type AuthContextType = {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
   hasPermission: (permission: string) => boolean;
@@ -27,7 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => {},
+  login: async () => false,
   logout: async () => {},
   register: async () => {},
   hasPermission: () => false,
@@ -42,15 +41,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       setIsLoading(true);
+      console.log("Checking authentication status...");
       const token = localStorage.getItem('token');
       if (token) {
         try {
+          console.log("Token found, fetching current user");
           const response = await authAPI.getCurrentUser();
+          console.log("User data received:", response.data);
           setUser(response.data);
         } catch (error) {
           console.error('Authentication error:', error);
           localStorage.removeItem('token');
         }
+      } else {
+        console.log("No token found");
       }
       setIsLoading(false);
     };
@@ -59,17 +63,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Login function
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
+      console.log("Attempting login for:", email);
       const response = await authAPI.login({ email, password });
+      console.log("Login response:", response.data);
+      
+      // Store token and user data
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
+      
       toast({
         title: "Login successful",
         description: `Welcome back, ${response.data.user?.name || ''}!`,
       });
-      return response.data;
+      
+      setIsLoading(false);
+      return true;
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
@@ -77,9 +88,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.response?.data?.message || "Invalid credentials",
         variant: "destructive",
       });
-      throw error;
-    } finally {
       setIsLoading(false);
+      return false;
     }
   };
 
@@ -87,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsLoading(true);
     try {
+      console.log("Logging out user");
       await authAPI.logout();
       localStorage.removeItem('token');
       setUser(null);
