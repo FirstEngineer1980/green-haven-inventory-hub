@@ -4,6 +4,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerProductController;
 use App\Http\Controllers\CustomerListController;
@@ -39,8 +40,8 @@ use App\Http\Controllers\StripeController;
 */
 
 // Public routes
-Route::post('/login', [UserController::class, 'login']);
-Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
 // Stripe routes
 Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
@@ -164,4 +165,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/email-logs/{emailLog}', [EmailLogController::class, 'destroy']);
     Route::delete('/email-logs', [EmailLogController::class, 'clearAll']);
 });
-
