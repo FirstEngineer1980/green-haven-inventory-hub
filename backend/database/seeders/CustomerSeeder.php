@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Database\Seeders;
@@ -13,12 +12,12 @@ class CustomerSeeder extends Seeder
     {
         // Get first admin user for association
         $user = User::first();
-        
+
         if (!$user) {
             // If no user exists, we can't proceed
             return;
         }
-        
+
         $customers = [
             [
                 'name' => 'XYZ Corporation',
