@@ -1,21 +1,23 @@
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@/context/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/context/AuthContext';
-import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Redirect if already authenticated
+  // Redirect if already authenticated
+  React.useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard');
     }
@@ -23,100 +25,78 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
+    setIsSubmitting(true);
+
     try {
-      const success = await login(email, password);
-      if (success) {
-        toast.success('Login successful');
-        navigate('/dashboard');
-      } else {
-        toast.error('Invalid credentials. Please try again.');
-      }
+      await login(email, password);
+      navigate('/dashboard');
     } catch (error) {
-      toast.error('An error occurred during login. Please try again.');
       console.error('Login error:', error);
+      // Toast is already handled in the AuthContext
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center p-6">
-      <div className="max-w-md w-full mx-auto bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="p-8">
-          <div className="text-center mb-6">
-            <div className="bg-gradient-to-r from-gh-green to-gh-blue w-16 h-16 rounded-lg flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
-              GH
-            </div>
-            <h1 className="text-2xl font-bold">Green Haven</h1>
-            <p className="text-gray-500">Inventory Management System</p>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <a href="#" className="text-xs text-gh-blue hover:underline">
-                  Forgot password?
-                </a>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 to-green-100 p-4">
+      <div className="w-full max-w-md">
+        <Card className="shadow-xl">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+            <CardDescription className="text-center">
+              Enter your credentials to access your account
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
-              <Input 
-                id="password" 
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-to-r from-gh-green to-gh-blue hover:from-gh-green/90 hover:to-gh-blue/90"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </Button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4">
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
+              </Button>
+              <div className="text-center text-sm">
+                Don't have an account?{' '}
+                <Link to="/register" className="text-primary hover:underline">
+                  Sign up
+                </Link>
+              </div>
+            </CardFooter>
           </form>
-          
-          <div className="mt-6 text-center text-sm">
-            <div className="text-gray-500 mb-2">Demo Accounts:</div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-gray-50 p-2 rounded">
-                <div className="font-medium">Admin</div>
-                <div>admin@example.com</div>
-              </div>
-              <div className="bg-gray-50 p-2 rounded">
-                <div className="font-medium">Manager</div>
-                <div>manager@example.com</div>
-              </div>
-              <div className="bg-gray-50 p-2 rounded">
-                <div className="font-medium">Staff</div>
-                <div>staff@example.com</div>
-              </div>
-              <div className="bg-gray-50 p-2 rounded">
-                <div className="font-medium">Viewer</div>
-                <div>viewer@example.com</div>
-              </div>
-            </div>
-            <div className="mt-2 text-gray-400 text-xs">
-              (No password required for demo accounts)
-            </div>
-          </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

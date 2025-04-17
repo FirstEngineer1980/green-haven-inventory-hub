@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/AuthProvider';
 import { ProductProvider } from './context/ProductContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { UserProvider } from './context/UserContext';
