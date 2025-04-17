@@ -1,3 +1,4 @@
+
 <?php
 
 namespace Database\Seeders;
@@ -5,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Create a test user if no users exist
+        if (User::count() === 0) {
+            User::create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => Hash::make('password'),
+                'phone' => '1234567890',
+                'position' => 'Tester',
+                'status' => 'active'
+            ]);
+        }
     }
 }
