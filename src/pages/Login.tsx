@@ -29,6 +29,7 @@ const Login = () => {
 
     try {
       await login(email, password);
+      // Explicitly redirect to dashboard after successful login
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
