@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -33,6 +34,10 @@ class UnitController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'room_id' => 'required|exists:rooms,id',
+            'number' => 'nullable|string|max:255',
+            'size' => 'nullable|string',
+            'size_unit' => 'nullable|string',
+            'status' => 'nullable|string|max:255',
         ]);
 
         $unit = Unit::create($validated);
@@ -59,6 +64,10 @@ class UnitController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'room_id' => 'sometimes|required|exists:rooms,id',
+            'number' => 'nullable|string|max:255',
+            'size' => 'nullable|string',
+            'size_unit' => 'nullable|string',
+            'status' => 'nullable|string|max:255',
         ]);
 
         $unit->update($validated);

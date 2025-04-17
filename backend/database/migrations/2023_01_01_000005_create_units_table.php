@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
+            $table->string('number')->nullable();  // Added number field
+            $table->string('size')->nullable();    // Added size field
+            $table->string('size_unit')->nullable(); // Added size_unit field
+            $table->string('status')->default('active'); // Added status field
             $table->timestamps();
             $table->softDeletes();
         });
