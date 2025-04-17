@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Services;
@@ -25,12 +24,12 @@ class EmailService
         try {
             $companyName = Setting::get('company_name', 'Inventory System');
             $fromEmail = Setting::get('notification_email', config('mail.from.address'));
-            
+
             Mail::send($view, $data, function (Message $message) use ($to, $subject, $companyName, $fromEmail, $attachments) {
                 $message->to($to)
                     ->subject($subject)
                     ->from($fromEmail, $companyName);
-                
+
                 // Add attachments if any
                 foreach ($attachments as $attachment) {
                     if (isset($attachment['path']) && file_exists($attachment['path'])) {
@@ -41,14 +40,14 @@ class EmailService
                     }
                 }
             });
-            
+
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to send email: ' . $e->getMessage());
             return false;
         }
     }
-    
+
     /**
      * Send low stock alert.
      *
@@ -65,7 +64,7 @@ class EmailService
             ['products' => $products]
         );
     }
-    
+
     /**
      * Send purchase order notification.
      *
@@ -82,7 +81,7 @@ class EmailService
             ['purchaseOrder' => $purchaseOrder->load('items.product', 'vendor')]
         );
     }
-    
+
     /**
      * Send report.
      *
@@ -97,11 +96,11 @@ class EmailService
     {
         // Generate report file
         $reportPath = $this->generateReportFile($reportName, $reportData, $format);
-        
+
         if (!$reportPath) {
             return false;
         }
-        
+
         return $this->send(
             $to,
             $subject,
@@ -116,7 +115,7 @@ class EmailService
             ]
         );
     }
-    
+
     /**
      * Generate a report file.
      *
@@ -130,26 +129,26 @@ class EmailService
         try {
             $fileName = $reportName . '_' . date('Ymd_His') . '.' . $format;
             $path = storage_path('app/reports/' . $fileName);
-            
+
             // Create directory if it doesn't exist
             if (!file_exists(dirname($path))) {
                 mkdir(dirname($path), 0755, true);
             }
-            
+
             if ($format === 'csv') {
                 $this->generateCsvReport($path, $reportData);
             } else {
                 // Default to PDF
                 $this->generatePdfReport($path, $reportName, $reportData);
             }
-            
+
             return $path;
         } catch (\Exception $e) {
             Log::error('Failed to generate report file: ' . $e->getMessage());
             return false;
         }
     }
-    
+
     /**
      * Generate a CSV report.
      *
@@ -162,21 +161,21 @@ class EmailService
         if (empty($data)) {
             return false;
         }
-        
+
         $file = fopen($path, 'w');
-        
+
         // Add headers
         fputcsv($file, array_keys((array)$data[0]));
-        
+
         // Add data
         foreach ($data as $row) {
             fputcsv($file, (array)$row);
         }
-        
+
         fclose($file);
         return true;
     }
-    
+
     /**
      * Generate a PDF report.
      *
@@ -189,20 +188,20 @@ class EmailService
     {
         // This is a placeholder for PDF generation
         // In a real application, you would use a PDF library like FPDF, TCPDF, or Dompdf
-        
+
         $html = '<html><head><title>' . $reportName . '</title></head><body>';
         $html .= '<h1>' . $reportName . '</h1>';
-        
+
         if (!empty($data)) {
             $html .= '<table border="1"><tr>';
-            
+
             // Add headers
             foreach (array_keys((array)$data[0]) as $header) {
                 $html .= '<th>' . $header . '</th>';
             }
-            
+
             $html .= '</tr>';
-            
+
             // Add data rows
             foreach ($data as $row) {
                 $html .= '<tr>';
@@ -211,17 +210,17 @@ class EmailService
                 }
                 $html .= '</tr>';
             }
-            
+
             $html .= '</table>';
         } else {
             $html .= '<p>No data available for this report.</p>';
         }
-        
+
         $html .= '</body></html>';
-        
+
         // Save HTML to file for now (in a real app, convert to PDF)
         file_put_contents($path, $html);
-        
+
         return true;
     }
 }
