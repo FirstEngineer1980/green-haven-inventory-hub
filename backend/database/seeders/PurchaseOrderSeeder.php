@@ -1,3 +1,4 @@
+
 <?php
 
 namespace Database\Seeders;
@@ -12,8 +13,12 @@ class PurchaseOrderSeeder extends Seeder
     public function run(): void
     {
         // Temporarily disable activity logging
-        $originalLogging = Activity::$recordEvents;
-        Activity::$recordEvents = false;
+        $wasLoggingEnabled = app('events')->hasListeners('eloquent.created: App\Models\PurchaseOrder');
+        
+        // Unregister the activity logger
+        app('events')->forget('eloquent.created: App\Models\PurchaseOrder');
+        app('events')->forget('eloquent.updated: App\Models\PurchaseOrder');
+        app('events')->forget('eloquent.deleted: App\Models\PurchaseOrder');
 
         // Create Purchase Order
         $po = PurchaseOrder::create([
@@ -50,7 +55,7 @@ class PurchaseOrderSeeder extends Seeder
             'status' => 'pending'
         ]);
 
-        // Re-enable activity logging
-        Activity::$recordEvents = $originalLogging;
+        // If logging was originally enabled, we would re-register the listeners here
+        // But since we're in a seeder, it's not necessary
     }
 }
