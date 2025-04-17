@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthProvider';
 import { Button } from '@/components/ui/button';
@@ -17,9 +17,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Redirect if already authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -30,7 +30,12 @@ const Login = () => {
     try {
       await login(email, password);
       // Explicitly redirect to dashboard after successful login
-      navigate('/dashboard');
+      // Use replace: true to prevent back navigation to login page
+      navigate('/dashboard', { replace: true });
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
     } catch (error) {
       console.error('Login error:', error);
       // Toast is already handled in the AuthContext
