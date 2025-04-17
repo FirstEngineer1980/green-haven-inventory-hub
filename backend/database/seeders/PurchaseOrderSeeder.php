@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Database\Seeders;
@@ -15,7 +14,7 @@ class PurchaseOrderSeeder extends Seeder
         // Temporarily disable activity logging
         $originalLogging = Activity::$recordEvents;
         Activity::$recordEvents = false;
-        
+
         // Create Purchase Order
         $po = PurchaseOrder::create([
             'order_number' => 'PO-2024001',
@@ -50,7 +49,7 @@ class PurchaseOrderSeeder extends Seeder
             'total_price' => 199.99,
             'status' => 'pending'
         ]);
-        
+
         // Re-enable activity logging
         Activity::$recordEvents = $originalLogging;
     }
