@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -36,7 +35,7 @@ class Vendor extends Model
     {
         return $this->hasMany(PurchaseOrder::class);
     }
-    
+
     /**
      * Get the products provided by this vendor.
      */

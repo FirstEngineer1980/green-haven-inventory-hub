@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -33,7 +32,7 @@ class Unit extends Model
     {
         return $this->belongsTo(Room::class);
     }
-    
+
     /**
      * Get the SKU matrices associated with this unit.
      */
@@ -41,7 +40,7 @@ class Unit extends Model
     {
         return $this->belongsToMany(SkuMatrix::class, 'sku_matrix_units');
     }
-    
+
     /**
      * Get the inventory items in this unit.
      */

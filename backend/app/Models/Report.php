@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -25,7 +24,7 @@ class Report extends Model
         'last_run',
         'user_id',
     ];
-    
+
     /**
      * The attributes that should be cast.
      *
@@ -35,7 +34,7 @@ class Report extends Model
         'params' => 'array',
         'last_run' => 'datetime',
     ];
-    
+
     /**
      * Get the user that owns the report.
      */

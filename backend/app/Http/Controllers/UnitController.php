@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -14,14 +13,14 @@ class UnitController extends Controller
     public function index(Request $request)
     {
         $query = Unit::query()->with('room');
-        
+
         // Filter by room_id if provided
         if ($request->has('room_id')) {
             $query->where('room_id', $request->room_id);
         }
-        
+
         $units = $query->get();
-        
+
         return response()->json($units);
     }
 
@@ -47,7 +46,7 @@ class UnitController extends Controller
     public function show(Unit $unit)
     {
         $unit->load('room');
-        
+
         return response()->json($unit);
     }
 

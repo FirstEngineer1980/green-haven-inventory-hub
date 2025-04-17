@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -24,7 +23,7 @@ class DashboardController extends Controller
         $totalProducts = Product::count();
         $lowStockCount = Product::whereRaw('quantity <= threshold')->count();
         $totalValue = Product::sum(DB::raw('quantity * price'));
-        
+
         $monthlyMovements = StockMovement::whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->count();

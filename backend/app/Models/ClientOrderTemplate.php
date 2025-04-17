@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -57,8 +56,8 @@ class ClientOrderTemplate extends Model
      */
     public function isDueForOrder()
     {
-        return $this->is_active && 
-               $this->next_order_date && 
+        return $this->is_active &&
+               $this->next_order_date &&
                $this->next_order_date->lte(Carbon::today());
     }
 
@@ -86,7 +85,7 @@ class ClientOrderTemplate extends Model
         }
 
         $this->save();
-        
+
         return $this->next_order_date;
     }
 
@@ -116,9 +115,9 @@ class ClientOrderTemplate extends Model
         // Add items to the purchase order
         foreach ($this->items as $item) {
             if (!$item->is_active) continue;
-            
+
             $product = $item->product;
-            
+
             $itemTotal = $product->price * $item->quantity;
             $total += $itemTotal;
 

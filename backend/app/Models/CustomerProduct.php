@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -36,7 +35,7 @@ class CustomerProduct extends Model
     {
         return $this->belongsTo(Customer::class);
     }
-    
+
     /**
      * Get the inventory items for this customer product.
      */
@@ -44,7 +43,7 @@ class CustomerProduct extends Model
     {
         return $this->hasMany(InventoryItem::class, 'product_id');
     }
-    
+
     /**
      * Get the room where the product is located.
      */
@@ -52,7 +51,7 @@ class CustomerProduct extends Model
     {
         return $this->belongsTo(Room::class);
     }
-    
+
     /**
      * Get the unit where the product is located.
      */

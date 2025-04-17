@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -36,7 +35,7 @@ class CustomerList extends Model
     {
         return $this->belongsTo(Customer::class);
     }
-    
+
     /**
      * Get the items in this list.
      */
@@ -44,7 +43,7 @@ class CustomerList extends Model
     {
         return $this->hasMany(CustomerListItem::class, 'list_id');
     }
-    
+
     /**
      * Get the room associated with this list.
      */

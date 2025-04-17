@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -71,7 +70,7 @@ class StripeController extends Controller
             // 1. Update your database to mark the order as paid
             // 2. Send confirmation emails
             // 3. Update inventory
-            
+
             return response()->json(['success' => true, 'session' => $session]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

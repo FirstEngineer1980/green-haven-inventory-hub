@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -55,14 +54,14 @@ class ExportNotificationController extends Controller
 
         // Get the user who performed the export
         $user = User::find($request->exportedBy);
-        
+
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
 
         // Get admin users for notifications
         $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
-        
+
         // Send email notification to admins and the user who performed the export
         $exportData = [
             'type' => $this->getExportTypeName($request->type),
@@ -71,14 +70,14 @@ class ExportNotificationController extends Controller
             'date' => date('Y-m-d H:i:s', strtotime($request->exportedAt)),
             'recordCount' => $request->recordCount,
         ];
-        
+
         // Send to admins
         foreach ($admins as $admin) {
             // Skip if admin is the same as the exporter
             if ($admin->id == $user->id) {
                 continue;
             }
-            
+
             $this->emailService->send(
                 $admin->email,
                 'Data Export Notification',
@@ -86,7 +85,7 @@ class ExportNotificationController extends Controller
                 $exportData
             );
         }
-        
+
         // Send to the user who performed the export
         $this->emailService->send(
             $user->email,

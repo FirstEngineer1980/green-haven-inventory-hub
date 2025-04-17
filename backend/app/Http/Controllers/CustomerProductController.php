@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -15,14 +14,14 @@ class CustomerProductController extends Controller
     public function index(Request $request)
     {
         $query = CustomerProduct::query()->with('customer');
-        
+
         // Filter by customer_id if provided
         if ($request->has('customer_id')) {
             $query->where('customer_id', $request->customer_id);
         }
-        
+
         $products = $query->get();
-        
+
         return response()->json($products);
     }
 
@@ -51,7 +50,7 @@ class CustomerProductController extends Controller
     public function show(CustomerProduct $customerProduct)
     {
         $customerProduct->load('customer');
-        
+
         return response()->json($customerProduct);
     }
 
@@ -83,14 +82,14 @@ class CustomerProductController extends Controller
 
         return response()->json(null, 204);
     }
-    
+
     /**
      * Get products for a specific customer.
      */
     public function getByCustomer(Customer $customer)
     {
         $products = $customer->customerProducts;
-        
+
         return response()->json($products);
     }
 }

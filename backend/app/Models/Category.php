@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -21,7 +20,7 @@ class Category extends Model
         'description',
         'parent_id',
     ];
-    
+
     /**
      * Get the products for the category.
      */
@@ -29,7 +28,7 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
-    
+
     /**
      * Get the parent category.
      */
@@ -37,7 +36,7 @@ class Category extends Model
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
-    
+
     /**
      * Get the child categories.
      */

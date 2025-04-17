@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -37,7 +36,7 @@ class StockMovementController extends Controller
         $newQuantity = $request->type === 'in'
             ? $product->quantity + $request->quantity
             : $product->quantity - $request->quantity;
-        
+
         $product->update(['quantity' => max(0, $newQuantity)]);
 
         return $stockMovement->load(['product', 'performer']);

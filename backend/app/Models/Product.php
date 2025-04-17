@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -32,7 +31,7 @@ class Product extends Model
         'weight',
         'dimensions',
     ];
-    
+
     /**
      * Get the category that owns the product.
      */
@@ -40,7 +39,7 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
-    
+
     /**
      * Get the inventory items for this product.
      */
@@ -48,7 +47,7 @@ class Product extends Model
     {
         return $this->hasMany(InventoryItem::class);
     }
-    
+
     /**
      * Get the stock movements for this product.
      */
@@ -56,7 +55,7 @@ class Product extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
-    
+
     /**
      * Get the vendors that supply this product.
      */
@@ -66,7 +65,7 @@ class Product extends Model
                     ->withPivot('sku', 'cost', 'lead_time', 'is_preferred')
                     ->withTimestamps();
     }
-    
+
     /**
      * Get purchase order items that include this product.
      */

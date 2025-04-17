@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -48,7 +47,7 @@ class PurchaseOrderItem extends Model
     {
         return $this->belongsTo(PurchaseOrder::class);
     }
-    
+
     /**
      * Get the product associated with this purchase order item.
      */

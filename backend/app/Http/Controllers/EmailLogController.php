@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -17,24 +16,24 @@ class EmailLogController extends Controller
     public function index(Request $request)
     {
         $query = EmailLog::query()->orderBy('created_at', 'desc');
-        
+
         // Filter by status if provided
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
-        
+
         // Filter by date range if provided
         if ($request->has('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
-        
+
         if ($request->has('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
-        
+
         $perPage = $request->per_page ?? 15;
         $emailLogs = $query->paginate($perPage);
-        
+
         return response()->json(['data' => $emailLogs]);
     }
 

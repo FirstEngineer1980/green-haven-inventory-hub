@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -169,7 +168,7 @@ class ReportController extends Controller
         if (isset($params['start_date'])) {
             $query->where('stock_movements.created_at', '>=', $params['start_date']);
         }
-        
+
         if (isset($params['end_date'])) {
             $query->where('stock_movements.created_at', '<=', $params['end_date']);
         }

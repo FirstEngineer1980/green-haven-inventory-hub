@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -21,7 +20,7 @@ class Setting extends Model
         'group',
         'description',
     ];
-    
+
     /**
      * Get setting by key.
      *
@@ -34,7 +33,7 @@ class Setting extends Model
         $setting = self::where('key', $key)->first();
         return $setting ? $setting->value : $default;
     }
-    
+
     /**
      * Set a setting value.
      *

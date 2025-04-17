@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -14,14 +13,14 @@ class RoomController extends Controller
     public function index(Request $request)
     {
         $query = Room::query()->with('customer');
-        
+
         // Filter by customer_id if provided
         if ($request->has('customer_id')) {
             $query->where('customer_id', $request->customer_id);
         }
-        
+
         $rooms = $query->get();
-        
+
         return response()->json($rooms);
     }
 
@@ -47,7 +46,7 @@ class RoomController extends Controller
     public function show(Room $room)
     {
         $room->load(['customer', 'units']);
-        
+
         return response()->json($room);
     }
 

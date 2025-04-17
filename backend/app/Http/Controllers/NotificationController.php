@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -19,7 +18,7 @@ class NotificationController extends Controller
         $notifications = Notification::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
-            
+
         return response()->json(['data' => $notifications]);
     }
 
@@ -35,7 +34,7 @@ class NotificationController extends Controller
         if ($notification->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        
+
         $notification->update(['read' => true]);
         return response()->json(['message' => 'Notification marked as read']);
     }
@@ -50,7 +49,7 @@ class NotificationController extends Controller
         Notification::where('user_id', Auth::id())
             ->where('read', false)
             ->update(['read' => true]);
-            
+
         return response()->json(['message' => 'All notifications marked as read']);
     }
 
@@ -88,7 +87,7 @@ class NotificationController extends Controller
         if ($notification->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        
+
         $notification->delete();
         return response()->json(['message' => 'Notification deleted successfully']);
     }

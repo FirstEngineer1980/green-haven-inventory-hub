@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -67,11 +66,11 @@ class SettingController extends Controller
     public function show($key)
     {
         $setting = Setting::where('key', $key)->first();
-        
+
         if (!$setting) {
             return response()->json(['error' => 'Setting not found'], 404);
         }
-        
+
         return response()->json(['data' => $setting]);
     }
 
@@ -85,11 +84,11 @@ class SettingController extends Controller
     public function update(Request $request, $key)
     {
         $setting = Setting::where('key', $key)->first();
-        
+
         if (!$setting) {
             return response()->json(['error' => 'Setting not found'], 404);
         }
-        
+
         $validator = Validator::make($request->all(), [
             'value' => 'required',
             'group' => 'nullable|string',
@@ -113,11 +112,11 @@ class SettingController extends Controller
     public function destroy($key)
     {
         $setting = Setting::where('key', $key)->first();
-        
+
         if (!$setting) {
             return response()->json(['error' => 'Setting not found'], 404);
         }
-        
+
         $setting->delete();
         return response()->json(['message' => 'Setting deleted successfully']);
     }
@@ -148,7 +147,7 @@ class SettingController extends Controller
         Setting::set('company_address', $request->address, 'company', 'Company address');
         Setting::set('company_phone', $request->phone, 'company', 'Company phone number');
         Setting::set('company_email', $request->email, 'company', 'Company email');
-        
+
         return response()->json([
             'message' => 'Company settings updated successfully',
             'data' => [
@@ -181,13 +180,13 @@ class SettingController extends Controller
         }
 
         $userId = Auth::id();
-        
+
         // Update notification settings
         Setting::set("user_{$userId}_email_notifications", $request->email_notifications, 'notifications', 'Email notifications');
         Setting::set("user_{$userId}_low_stock_alerts", $request->low_stock_alerts, 'notifications', 'Low stock alerts');
         Setting::set("user_{$userId}_new_product_notifications", $request->new_product_notifications, 'notifications', 'New product notifications');
         Setting::set("user_{$userId}_system_maintenance_notifications", $request->system_maintenance_notifications, 'notifications', 'System maintenance notifications');
-        
+
         return response()->json([
             'message' => 'Notification settings updated successfully'
         ]);
@@ -202,17 +201,17 @@ class SettingController extends Controller
     public function resetSystem(Request $request)
     {
         $user = Auth::user();
-        
+
         if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        
+
         // In a real application, this would reset system settings but preserve data
         // For demo purposes, we'll just return a success message
-        
+
         // Notify admins about system reset
         $admins = DB::table('users')->whereIn('role', ['admin', 'super_admin'])->get();
-        
+
         foreach ($admins as $admin) {
             $this->emailService->send(
                 $admin->email,
@@ -224,7 +223,7 @@ class SettingController extends Controller
                 ]
             );
         }
-        
+
         return response()->json([
             'message' => 'System has been reset successfully'
         ]);
@@ -239,17 +238,17 @@ class SettingController extends Controller
     public function clearData(Request $request)
     {
         $user = Auth::user();
-        
+
         if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        
+
         // In a real application, this would clear all data tables
         // For demo purposes, we'll just return a success message
-        
+
         // Notify admins about data clearing
         $admins = DB::table('users')->whereIn('role', ['admin', 'super_admin'])->get();
-        
+
         foreach ($admins as $admin) {
             $this->emailService->send(
                 $admin->email,
@@ -261,7 +260,7 @@ class SettingController extends Controller
                 ]
             );
         }
-        
+
         return response()->json([
             'message' => 'All data has been cleared from the system'
         ]);

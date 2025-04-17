@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -15,14 +14,14 @@ class CustomerListController extends Controller
     public function index(Request $request)
     {
         $query = CustomerList::query()->with('customer');
-        
+
         // Filter by customer_id if provided
         if ($request->has('customer_id')) {
             $query->where('customer_id', $request->customer_id);
         }
-        
+
         $lists = $query->get();
-        
+
         return response()->json($lists);
     }
 
@@ -52,7 +51,7 @@ class CustomerListController extends Controller
     public function show(CustomerList $customerList)
     {
         $customerList->load('customer');
-        
+
         return response()->json($customerList);
     }
 
@@ -85,14 +84,14 @@ class CustomerListController extends Controller
 
         return response()->json(null, 204);
     }
-    
+
     /**
      * Get lists for a specific customer.
      */
     public function getByCustomer(Customer $customer)
     {
         $lists = $customer->lists;
-        
+
         return response()->json($lists);
     }
 }

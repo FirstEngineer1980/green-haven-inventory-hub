@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -25,7 +24,7 @@ class Notification extends Model
         'reference_id',
         'reference_type',
     ];
-    
+
     /**
      * The attributes that should be cast.
      *
@@ -34,7 +33,7 @@ class Notification extends Model
     protected $casts = [
         'read' => 'boolean',
     ];
-    
+
     /**
      * Get the user that this notification is for.
      */
@@ -42,7 +41,7 @@ class Notification extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     /**
      * Get the related model that triggered this notification.
      */

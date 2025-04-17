@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -21,7 +20,7 @@ class ProfileController extends Controller
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-        
+
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
             'email' => [
@@ -41,7 +40,7 @@ class ProfileController extends Controller
         }
 
         $user->update($request->only(['name', 'email', 'phone', 'position']));
-        
+
         return response()->json(['data' => $user, 'message' => 'Profile updated successfully']);
     }
 
@@ -54,7 +53,7 @@ class ProfileController extends Controller
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
-        
+
         $validator = Validator::make($request->all(), [
             'current_password' => 'required|string',
             'new_password' => 'required|string|min:8|different:current_password',
@@ -68,11 +67,11 @@ class ProfileController extends Controller
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json(['error' => 'Current password is incorrect.'], 422);
         }
-        
+
         // Update password
         $user->password = Hash::make($request->new_password);
         $user->save();
-        
+
         return response()->json(['message' => 'Password updated successfully']);
     }
 
@@ -85,7 +84,7 @@ class ProfileController extends Controller
     public function uploadAvatar(Request $request)
     {
         $user = Auth::user();
-        
+
         $validator = Validator::make($request->all(), [
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -98,13 +97,13 @@ class ProfileController extends Controller
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $user->avatar = '/storage/' . $avatarPath;
             $user->save();
-            
+
             return response()->json([
                 'data' => ['avatar_url' => $user->avatar],
                 'message' => 'Avatar uploaded successfully'
             ]);
         }
-        
+
         return response()->json(['error' => 'No avatar file provided.'], 422);
     }
 }

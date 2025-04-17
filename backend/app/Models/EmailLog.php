@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -24,7 +23,7 @@ class EmailLog extends Model
         'error',
         'sent_at',
     ];
-    
+
     /**
      * The attributes that should be cast.
      *
