@@ -16,7 +16,7 @@ const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
+  // Only redirect once, and only after checking auth status
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       console.log("User is authenticated, redirecting to dashboard");
@@ -32,10 +32,7 @@ const Login = () => {
       const result = await login(email, password);
       if (result) {
         console.log("Login successful, redirecting to dashboard");
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
-        });
+        // No toast here - it's already handled in the auth context
         navigate('/dashboard', { replace: true });
       }
     } catch (error) {
@@ -46,13 +43,18 @@ const Login = () => {
     }
   };
 
-  // Return loading if checking authentication
+  // If we're still checking auth status, show loading
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-lg">Loading...</p>
       </div>
     );
+  }
+
+  // Only render the login form if not authenticated
+  if (isAuthenticated) {
+    return null; // Don't render anything if we're authenticated (we'll redirect)
   }
 
   return (

@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 // Create a custom axios instance
@@ -30,11 +31,15 @@ api.interceptors.response.use(
       if (error.response.status === 401 && !isRedirecting) {
         console.log("401 Unauthorized response received, clearing token");
         localStorage.removeItem('token');
-        // Only redirect if not already on login page
-        if (window.location.pathname !== '/login') {
+        
+        // Only redirect if not already on login or index page
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
           console.log("Redirecting to login page");
           isRedirecting = true;
+          
+          // Use React Router history if available, otherwise fall back to window.location
           window.location.href = '/login';
+          
           // Reset the flag after navigation completes
           setTimeout(() => {
             isRedirecting = false;
