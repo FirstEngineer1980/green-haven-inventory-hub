@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Database\Seeders;
@@ -14,7 +13,7 @@ class PurchaseOrderSeeder extends Seeder
     {
         // Temporarily disable activity logging
         $wasLoggingEnabled = app('events')->hasListeners('eloquent.created: App\Models\PurchaseOrder');
-        
+
         // Unregister the activity logger
         app('events')->forget('eloquent.created: App\Models\PurchaseOrder');
         app('events')->forget('eloquent.updated: App\Models\PurchaseOrder');
