@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,10 +27,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { addToComparison, isInComparison } = useComparison();
   const { addToCart } = useCart();
   
-  // Ensure price is a number
-  const displayPrice = typeof product.price === 'number' ? 
-    formatCurrency(product.price) : 
-    formatCurrency(0);
+  // Safely format the price
+  const displayPrice = formatCurrency(typeof product.price === 'number' ? product.price : 0);
   
   const handleAddToFavorites = (e: React.MouseEvent) => {
     e.stopPropagation();

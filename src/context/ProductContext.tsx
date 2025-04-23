@@ -7,6 +7,7 @@ interface ProductContextType {
   products: Product[];
   stockMovements: StockMovement[];
   categories: Category[];
+  isLoading: boolean;
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
@@ -25,47 +26,76 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [products, setProducts] = useState<Product[]>([]);
   const [stockMovements, setStockMovements] = useState<StockMovement[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { addNotification } = useNotifications();
 
   // Fetch products and categories on initial mount using backend API
   useEffect(() => {
-    api.products.getAll().then(res => {
-      // Ensure all price values are numbers
-      const normalizedProducts = res.data.map(product => ({
-        ...product,
-        price: typeof product.price === 'string' ? parseFloat(product.price) : Number(product.price),
-        costPrice: typeof product.costPrice === 'string' ? parseFloat(product.costPrice) : Number(product.costPrice),
-        quantity: typeof product.quantity === 'string' ? parseInt(product.quantity, 10) : Number(product.quantity),
-        threshold: typeof product.threshold === 'string' ? parseInt(product.threshold, 10) : Number(product.threshold),
-      }));
-      setProducts(normalizedProducts);
-    }).catch(() => {});
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch products
+        const productsResponse = await api.products.getAll();
+        console.log("Products response:", productsResponse);
+        
+        if (productsResponse?.data) {
+          // Ensure all price values are numbers
+          const normalizedProducts = productsResponse.data.map(product => ({
+            ...product,
+            price: typeof product.price === 'string' ? parseFloat(product.price) : Number(product.price),
+            costPrice: typeof product.costPrice === 'string' ? parseFloat(product.costPrice) : Number(product.costPrice),
+            quantity: typeof product.quantity === 'string' ? parseInt(product.quantity, 10) : Number(product.quantity),
+            threshold: typeof product.threshold === 'string' ? parseInt(product.threshold, 10) : Number(product.threshold),
+          }));
+          setProducts(normalizedProducts);
+        }
+        
+        // Fetch categories
+        const categoriesResponse = await api.categories.getAll();
+        console.log("Categories response:", categoriesResponse);
+        
+        if (categoriesResponse?.data) {
+          setCategories(categoriesResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Set empty arrays as fallback
+        setProducts([]);
+        setCategories([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    api.categories.getAll?.()
-      .then(res => setCategories(res.data))
-      .catch(() => {});
-    // Note: handle stockMovements as needed.
+    fetchData();
   }, []);
 
   // Product CRUD
   const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const res = await api.products.create(product);
-    // Ensure numeric values
-    const newProduct = {
-      ...res.data,
-      price: typeof res.data.price === 'string' ? parseFloat(res.data.price) : Number(res.data.price),
-      costPrice: typeof res.data.costPrice === 'string' ? parseFloat(res.data.costPrice) : Number(res.data.costPrice),
-      quantity: typeof res.data.quantity === 'string' ? parseInt(res.data.quantity, 10) : Number(res.data.quantity),
-      threshold: typeof res.data.threshold === 'string' ? parseInt(res.data.threshold, 10) : Number(res.data.threshold),
-    };
-    
-    setProducts((prev) => [...prev, newProduct]);
-    addNotification({
-      title: 'New Product Added',
-      message: `${newProduct.name} has been added to inventory`,
-      type: 'info',
-      for: ['1', '2', '3', '4'],
-    });
+    try {
+      const res = await api.products.create(product);
+      console.log("Created product response:", res);
+      
+      // Ensure numeric values
+      const newProduct = {
+        ...res.data,
+        price: typeof res.data.price === 'string' ? parseFloat(res.data.price) : Number(res.data.price),
+        costPrice: typeof res.data.costPrice === 'string' ? parseFloat(res.data.costPrice) : Number(res.data.costPrice),
+        quantity: typeof res.data.quantity === 'string' ? parseInt(res.data.quantity, 10) : Number(res.data.quantity),
+        threshold: typeof res.data.threshold === 'string' ? parseInt(res.data.threshold, 10) : Number(res.data.threshold),
+      };
+      
+      setProducts((prev) => [...prev, newProduct]);
+      addNotification({
+        title: 'New Product Added',
+        message: `${newProduct.name} has been added to inventory`,
+        type: 'info',
+        for: ['1', '2', '3', '4'],
+      });
+    } catch (error) {
+      console.error('Error adding product:', error);
+      throw error;
+    }
   };
 
   const updateProduct = async (id: string, updates: Partial<Product>) => {
@@ -189,6 +219,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       products,
       stockMovements,
       categories,
+      isLoading,
       addProduct,
       updateProduct,
       deleteProduct,

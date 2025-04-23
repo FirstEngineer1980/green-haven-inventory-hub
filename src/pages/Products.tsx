@@ -17,7 +17,7 @@ import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const Products = () => {
-  const { products, categories, addProduct } = useProducts();
+  const { products, categories, addProduct, isLoading } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -123,13 +123,28 @@ const Products = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProductTable 
-            products={filteredProducts}
-            onEdit={(product) => {
-              setSelectedProduct(product);
-              setOpenEditDialog(true);
-            }}
-          />
+          {isLoading ? (
+            <div className="w-full py-8 text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+              <p className="mt-4 text-muted-foreground">Loading products...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">No products found</p>
+              <Button onClick={() => setOpenAddDialog(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Your First Product
+              </Button>
+            </div>
+          ) : (
+            <ProductTable 
+              products={filteredProducts}
+              onEdit={(product) => {
+                setSelectedProduct(product);
+                setOpenEditDialog(true);
+              }}
+            />
+          )}
         </CardContent>
       </Card>
 
