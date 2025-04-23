@@ -1,9 +1,7 @@
-
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
 
-// Define the interface for updating user profile
 interface UpdateUserParams {
   name?: string;
   email?: string;
@@ -15,6 +13,7 @@ interface UpdateUserParams {
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  isLoading: boolean;
   currentUser: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
@@ -22,31 +21,27 @@ interface AuthContextType {
   updateUser: (userData: UpdateUserParams) => Promise<boolean>;
 }
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  isLoading: true,
+  currentUser: null,
+  login: () => Promise.resolve(false),
+  logout: () => {},
+  hasPermission: () => false,
+  updateUser: () => Promise.resolve(false)
+});
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('currentUser');
-    
-    if (storedToken && storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        setCurrentUser(user);
-        setIsAuthenticated(true);
-        
-        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-      } catch (error) {
-        console.error('Error parsing stored user:', error);
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('token');
-      }
-    }
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -172,10 +167,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      currentUser, 
-      login, 
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      isLoading,
+      currentUser,
+      login,
       logout,
       hasPermission,
       updateUser

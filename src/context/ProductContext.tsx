@@ -1,21 +1,20 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Product, StockMovement, Category } from '../types';
-import { mockProducts, mockStockMovements, mockCategories } from '../data/mockData';
 import { useNotifications } from './NotificationContext';
+import api from '../services/api';
 
 interface ProductContextType {
   products: Product[];
   stockMovements: StockMovement[];
   categories: Category[];
-  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateProduct: (id: string, updates: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
   addStockMovement: (movement: Omit<StockMovement, 'id' | 'date'>) => void;
   getLowStockProducts: () => Product[];
-  addCategory: (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateCategory: (id: string, updates: Partial<Category>) => void;
-  deleteCategory: (id: string) => void;
+  addCategory: (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateCategory: (id: string, updates: Partial<Category>) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
 }
 
 const ProductContext = createContext<ProductContextType>({} as ProductContextType);
@@ -23,89 +22,115 @@ const ProductContext = createContext<ProductContextType>({} as ProductContextTyp
 export const useProducts = () => useContext(ProductContext);
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [stockMovements, setStockMovements] = useState<StockMovement[]>(mockStockMovements);
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [stockMovements, setStockMovements] = useState<StockMovement[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const { addNotification } = useNotifications();
 
-  // Check for low stock products on initial load
+  // Fetch products and categories on initial mount using backend API
   useEffect(() => {
-    const lowStockProducts = getLowStockProducts();
-    if (lowStockProducts.length > 0) {
-      // No need to send notifications here as they're already in mock data
-      // In a real app, you might want to check and send notifications
-    }
+    api.products.getAll().then(res => setProducts(res.data)).catch(() => {});
+    api.categories.getAll?.()
+      .then(res => setCategories(res.data))
+      .catch(() => {});
+    // Note: handle stockMovements as needed.
   }, []);
 
-  const addProduct = (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
-    const newProduct: Product = {
-      ...product,
-      id: Date.now().toString(),
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    setProducts(prev => [...prev, newProduct]);
-    
-    // Send notification about new product
+  // Product CRUD
+  const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const res = await api.products.create(product);
+    setProducts((prev) => [...prev, res.data]);
     addNotification({
       title: 'New Product Added',
-      message: `${newProduct.name} has been added to inventory`,
+      message: `${res.data.name} has been added to inventory`,
       type: 'info',
-      for: ['1', '2', '3', '4'], // All users in this demo
+      for: ['1', '2', '3', '4'],
     });
   };
 
-  const updateProduct = (id: string, updates: Partial<Product>) => {
+  const updateProduct = async (id: string, updates: Partial<Product>) => {
+    const res = await api.products.update(id, updates);
     setProducts(prev => 
       prev.map(product => 
-        product.id === id 
-          ? { ...product, ...updates, updatedAt: new Date().toISOString() } 
+        product.id == id 
+          ? { ...product, ...res.data }
           : product
       )
     );
-    
-    // Get the updated product
-    const updatedProduct = products.find(p => p.id === id);
-    if (updatedProduct) {
-      // Send notification about update
+    addNotification({
+      title: 'Inventory Updated',
+      message: `${res.data.name} inventory has been updated`,
+      type: 'success',
+      for: ['1', '2', '3'],
+    });
+    if ((res.data.quantity !== undefined) && (res.data.quantity <= (res.data.threshold))) {
       addNotification({
-        title: 'Inventory Updated',
-        message: `${updatedProduct.name} inventory has been updated`,
-        type: 'success',
-        for: ['1', '2', '3'], // Admin, Manager, Staff
+        title: 'Low Stock Alert',
+        message: `${res.data.name} is below the threshold quantity`,
+        type: 'warning',
+        for: ['1', '2'],
       });
-      
-      // Check if product is now below threshold
-      if ((updates.quantity !== undefined) && 
-          (updates.quantity <= (updates.threshold || updatedProduct.threshold))) {
-        addNotification({
-          title: 'Low Stock Alert',
-          message: `${updatedProduct.name} is below the threshold quantity`,
-          type: 'warning',
-          for: ['1', '2'], // Admin, Manager
-        });
-      }
     }
   };
 
-  const deleteProduct = (id: string) => {
-    // Get the product before deleting
-    const productToDelete = products.find(p => p.id === id);
-    
-    setProducts(prev => prev.filter(product => product.id !== id));
-    
-    if (productToDelete) {
+  const deleteProduct = async (id: string) => {
+    const prod = products.find(p => p.id == id);
+    await api.products.delete(id);
+    setProducts(prev => prev.filter(product => product.id != id));
+    if (prod) {
       addNotification({
         title: 'Product Deleted',
-        message: `${productToDelete.name} has been removed from inventory`,
+        message: `${prod.name} has been removed from inventory`,
         type: 'info',
-        for: ['1', '2'], // Admin, Manager
+        for: ['1', '2'],
       });
     }
   };
 
+  // Category CRUD
+  const addCategory = async (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const res = await api.categories.create(category);
+    setCategories(prev => [...prev, res.data]);
+    addNotification({
+      title: 'New Category Added',
+      message: `${res.data.name} category has been added`,
+      type: 'info',
+      for: ['1', '2'],
+    });
+  };
+
+  const updateCategory = async (id: string, updates: Partial<Category>) => {
+    const res = await api.categories.update(id, updates);
+    setCategories(prev => 
+      prev.map(category => 
+        category.id == id 
+          ? { ...category, ...res.data }
+          : category
+      )
+    );
+    addNotification({
+      title: 'Category Updated',
+      message: `${res.data.name} category has been updated`,
+      type: 'info',
+      for: ['1', '2'],
+    });
+  };
+
+  const deleteCategory = async (id: string) => {
+    const cat = categories.find(c => c.id == id);
+    await api.categories.delete(id);
+    setCategories(prev => prev.filter(category => category.id != id));
+    if (cat) {
+      addNotification({
+        title: 'Category Deleted',
+        message: `${cat.name} category has been removed`,
+        type: 'info',
+        for: ['1', '2'],
+      });
+    }
+  };
+
+  // You might need to review addStockMovement and getLowStockProducts logic for API support.
   const addStockMovement = (movement: Omit<StockMovement, 'id' | 'date'>) => {
     const newMovement: StockMovement = {
       ...movement,
@@ -130,68 +155,13 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return products.filter(product => product.quantity <= product.threshold);
   };
 
-  // Category-related functions
-  const addCategory = (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
-    const newCategory: Category = {
-      ...category,
-      id: Date.now().toString(),
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    setCategories(prev => [...prev, newCategory]);
-    
-    addNotification({
-      title: 'New Category Added',
-      message: `${newCategory.name} category has been added`,
-      type: 'info',
-      for: ['1', '2'], // Admin, Manager
-    });
-  };
-
-  const updateCategory = (id: string, updates: Partial<Category>) => {
-    setCategories(prev => 
-      prev.map(category => 
-        category.id === id 
-          ? { ...category, ...updates, updatedAt: new Date().toISOString() } 
-          : category
-      )
-    );
-    
-    const updatedCategory = categories.find(c => c.id === id);
-    if (updatedCategory) {
-      addNotification({
-        title: 'Category Updated',
-        message: `${updatedCategory.name} category has been updated`,
-        type: 'info',
-        for: ['1', '2'], // Admin, Manager
-      });
-    }
-  };
-
-  const deleteCategory = (id: string) => {
-    const categoryToDelete = categories.find(c => c.id === id);
-    
-    setCategories(prev => prev.filter(category => category.id !== id));
-    
-    if (categoryToDelete) {
-      addNotification({
-        title: 'Category Deleted',
-        message: `${categoryToDelete.name} category has been removed`,
-        type: 'info',
-        for: ['1', '2'], // Admin, Manager
-      });
-    }
-  };
-
   return (
-    <ProductContext.Provider value={{ 
+    <ProductContext.Provider value={{
       products,
       stockMovements,
       categories,
-      addProduct, 
-      updateProduct, 
+      addProduct,
+      updateProduct,
       deleteProduct,
       addStockMovement,
       getLowStockProducts,

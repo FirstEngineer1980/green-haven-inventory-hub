@@ -1,7 +1,5 @@
-
 import axios from 'axios';
 
-// Create a custom axios instance
 const api = axios.create({
   baseURL: 'https://backend.myphr.io/backend/api',
   headers: {
@@ -82,6 +80,15 @@ export const productsAPI = {
   getLowStock: () => api.get('/products/low-stock')
 };
 
+// Categories API functions
+export const categoriesAPI = {
+  getAll: (params?: any) => api.get('/categories', { params }),
+  getById: (id: string) => api.get(`/categories/${id}`),
+  create: (data: any) => api.post('/categories', data),
+  update: (id: string, data: any) => api.put(`/categories/${id}`, data),
+  delete: (id: string) => api.delete(`/categories/${id}`)
+};
+
 // Customers API functions
 export const customersAPI = {
   getAll: (params?: any) => api.get('/customers', { params }),
@@ -106,5 +113,6 @@ export default {
   auth: authAPI,
   products: productsAPI,
   customers: customersAPI,
-  purchaseOrders: purchaseOrdersAPI
+  purchaseOrders: purchaseOrdersAPI,
+  categories: categoriesAPI
 };
