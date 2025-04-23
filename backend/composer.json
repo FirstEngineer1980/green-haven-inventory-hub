@@ -1,4 +1,3 @@
-
 {
     "name": "inventory/backend",
     "type": "project",
@@ -7,14 +6,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^11.0",
-        "maatwebsite/excel": "^3.1.50",
-        "laravel/sanctum": "^4.0",
-        "spatie/laravel-permission": "^6.0",
-        "spatie/laravel-query-builder": "^5.0",
-        "spatie/laravel-activitylog": "^4.0",
+        "barryvdh/laravel-dompdf": "^2.0",
         "bensampo/laravel-enum": "^6.0",
-        "barryvdh/laravel-dompdf": "^2.0"
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.1",
+        "maatwebsite/excel": "^3.1.50",
+        "spatie/laravel-activitylog": "^4.0",
+        "spatie/laravel-permission": "^6.0",
+        "spatie/laravel-query-builder": "^5.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
