@@ -12,29 +12,30 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Only redirect once, and only after checking auth status
+  // Redirect if already authenticated
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      console.log("User is authenticated, redirecting to dashboard");
+    if (isAuthenticated) {
       navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const result = await login(email, password);
-      if (result) {
-        console.log("Login successful, redirecting to dashboard");
-        // No toast here - it's already handled in the auth context
-        navigate('/dashboard', { replace: true });
-      }
+      await login(email, password);
+      // Explicitly redirect to dashboard after successful login
+      // Use replace: true to prevent back navigation to login page
+      navigate('/dashboard', { replace: true });
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
     } catch (error) {
       console.error('Login error:', error);
       // Toast is already handled in the AuthContext
@@ -42,20 +43,6 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
-
-  // If we're still checking auth status, show loading
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-lg">Loading...</p>
-      </div>
-    );
-  }
-
-  // Only render the login form if not authenticated
-  if (isAuthenticated) {
-    return null; // Don't render anything if we're authenticated (we'll redirect)
-  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 to-green-100 p-4">

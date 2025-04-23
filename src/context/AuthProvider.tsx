@@ -16,7 +16,7 @@ type AuthContextType = {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
   hasPermission: (permission: string) => boolean;
@@ -27,7 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => false,
+  login: async () => {},
   logout: async () => {},
   register: async () => {},
   hasPermission: () => false,
@@ -41,52 +41,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check if user is authenticated on mount
   useEffect(() => {
     const checkAuth = async () => {
-      setIsLoading(true);
-      console.log("Checking authentication status...");
       const token = localStorage.getItem('token');
-      
-      if (!token) {
-        console.log("No token found");
-        setUser(null);
-        setIsLoading(false);
-        return;
+      if (token) {
+        try {
+          const response = await authAPI.getCurrentUser();
+          setUser(response.data);
+        } catch (error) {
+          console.error('Authentication error:', error);
+          localStorage.removeItem('token');
+        }
       }
-      
-      try {
-        console.log("Token found, fetching current user");
-        const response = await authAPI.getCurrentUser();
-        console.log("User data received:", response.data);
-        setUser(response.data);
-      } catch (error) {
-        console.error('Authentication error:', error);
-        localStorage.removeItem('token');
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     };
 
     checkAuth();
   }, []);
 
   // Login function
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      console.log("Attempting login for:", email);
       const response = await authAPI.login({ email, password });
-      console.log("Login response:", response.data);
-      
-      // Store token and user data
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
-      
       toast({
         title: "Login successful",
-        description: `Welcome back, ${response.data.user?.name || ''}!`,
+        description: `Welcome back, ${response.data.user.name}!`,
       });
-      
-      return true;
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
@@ -94,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.response?.data?.message || "Invalid credentials",
         variant: "destructive",
       });
-      return false;
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +85,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsLoading(true);
     try {
-      console.log("Logging out user");
       await authAPI.logout();
       localStorage.removeItem('token');
       setUser(null);
