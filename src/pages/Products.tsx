@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProducts } from '@/context/ProductContext';
@@ -15,16 +16,25 @@ import { useToast } from '@/hooks/use-toast';
 import ExportButton from '@/components/shared/ExportButton';
 import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
+import { useAuth } from '@/context/AuthContext';
 
 const Products = () => {
-  const { products, categories, addProduct, isLoading } = useProducts();
+  const { products, categories, addProduct, isLoading, error } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  // Check authentication
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isLoading, navigate]);
   
   const handleProductImport = (data: any[]) => {
     try {
@@ -69,6 +79,21 @@ const Products = () => {
     
     return matchesSearch && matchesCategory;
   });
+
+  // Error state handling
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center h-[50vh]">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-500 mb-4">Error Loading Products</h1>
+            <p className="text-muted-foreground mb-6">{typeof error === 'string' ? error : 'Failed to fetch product data. Please try again later.'}</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

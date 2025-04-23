@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 const api = axios.create({
@@ -5,7 +6,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
-  }
+  },
+  withCredentials: true // Enable sending cookies with requests
 });
 
 // Add request interceptor to include auth token
@@ -24,6 +26,8 @@ let isRedirecting = false;
 api.interceptors.response.use(
   response => response,
   error => {
+    console.error('API Error:', error.response?.status, error.message);
+    
     // Handle authentication errors
     if (error.response) {
       if (error.response.status === 401 && !isRedirecting) {
@@ -89,30 +93,9 @@ export const categoriesAPI = {
   delete: (id: string) => api.delete(`/categories/${id}`)
 };
 
-// Customers API functions
-export const customersAPI = {
-  getAll: (params?: any) => api.get('/customers', { params }),
-  getById: (id: string) => api.get(`/customers/${id}`),
-  create: (data: any) => api.post('/customers', data),
-  update: (id: string, data: any) => api.put(`/customers/${id}`, data),
-  delete: (id: string) => api.delete(`/customers/${id}`)
-};
-
-// Purchase Orders API functions
-export const purchaseOrdersAPI = {
-  getAll: (params?: any) => api.get('/purchase-orders', { params }),
-  getById: (id: string) => api.get(`/purchase-orders/${id}`),
-  create: (data: any) => api.post('/purchase-orders', data),
-  update: (id: string, data: any) => api.put(`/purchase-orders/${id}`, data),
-  updateStatus: (id: string, status: string) => api.patch(`/purchase-orders/${id}/status`, { status }),
-  delete: (id: string) => api.delete(`/purchase-orders/${id}`)
-};
-
 // Export all API services
 export default {
   auth: authAPI,
   products: productsAPI,
-  customers: customersAPI,
-  purchaseOrders: purchaseOrdersAPI,
   categories: categoriesAPI
 };

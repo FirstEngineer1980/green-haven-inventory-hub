@@ -1,13 +1,16 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Product, StockMovement, Category } from '../types';
 import { useNotifications } from './NotificationContext';
 import api from '../services/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProductContextType {
   products: Product[];
   stockMovements: StockMovement[];
   categories: Category[];
   isLoading: boolean;
+  error: string | null;
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
@@ -27,13 +30,24 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [stockMovements, setStockMovements] = useState<StockMovement[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const { addNotification } = useNotifications();
+  const { toast } = useToast();
 
   // Fetch products and categories on initial mount using backend API
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setError(null);
       try {
+        // Check if we have a token first
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('Authentication required. Please log in.');
+          setIsLoading(false);
+          return;
+        }
+        
         // Fetch products
         const productsResponse = await api.products.getAll();
         console.log("Products response:", productsResponse);
@@ -57,8 +71,17 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (categoriesResponse?.data) {
           setCategories(categoriesResponse.data);
         }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      } catch (err: any) {
+        console.error('Error fetching data:', err);
+        setError(err.response?.data?.message || 'Failed to fetch products. Please try again.');
+        
+        // Show toast with error
+        toast({
+          title: "Error loading data",
+          description: err.response?.data?.message || 'Failed to load products and categories',
+          variant: "destructive",
+        });
+        
         // Set empty arrays as fallback
         setProducts([]);
         setCategories([]);
@@ -68,7 +91,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     
     fetchData();
-  }, []);
+  }, [toast]);
 
   // Product CRUD
   const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -92,8 +115,20 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         type: 'info',
         for: ['1', '2', '3', '4'],
       });
-    } catch (error) {
+      
+      toast({
+        title: "Product added",
+        description: `${newProduct.name} has been added to the inventory`,
+      });
+    } catch (error: any) {
       console.error('Error adding product:', error);
+      
+      toast({
+        title: "Failed to add product",
+        description: error.response?.data?.message || "An error occurred while adding the product",
+        variant: "destructive",
+      });
+      
       throw error;
     }
   };
@@ -220,6 +255,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       stockMovements,
       categories,
       isLoading,
+      error,
       addProduct,
       updateProduct,
       deleteProduct,
