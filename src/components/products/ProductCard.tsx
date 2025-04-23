@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useFavorites } from '@/context/FavoritesContext';
 import { useComparison } from '@/context/ComparisonContext';
 import { useCart } from '@/context/CartContext';
+import { formatCurrency } from '@/utils/formatters';
 
 interface ProductCardProps {
   product: Product;
@@ -26,6 +27,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { addToFavorites, isFavorite } = useFavorites();
   const { addToComparison, isInComparison } = useComparison();
   const { addToCart } = useCart();
+  
+  // Ensure price is a number
+  const displayPrice = typeof product.price === 'number' ? 
+    formatCurrency(product.price) : 
+    formatCurrency(0);
   
   const handleAddToFavorites = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -76,7 +82,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
             <p className="text-muted-foreground line-clamp-2 mb-3">{product.description}</p>
             <div className="flex items-center justify-between">
-              <span className="text-xl font-bold">${product.price.toFixed(2)}</span>
+              <span className="text-xl font-bold">{displayPrice}</span>
               <div className="flex space-x-2">
                 <Button 
                   variant="outline" 
@@ -154,7 +160,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <p className="text-muted-foreground text-sm line-clamp-2 h-10">{product.description}</p>
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 pt-0">
-        <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+        <span className="text-lg font-bold">{displayPrice}</span>
         <Button size="sm" onClick={handleAddToCart}>
           <ShoppingCart className="h-4 w-4 mr-2" />
           Add

@@ -29,7 +29,18 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Fetch products and categories on initial mount using backend API
   useEffect(() => {
-    api.products.getAll().then(res => setProducts(res.data)).catch(() => {});
+    api.products.getAll().then(res => {
+      // Ensure all price values are numbers
+      const normalizedProducts = res.data.map(product => ({
+        ...product,
+        price: typeof product.price === 'string' ? parseFloat(product.price) : Number(product.price),
+        costPrice: typeof product.costPrice === 'string' ? parseFloat(product.costPrice) : Number(product.costPrice),
+        quantity: typeof product.quantity === 'string' ? parseInt(product.quantity, 10) : Number(product.quantity),
+        threshold: typeof product.threshold === 'string' ? parseInt(product.threshold, 10) : Number(product.threshold),
+      }));
+      setProducts(normalizedProducts);
+    }).catch(() => {});
+    
     api.categories.getAll?.()
       .then(res => setCategories(res.data))
       .catch(() => {});
@@ -39,10 +50,19 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Product CRUD
   const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     const res = await api.products.create(product);
-    setProducts((prev) => [...prev, res.data]);
+    // Ensure numeric values
+    const newProduct = {
+      ...res.data,
+      price: typeof res.data.price === 'string' ? parseFloat(res.data.price) : Number(res.data.price),
+      costPrice: typeof res.data.costPrice === 'string' ? parseFloat(res.data.costPrice) : Number(res.data.costPrice),
+      quantity: typeof res.data.quantity === 'string' ? parseInt(res.data.quantity, 10) : Number(res.data.quantity),
+      threshold: typeof res.data.threshold === 'string' ? parseInt(res.data.threshold, 10) : Number(res.data.threshold),
+    };
+    
+    setProducts((prev) => [...prev, newProduct]);
     addNotification({
       title: 'New Product Added',
-      message: `${res.data.name} has been added to inventory`,
+      message: `${newProduct.name} has been added to inventory`,
       type: 'info',
       for: ['1', '2', '3', '4'],
     });
@@ -50,23 +70,32 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateProduct = async (id: string, updates: Partial<Product>) => {
     const res = await api.products.update(id, updates);
+    // Ensure numeric values in the response
+    const updatedProduct = {
+      ...res.data,
+      price: typeof res.data.price === 'string' ? parseFloat(res.data.price) : Number(res.data.price),
+      costPrice: typeof res.data.costPrice === 'string' ? parseFloat(res.data.costPrice) : Number(res.data.costPrice),
+      quantity: typeof res.data.quantity === 'string' ? parseInt(res.data.quantity, 10) : Number(res.data.quantity),
+      threshold: typeof res.data.threshold === 'string' ? parseInt(res.data.threshold, 10) : Number(res.data.threshold),
+    };
+    
     setProducts(prev => 
       prev.map(product => 
         product.id == id 
-          ? { ...product, ...res.data }
+          ? { ...product, ...updatedProduct }
           : product
       )
     );
     addNotification({
       title: 'Inventory Updated',
-      message: `${res.data.name} inventory has been updated`,
+      message: `${updatedProduct.name} inventory has been updated`,
       type: 'success',
       for: ['1', '2', '3'],
     });
-    if ((res.data.quantity !== undefined) && (res.data.quantity <= (res.data.threshold))) {
+    if ((updatedProduct.quantity !== undefined) && (updatedProduct.quantity <= (updatedProduct.threshold))) {
       addNotification({
         title: 'Low Stock Alert',
-        message: `${res.data.name} is below the threshold quantity`,
+        message: `${updatedProduct.name} is below the threshold quantity`,
         type: 'warning',
         for: ['1', '2'],
       });
