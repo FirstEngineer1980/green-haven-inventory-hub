@@ -16,9 +16,10 @@ const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated - add isAuthenticated to dependency array
   useEffect(() => {
     if (isAuthenticated) {
+      // Use replace to prevent navigation history issues
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, navigate]);
@@ -29,9 +30,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      // Explicitly redirect to dashboard after successful login
-      // Use replace: true to prevent back navigation to login page
-      navigate('/dashboard', { replace: true });
+      // The redirect will be handled by the useEffect above
       toast({
         title: "Login successful",
         description: "Welcome back!",

@@ -19,6 +19,9 @@ api.interceptors.request.use(config => {
   return config;
 });
 
+// Track if we're already redirecting to prevent multiple redirects
+let isRedirecting = false;
+
 // Add response interceptor to handle common errors
 api.interceptors.response.use(
   response => response,
@@ -26,10 +29,17 @@ api.interceptors.response.use(
     // Handle authentication errors
     if (error.response) {
       if (error.response.status === 401) {
+        // Clear token if unauthorized
         localStorage.removeItem('token');
-        // Only redirect if not already on login page
-        if (window.location.pathname !== '/login') {
+        
+        // Only redirect if not already redirecting and not on login page
+        if (!isRedirecting && window.location.pathname !== '/login') {
+          isRedirecting = true;
           window.location.href = '/login';
+          // Reset after a delay
+          setTimeout(() => {
+            isRedirecting = false;
+          }, 1000);
         }
       } else if (error.response.status === 403) {
         // Forbidden - user doesn't have permission

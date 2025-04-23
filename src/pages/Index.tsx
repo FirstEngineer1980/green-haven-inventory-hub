@@ -16,10 +16,15 @@ const Index = () => {
         navigate('/login', { replace: true });
       }
     }
+    // Include isLoading in dependency array to prevent multiple redirects
   }, [navigate, isAuthenticated, isLoading]);
   
-  // Return a loading state or null while checking auth
-  return null;
+  // Return a loading state while checking auth
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      {isLoading && <p>Loading...</p>}
+    </div>
+  );
 };
 
 export default Index;
