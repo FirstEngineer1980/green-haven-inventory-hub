@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Product, StockMovement, Category } from '../types';
 import { useNotifications } from './NotificationContext';
@@ -36,17 +37,20 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    // Only fetch data if authenticated
     if (!isAuthenticated) {
       setIsLoading(false);
       return;
     }
-
+    
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+      
       try {
+        // Fetch products
         const productsResponse = await api.products.getAll();
-        console.log("Products response:", productsResponse);
+        console.log("Products API response:", productsResponse);
         
         if (productsResponse?.data) {
           const normalizedProducts = productsResponse.data.map(product => ({
@@ -59,24 +63,22 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setProducts(normalizedProducts);
         }
         
+        // Fetch categories
         const categoriesResponse = await api.categories.getAll();
-        console.log("Categories response:", categoriesResponse);
+        console.log("Categories API response:", categoriesResponse);
         
         if (categoriesResponse?.data) {
           setCategories(categoriesResponse.data);
         }
       } catch (err: any) {
-        console.error('Error fetching data:', err);
+        console.error('Error fetching product data:', err);
         setError(err.response?.data?.message || 'Failed to fetch products. Please try again.');
         
         toast({
-          title: "Error loading data",
+          title: "Error loading product data",
           description: err.response?.data?.message || 'Failed to load products and categories',
           variant: "destructive",
         });
-        
-        setProducts([]);
-        setCategories([]);
       } finally {
         setIsLoading(false);
       }

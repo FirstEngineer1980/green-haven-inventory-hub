@@ -6,7 +6,12 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://frontend.myphr.io', 'https://preview--green-haven-inventory-hub.lovable.app', 'http://localhost:3000'],
+    'allowed_origins' => [
+        'https://frontend.myphr.io', 
+        'https://preview--green-haven-inventory-hub.lovable.app', 
+        'http://localhost:3000',
+        'https://green-haven-inventory-hub.lovable.app'
+    ],
 
     'allowed_origins_patterns' => ['#^https://.*\.lovable\.app$#'],
 

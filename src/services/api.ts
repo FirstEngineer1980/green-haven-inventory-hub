@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://backend.myphr.io/backend/api',
+  baseURL: 'https://backend.myphr.io/api', // Remove the additional /backend in the path
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'

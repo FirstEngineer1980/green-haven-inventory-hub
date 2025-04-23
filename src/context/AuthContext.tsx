@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
+import { authAPI } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface UpdateUserParams {
   name?: string;
@@ -37,15 +39,42 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
-    setIsLoading(false);
+    const checkAuth = async () => {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('currentUser');
+      
+      if (token) {
+        if (storedUser) {
+          setCurrentUser(JSON.parse(storedUser));
+          setIsAuthenticated(true);
+        } else {
+          try {
+            const response = await authAPI.getCurrentUser();
+            setCurrentUser(response.data);
+            localStorage.setItem('currentUser', JSON.stringify(response.data));
+            setIsAuthenticated(true);
+          } catch (error) {
+            console.error('Failed to fetch user data:', error);
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+          }
+        }
+      }
+      
+      setIsLoading(false);
+    };
+    
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      setIsLoading(true);
+      
       if (email.includes('@greenhaven.com') || email.includes('@example.com')) {
         if (email === 'admin@example.com' || email === 'admin@greenhaven.com') {
           const demoUser: User = {
@@ -62,6 +91,12 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
           localStorage.setItem('currentUser', JSON.stringify(demoUser));
           localStorage.setItem('token', 'demo-token-admin');
+          
+          toast({
+            title: "Login successful",
+            description: `Welcome back, ${demoUser.name}!`,
+          });
+          
           return true;
         } else if (email === 'manager@example.com' || email === 'john@greenhaven.com') {
           const demoUser: User = {
@@ -113,20 +148,32 @@ export const AuthProvider = ({ children }) => {
         }
       }
       
-      const response = await axios.post('/api/login', { email, password });
-      const { user, token } = response.data;
-      
-      setCurrentUser(user);
-      setIsAuthenticated(true);
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      localStorage.setItem('token', token);
-      
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
+      try {
+        const response = await authAPI.login({ email, password });
+        localStorage.setItem('token', response.data.token);
+        setCurrentUser(response.data.user);
+        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+        setIsAuthenticated(true);
+        
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${response.data.user.name}!`,
+        });
+        
+        return true;
+      } catch (error: any) {
+        console.error('Login error:', error);
+        
+        toast({
+          title: "Login failed",
+          description: error.response?.data?.message || "Invalid credentials",
+          variant: "destructive",
+        });
+        
+        return false;
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -158,7 +205,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
     
-    delete axios.defaults.headers.common['Authorization'];
+    try {
+      authAPI.logout().catch(err => console.error('Logout API error:', err));
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const hasPermission = (permission: Permission): boolean => {

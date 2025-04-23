@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,12 @@ const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Remove useEffect to prevent redirect loop - we'll handle redirection after successful login only
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +34,7 @@ const Login = () => {
           title: "Login successful",
           description: "Welcome back!",
         });
-        navigate('/dashboard', { replace: true });
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);
