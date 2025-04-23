@@ -1,9 +1,9 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Product, StockMovement, Category } from '../types';
 import { useNotifications } from './NotificationContext';
 import api from '../services/api';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from './AuthContext';
 
 interface ProductContextType {
   products: Product[];
@@ -33,27 +33,22 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [error, setError] = useState<string | null>(null);
   const { addNotification } = useNotifications();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
-  // Fetch products and categories on initial mount using backend API
   useEffect(() => {
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        // Check if we have a token first
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Authentication required. Please log in.');
-          setIsLoading(false);
-          return;
-        }
-        
-        // Fetch products
         const productsResponse = await api.products.getAll();
         console.log("Products response:", productsResponse);
         
         if (productsResponse?.data) {
-          // Ensure all price values are numbers
           const normalizedProducts = productsResponse.data.map(product => ({
             ...product,
             price: typeof product.price === 'string' ? parseFloat(product.price) : Number(product.price),
@@ -64,7 +59,6 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setProducts(normalizedProducts);
         }
         
-        // Fetch categories
         const categoriesResponse = await api.categories.getAll();
         console.log("Categories response:", categoriesResponse);
         
@@ -75,14 +69,12 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error('Error fetching data:', err);
         setError(err.response?.data?.message || 'Failed to fetch products. Please try again.');
         
-        // Show toast with error
         toast({
           title: "Error loading data",
           description: err.response?.data?.message || 'Failed to load products and categories',
           variant: "destructive",
         });
         
-        // Set empty arrays as fallback
         setProducts([]);
         setCategories([]);
       } finally {
@@ -91,15 +83,13 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     
     fetchData();
-  }, [toast]);
+  }, [isAuthenticated, toast]);
 
-  // Product CRUD
   const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       const res = await api.products.create(product);
       console.log("Created product response:", res);
       
-      // Ensure numeric values
       const newProduct = {
         ...res.data,
         price: typeof res.data.price === 'string' ? parseFloat(res.data.price) : Number(res.data.price),
@@ -135,7 +125,6 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateProduct = async (id: string, updates: Partial<Product>) => {
     const res = await api.products.update(id, updates);
-    // Ensure numeric values in the response
     const updatedProduct = {
       ...res.data,
       price: typeof res.data.price === 'string' ? parseFloat(res.data.price) : Number(res.data.price),
@@ -181,7 +170,6 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  // Category CRUD
   const addCategory = async (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
     const res = await api.categories.create(category);
     setCategories(prev => [...prev, res.data]);
@@ -224,7 +212,6 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  // You might need to review addStockMovement and getLowStockProducts logic for API support.
   const addStockMovement = (movement: Omit<StockMovement, 'id' | 'date'>) => {
     const newMovement: StockMovement = {
       ...movement,
@@ -234,7 +221,6 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     setStockMovements(prev => [newMovement, ...prev]);
     
-    // Update product quantity
     const product = products.find(p => p.id === movement.productId);
     if (product) {
       const newQuantity = movement.type === 'in' 

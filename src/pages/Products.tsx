@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,12 +29,7 @@ const Products = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  // Check authentication
-  useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
+  // DashboardLayout now handles authentication checks, no need for separate effect here
   
   const handleProductImport = (data: any[]) => {
     try {

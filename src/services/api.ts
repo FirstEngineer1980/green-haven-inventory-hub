@@ -35,9 +35,11 @@ api.interceptors.response.use(
         localStorage.removeItem('token');
         localStorage.removeItem('currentUser');
         
-        // Only redirect if not on login page already
-        if (window.location.pathname !== '/login') {
+        // Only redirect if not on login or register page already
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/login' && currentPath !== '/register') {
           isRedirecting = true;
+          console.log('Redirecting to login page due to 401 error');
           window.location.href = '/login';
           setTimeout(() => {
             isRedirecting = false;
