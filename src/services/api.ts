@@ -65,9 +65,12 @@ api.interceptors.response.use(
 
 // Auth API functions
 export const authAPI = {
-  login: (credentials: { email: string; password: string }) => 
-    api.post('/login', credentials),
-  
+  login: async (credentials: { email: string; password: string }) => {
+    await axios.get('https://backend.myphr.io/backend/sanctum/csrf-cookie', {
+      withCredentials: true
+    });
+    return api.post('/login', credentials);
+  },
   register: (userData: { name: string; email: string; password: string; password_confirmation: string }) => 
     api.post('/register', userData),
     
