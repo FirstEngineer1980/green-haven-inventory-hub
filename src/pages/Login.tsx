@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,25 +16,21 @@ const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect if already authenticated - add isAuthenticated to dependency array
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Use replace to prevent navigation history issues
-      navigate('/dashboard', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
+  // Remove useEffect to prevent redirect loop - we'll handle redirection after successful login only
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-      // The redirect will be handled by the useEffect above
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
+      const success = await login(email, password);
+      if (success) {
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        });
+        navigate('/dashboard', { replace: true });
+      }
     } catch (error) {
       console.error('Login error:', error);
       // Toast is already handled in the AuthContext

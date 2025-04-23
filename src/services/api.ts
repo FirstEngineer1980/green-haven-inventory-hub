@@ -28,15 +28,15 @@ api.interceptors.response.use(
   error => {
     // Handle authentication errors
     if (error.response) {
-      if (error.response.status === 401) {
+      if (error.response.status === 401 && !isRedirecting) {
         // Clear token if unauthorized
         localStorage.removeItem('token');
+        localStorage.removeItem('currentUser');
         
-        // Only redirect if not already redirecting and not on login page
-        if (!isRedirecting && window.location.pathname !== '/login') {
+        // Only redirect if not on login page already
+        if (window.location.pathname !== '/login') {
           isRedirecting = true;
           window.location.href = '/login';
-          // Reset after a delay
           setTimeout(() => {
             isRedirecting = false;
           }, 1000);

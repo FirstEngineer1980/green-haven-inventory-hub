@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthProvider';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { ProductProvider } from './context/ProductContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { UserProvider } from './context/UserContext';
 import { CustomerProvider } from './context/CustomerContext';
 import { RoomProvider } from './context/RoomContext';
-import { UnitProvider } from './context/UnitContext';
+import { UnitProvider } from './context/UnitProvider';
 import { CustomerProductProvider } from './context/CustomerProductContext';
 import { BinProvider } from './context/BinContext';
 import { UnitMatrixProvider } from './context/UnitMatrixContext';
@@ -83,7 +83,7 @@ function App() {
                                   <CartProvider>
                                     <BrowserRouter>
                                       <Routes>
-                                        <Route path="/" element={<LandingPage />} />
+                                        <Route path="/" element={<Index />} />
                                         <Route path="/login" element={<Login />} />
                                         <Route path="/unauthorized" element={<Unauthorized />} />
                                         <Route path="/about" element={<AboutPage />} />

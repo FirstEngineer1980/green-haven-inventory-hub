@@ -1,30 +1,24 @@
 
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthProvider';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
-  const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   
-  useEffect(() => {
-    // Only redirect after we've checked authentication status
-    if (!isLoading) {
-      if (isAuthenticated) {
-        navigate('/dashboard', { replace: true });
-      } else {
-        navigate('/login', { replace: true });
-      }
-    }
-    // Include isLoading in dependency array to prevent multiple redirects
-  }, [navigate, isAuthenticated, isLoading]);
+  // Use a simple conditional to determine where to redirect
+  // Don't use useEffect to avoid unnecessary rerenders
   
-  // Return a loading state while checking auth
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      {isLoading && <p>Loading...</p>}
-    </div>
-  );
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
+  // Direct redirect based on authentication
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />;
 };
 
 export default Index;
