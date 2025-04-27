@@ -3,19 +3,22 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    try {
-        // Test database connection
-        DB::connection()->getPdo();
-        $dbStatus = true;
-    } catch (\Exception $e) {
-        $dbStatus = false;
-    }
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
 
-    return view('welcome', [
-        'dbStatus' => $dbStatus,
-        'phpVersion' => PHP_VERSION,
-        'laravelVersion' => app()->version(),
-    ]);
-});
+// Add a named route for login
+Route::view('/login', 'welcome')->name('login');
+
+// Default route - serve the welcome view
+Route::get('/{path?}', function () {
+    return view('welcome');
+})->where('path', '.*');
 

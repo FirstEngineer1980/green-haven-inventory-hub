@@ -1,8 +1,7 @@
-
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://backend.myphr.io/backend/api', // Updated to include /backend/api
+  baseURL: 'https://backend.myphr.io/backend/api',
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
@@ -66,10 +65,16 @@ api.interceptors.response.use(
 // Auth API functions
 export const authAPI = {
   login: async (credentials: { email: string; password: string }) => {
-    await axios.get('https://backend.myphr.io/backend/sanctum/csrf-cookie', {
-      withCredentials: true
-    });
-    return api.post('/login', credentials);
+    // First get CSRF cookie
+    try {
+      await axios.get('https://backend.myphr.io/backend/sanctum/csrf-cookie', {
+        withCredentials: true
+      });
+      return api.post('/login', credentials);
+    } catch (error) {
+      console.error('Error getting CSRF cookie:', error);
+      throw error;
+    }
   },
   register: (userData: { name: string; email: string; password: string; password_confirmation: string }) => 
     api.post('/register', userData),

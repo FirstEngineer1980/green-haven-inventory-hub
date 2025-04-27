@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 window.axios = axios;
 
@@ -23,9 +24,12 @@ window.axios.interceptors.response.use(
         // Handle 401 Unauthorized errors (token expired, etc.)
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('token');
-            // Redirect to login page if needed
-            if (window.location.pathname !== '/login') {
-                window.location.href = '/login';
+            // For API requests, don't redirect
+            if (!error.request.responseURL.includes('/api/')) {
+                // Redirect to login page if needed
+                if (window.location.pathname !== '/login') {
+                    window.location.href = '/login';
+                }
             }
         }
         return Promise.reject(error);
