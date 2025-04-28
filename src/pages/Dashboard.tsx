@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+
+import { CONFIG } from 'src/config-global';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

@@ -27,6 +27,7 @@ use App\Http\Controllers\EmailLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExportNotificationController;
 use App\Http\Controllers\StripeController;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,12 +41,18 @@ use App\Http\Controllers\StripeController;
 */
 
 // Public routes
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::any('/login', [AuthController::class, 'login']);
 
 // Stripe routes
 Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
 Route::get('/checkout-success', [StripeController::class, 'handleSuccess']);
+
+// Public routes
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::get('/csrf-cookie', function() {
+    return response()->json(['message' => 'CSRF cookie set']);
+});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
