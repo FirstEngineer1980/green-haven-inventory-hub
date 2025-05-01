@@ -1,8 +1,9 @@
+
 import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://myphr.io/backend/api',
+  baseURL: 'https://backend.myphr.io/backend/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -85,50 +86,50 @@ export const authAPI = {
 
 // Product endpoints
 export const productAPI = {
-  getProducts: async () => {
+  getAll: async () => {
     try {
       const response = await api.get('/products');
-      return response.data;
+      return response;
     } catch (error) {
       console.error('Error fetching products:', error);
       throw error;
     }
   },
 
-  getProduct: async (id: number) => {
+  getOne: async (id: string) => {
     try {
       const response = await api.get(`/products/${id}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error fetching product ${id}:`, error);
       throw error;
     }
   },
 
-  createProduct: async (productData: any) => {
+  create: async (productData: any) => {
     try {
       const response = await api.post('/products', productData);
-      return response.data;
+      return response;
     } catch (error) {
       console.error('Error creating product:', error);
       throw error;
     }
   },
 
-  updateProduct: async (id: number, productData: any) => {
+  update: async (id: string, productData: any) => {
     try {
       const response = await api.put(`/products/${id}`, productData);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error updating product ${id}:`, error);
       throw error;
     }
   },
 
-  deleteProduct: async (id: number) => {
+  delete: async (id: string) => {
     try {
       const response = await api.delete(`/products/${id}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error(`Error deleting product ${id}:`, error);
       throw error;
@@ -136,4 +137,62 @@ export const productAPI = {
   },
 };
 
-export default api;
+// Category endpoints
+export const categoryAPI = {
+  getAll: async () => {
+    try {
+      const response = await api.get('/categories');
+      return response;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+  },
+
+  getOne: async (id: string) => {
+    try {
+      const response = await api.get(`/categories/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching category ${id}:`, error);
+      throw error;
+    }
+  },
+
+  create: async (categoryData: any) => {
+    try {
+      const response = await api.post('/categories', categoryData);
+      return response;
+    } catch (error) {
+      console.error('Error creating category:', error);
+      throw error;
+    }
+  },
+
+  update: async (id: string, categoryData: any) => {
+    try {
+      const response = await api.put(`/categories/${id}`, categoryData);
+      return response;
+    } catch (error) {
+      console.error(`Error updating category ${id}:`, error);
+      throw error;
+    }
+  },
+
+  delete: async (id: string) => {
+    try {
+      const response = await api.delete(`/categories/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error deleting category ${id}:`, error);
+      throw error;
+    }
+  },
+};
+
+// Default export with all API services
+export default {
+  auth: authAPI,
+  products: productAPI,
+  categories: categoryAPI,
+};
