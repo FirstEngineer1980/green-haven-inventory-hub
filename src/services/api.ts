@@ -82,6 +82,32 @@ export const authAPI = {
       throw error;
     }
   },
+
+  // Adding the missing register method
+  register: async (userData: { name: string, email: string, password: string, password_confirmation: string }) => {
+    try {
+      // First get CSRF cookie
+      await api.get('/csrf-cookie');
+
+      // Then attempt registration
+      const response = await api.post('/register', userData);
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
+  },
+
+  // Alias for getUser to match the code in AuthContext and AuthProvider
+  getCurrentUser: async () => {
+    try {
+      const response = await api.get('/user');
+      return response.data;
+    } catch (error) {
+      console.error('Get current user error:', error);
+      throw error;
+    }
+  },
 };
 
 // Product endpoints
