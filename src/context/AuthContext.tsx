@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
@@ -54,9 +53,9 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         } else {
           try {
-            const response = await authAPI.getUser();
-            setCurrentUser(response);
-            localStorage.setItem('currentUser', JSON.stringify(response));
+            const response = await authAPI.getCurrentUser();
+            setCurrentUser(response.data);
+            localStorage.setItem('currentUser', JSON.stringify(response.data));
             setIsAuthenticated(true);
           } catch (error) {
             console.error('Failed to fetch user data:', error);
@@ -150,15 +149,15 @@ export const AuthProvider = ({ children }) => {
       }
       
       try {
-        const response = await authAPI.login(email, password);
-        localStorage.setItem('token', response.token);
-        setCurrentUser(response.user);
-        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        const response = await authAPI.login({ email, password });
+        localStorage.setItem('token', response.data.token);
+        setCurrentUser(response.data.user);
+        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
         setIsAuthenticated(true);
         
         toast({
           title: "Login successful",
-          description: `Welcome back, ${response.user.name}!`,
+          description: `Welcome back, ${response.data.user.name}!`,
         });
         
         return true;
