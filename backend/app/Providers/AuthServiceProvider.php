@@ -1,9 +1,11 @@
+
 <?php
 
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Passport\Passport;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -21,8 +23,30 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // $this->registerPolicies();
+        $this->registerPolicies();
 
-        //
+        // Register Passport routes
+        Passport::routes();
+        
+        // Define token scopes if needed
+        Passport::tokensCan([
+            'view-products' => 'View products',
+            'manage-products' => 'Create, update and delete products',
+            'view-categories' => 'View categories',
+            'manage-categories' => 'Create, update and delete categories',
+            'view-users' => 'View users',
+            'manage-users' => 'Create, update and delete users',
+            'manage-inventory' => 'Manage inventory items',
+        ]);
+        
+        // Set default scope
+        Passport::setDefaultScope([
+            'view-products',
+        ]);
+        
+        // Set token expiration (optional)
+        Passport::tokensExpireIn(now()->addDays(15));
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
     }
 }

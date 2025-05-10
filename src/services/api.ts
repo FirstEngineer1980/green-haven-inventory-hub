@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 // Create axios instance with default config
@@ -14,7 +13,11 @@ const api = axios.create({
 // Request interceptor for API calls
 api.interceptors.request.use(
     async (config) => {
-      // You can add logic here to attach tokens if needed
+      const token = localStorage.getItem('token');
+      
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
       return config;
     },
     (error) => {
@@ -49,39 +52,88 @@ api.interceptors.response.use(
 
 // Authentication endpoints
 export const authAPI = {
-  login: async (email: string, password: string) => {
+  // Login function - now updated for Passport
+  login: async (credentials) => {
     try {
       // First get CSRF cookie
       await api.get('/csrf-cookie');
 
-      // Then attempt login
-      const response = await api.post('/login', { email, password });
-      return response.data;
+      // Then attempt login with OAuth password grant
+      const response = await api.post('/oauth/token', {
+        grant_type: 'password',
+        client_id: process.env.VITE_CLIENT_ID || '2',
+        client_secret: process.env.VITE_CLIENT_SECRET || '',
+        username: credentials.email,
+        password: credentials.password,
+        scope: '',
+      });
+      
+      // Store the access token
+      if (response.data.access_token) {
+        localStorage.setItem('token', response.data.access_token);
+      }
+      
+      // Get user data
+      const userResponse = await api.get('/user');
+      
+      return {
+        data: {
+          token: response.data.access_token,
+          user: userResponse.data
+        }
+      };
     } catch (error) {
       console.error('Login error:', error);
       throw error;
     }
   },
 
+  // Logout function
   logout: async () => {
     try {
       const response = await api.post('/logout');
+      localStorage.removeItem('token');
       return response.data;
     } catch (error) {
       console.error('Logout error:', error);
+      localStorage.removeItem('token');
       throw error;
     }
   },
 
-  getUser: async () => {
+  // Get current user
+  getCurrentUser: async () => {
     try {
       const response = await api.get('/user');
-      return response.data;
+      return {
+        data: response.data
+      };
     } catch (error) {
       console.error('Get user error:', error);
       throw error;
     }
   },
+
+  // Register function
+  register: async (userData) => {
+    try {
+      const response = await api.post('/register', userData);
+      
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+      
+      return {
+        data: {
+          token: response.data.token,
+          user: response.data.user
+        }
+      };
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
+  }
 };
 
 // Product endpoints

@@ -103,7 +103,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string, passwordConfirmation: string) => {
     setIsLoading(true);
     try {
-      const response = await authAPI.register({ name, email, password, password_confirmation: passwordConfirmation });
+      const response = await authAPI.register({ 
+        name, 
+        email, 
+        password, 
+        password_confirmation: passwordConfirmation 
+      });
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
       toast({

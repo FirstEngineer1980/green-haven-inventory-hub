@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
@@ -179,7 +180,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = async (userData: UpdateUserParams): Promise<boolean> => {
     try {
-      if (currentUser && currentUser.email.includes('@greenhaven.com') || currentUser?.email.includes('@example.com')) {
+      if (currentUser && (currentUser.email.includes('@greenhaven.com') || currentUser?.email.includes('@example.com'))) {
         const updatedUser = { ...currentUser, ...userData };
         setCurrentUser(updatedUser);
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
