@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -17,8 +18,7 @@ import { ComparisonProvider } from './context/ComparisonContext';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider } from '@tanstack/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CategoryProvider } from './context/CategoryContext';
 import { PromotionProvider } from './context/PromotionContext';
 
@@ -66,6 +66,9 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import './App.css';
 
+// Create a client
+const queryClient = new QueryClient();
+
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="ui-theme">
@@ -88,7 +91,116 @@ const App = () => {
                                     <CustomerProductProvider>
                                       <WizardProvider>
                                         <PromotionProvider>
-                                          <RouterProvider router={router} />
+                                          <BrowserRouter>
+                                            <Routes>
+                                              {/* Public routes */}
+                                              <Route path="/login" element={<Login />} />
+                                              <Route path="/unauthorized" element={<Unauthorized />} />
+                                              <Route path="/" element={<Index />} />
+                                              <Route path="/about" element={<AboutPage />} />
+                                              <Route path="/contact" element={<ContactPage />} />
+                                              <Route path="/landing" element={<LandingPage />} />
+                                              <Route path="/products-page" element={<ProductsPage />} />
+                                              <Route path="/product/:id" element={<ProductPage />} />
+                                              <Route path="/favorites" element={<FavoritesPage />} />
+                                              <Route path="/compare" element={<ComparePage />} />
+                                              <Route path="/cart" element={<CartPage />} />
+                                              <Route path="/checkout" element={<CheckoutPage />} />
+                                              <Route path="/promotions" element={<PromotionsPage />} />
+                                              <Route path="/orders" element={<OrdersPage />} />
+                                              <Route path="/order/:id" element={<OrderDetailsPage />} />
+                                              <Route path="/order-success" element={<OrderSuccessPage />} />
+
+                                              {/* Protected routes */}
+                                              <Route 
+                                                path="/dashboard" 
+                                                element={<ProtectedRoute><Dashboard /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/products" 
+                                                element={<ProtectedRoute><Products /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/categories" 
+                                                element={<ProtectedRoute><Categories /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/customers" 
+                                                element={<ProtectedRoute><Customers /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/customers/manage/:id?" 
+                                                element={<ProtectedRoute><ManageCustomer /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/customer-products" 
+                                                element={<ProtectedRoute><CustomerProducts /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/customer-list/:id?" 
+                                                element={<ProtectedRoute><CustomerList /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/rooms" 
+                                                element={<ProtectedRoute><Rooms /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/units" 
+                                                element={<ProtectedRoute><Units /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/purchase-orders" 
+                                                element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/vendors" 
+                                                element={<ProtectedRoute><Vendors /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/stock-movements" 
+                                                element={<ProtectedRoute><StockMovements /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/bins" 
+                                                element={<ProtectedRoute><Bins /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/unit-matrix" 
+                                                element={<ProtectedRoute><UnitMatrixPage /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/users" 
+                                                element={<ProtectedRoute><Users /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/notifications" 
+                                                element={<ProtectedRoute><Notifications /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/settings" 
+                                                element={<ProtectedRoute><Settings /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/reports" 
+                                                element={<ProtectedRoute><Reports /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/wizard" 
+                                                element={<ProtectedRoute><WizardPage /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/inventory" 
+                                                element={<ProtectedRoute><Inventory /></ProtectedRoute>} 
+                                              />
+                                              <Route 
+                                                path="/profile" 
+                                                element={<ProtectedRoute><Profile /></ProtectedRoute>} 
+                                              />
+
+                                              {/* Catch all */}
+                                              <Route path="*" element={<NotFound />} />
+                                            </Routes>
+                                          </BrowserRouter>
                                         </PromotionProvider>
                                       </WizardProvider>
                                     </CustomerProductProvider>
