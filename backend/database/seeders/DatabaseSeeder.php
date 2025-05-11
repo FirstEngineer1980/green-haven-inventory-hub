@@ -26,7 +26,8 @@ class DatabaseSeeder extends Seeder
             PurchaseOrderSeeder::class,
             ClientOrderTemplateSeeder::class,
             SettingSeeder::class,
-            PassportSeeder::class, // Add Passport seeder
+            PassportSeeder::class,
+            PromotionSeeder::class, // Add Promotion seeder
         ]);
     }
 }

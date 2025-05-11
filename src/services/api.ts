@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 // Create axios instance with default config
@@ -242,9 +243,211 @@ export const categoryAPI = {
   },
 };
 
+// Promotion endpoints
+export const promotionAPI = {
+  getAll: async () => {
+    try {
+      const response = await api.get('/promotions');
+      return response;
+    } catch (error) {
+      console.error('Error fetching promotions:', error);
+      throw error;
+    }
+  },
+
+  getActive: async () => {
+    try {
+      const response = await api.get('/active-promotions');
+      return response;
+    } catch (error) {
+      console.error('Error fetching active promotions:', error);
+      throw error;
+    }
+  },
+
+  getDiscountedProducts: async () => {
+    try {
+      const response = await api.get('/discounted-products');
+      return response;
+    } catch (error) {
+      console.error('Error fetching discounted products:', error);
+      throw error;
+    }
+  },
+
+  getOne: async (id: string) => {
+    try {
+      const response = await api.get(`/promotions/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching promotion ${id}:`, error);
+      throw error;
+    }
+  },
+
+  create: async (promotionData: any) => {
+    try {
+      const response = await api.post('/promotions', promotionData);
+      return response;
+    } catch (error) {
+      console.error('Error creating promotion:', error);
+      throw error;
+    }
+  },
+
+  update: async (id: string, promotionData: any) => {
+    try {
+      const response = await api.put(`/promotions/${id}`, promotionData);
+      return response;
+    } catch (error) {
+      console.error(`Error updating promotion ${id}:`, error);
+      throw error;
+    }
+  },
+
+  delete: async (id: string) => {
+    try {
+      const response = await api.delete(`/promotions/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error deleting promotion ${id}:`, error);
+      throw error;
+    }
+  },
+};
+
+// Customer Product endpoints
+export const customerProductAPI = {
+  getAll: async () => {
+    try {
+      const response = await api.get('/customer-products');
+      return response;
+    } catch (error) {
+      console.error('Error fetching customer products:', error);
+      throw error;
+    }
+  },
+
+  getByCustomer: async (customerId: string) => {
+    try {
+      const response = await api.get(`/customers/${customerId}/products`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching products for customer ${customerId}:`, error);
+      throw error;
+    }
+  },
+
+  getOne: async (id: string) => {
+    try {
+      const response = await api.get(`/customer-products/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching customer product ${id}:`, error);
+      throw error;
+    }
+  },
+
+  create: async (productData: any) => {
+    try {
+      const response = await api.post('/customer-products', productData);
+      return response;
+    } catch (error) {
+      console.error('Error creating customer product:', error);
+      throw error;
+    }
+  },
+
+  update: async (id: string, productData: any) => {
+    try {
+      const response = await api.put(`/customer-products/${id}`, productData);
+      return response;
+    } catch (error) {
+      console.error(`Error updating customer product ${id}:`, error);
+      throw error;
+    }
+  },
+
+  delete: async (id: string) => {
+    try {
+      const response = await api.delete(`/customer-products/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error deleting customer product ${id}:`, error);
+      throw error;
+    }
+  },
+};
+
+// Customer List endpoints
+export const customerListAPI = {
+  getAll: async () => {
+    try {
+      const response = await api.get('/customer-lists');
+      return response;
+    } catch (error) {
+      console.error('Error fetching customer lists:', error);
+      throw error;
+    }
+  },
+
+  getByCustomer: async (customerId: string) => {
+    try {
+      const response = await api.get(`/customers/${customerId}/lists`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching lists for customer ${customerId}:`, error);
+      throw error;
+    }
+  },
+
+  getOne: async (id: string) => {
+    try {
+      const response = await api.get(`/customer-lists/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching customer list ${id}:`, error);
+      throw error;
+    }
+  },
+
+  create: async (listData: any) => {
+    try {
+      const response = await api.post('/customer-lists', listData);
+      return response;
+    } catch (error) {
+      console.error('Error creating customer list:', error);
+      throw error;
+    }
+  },
+
+  update: async (id: string, listData: any) => {
+    try {
+      const response = await api.put(`/customer-lists/${id}`, listData);
+      return response;
+    } catch (error) {
+      console.error(`Error updating customer list ${id}:`, error);
+      throw error;
+    }
+  },
+
+  delete: async (id: string) => {
+    try {
+      const response = await api.delete(`/customer-lists/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error deleting customer list ${id}:`, error);
+      throw error;
+    }
+  },
+};
+
 // Default export with all API services
 export default {
   auth: authAPI,
   products: productAPI,
   categories: categoryAPI,
+  promotions: promotionAPI,
+  customerProducts: customerProductAPI,
+  customerLists: customerListAPI,
 };

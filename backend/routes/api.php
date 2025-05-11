@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ use App\Http\Controllers\EmailLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExportNotificationController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\PromotionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +117,11 @@ Route::middleware('auth:api')->group(function () {
     // Category routes
     Route::apiResource('categories', CategoryController::class);
     Route::get('/categories/{category}/products', [CategoryController::class, 'getProducts']);
+
+    // Promotion routes
+    Route::apiResource('promotions', PromotionController::class);
+    Route::get('/active-promotions', [PromotionController::class, 'getActivePromotions']);
+    Route::get('/discounted-products', [PromotionController::class, 'getDiscountedProducts']);
 
     // Stock Movement routes
     Route::apiResource('stock-movements', StockMovementController::class);

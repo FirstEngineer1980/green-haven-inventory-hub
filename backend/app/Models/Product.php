@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -12,8 +13,6 @@ class Product extends Model
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -72,5 +71,32 @@ class Product extends Model
     public function purchaseOrderItems()
     {
         return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    /**
+     * Get the promotions associated with this product.
+     */
+    public function promotions()
+    {
+        return $this->belongsToMany(Promotion::class);
+    }
+
+    /**
+     * Get the discounted price of the product based on active promotions.
+     */
+    public function getDiscountedPrice()
+    {
+        $activePromotion = $this->promotions()
+            ->where('active', true)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('discount', 'desc')
+            ->first();
+        
+        if ($activePromotion) {
+            return round($this->price * (1 - $activePromotion->discount), 2);
+        }
+        
+        return $this->price;
     }
 }

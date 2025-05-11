@@ -37,11 +37,17 @@ class AuthServiceProvider extends ServiceProvider
             'view-users' => 'View users',
             'manage-users' => 'Create, update and delete users',
             'manage-inventory' => 'Manage inventory items',
+            'view-promotions' => 'View promotions',
+            'manage-promotions' => 'Create, update and delete promotions',
+            'view-customers' => 'View customers',
+            'manage-customers' => 'Create, update and delete customers',
         ]);
         
         // Set default scope
         Passport::setDefaultScope([
             'view-products',
+            'view-promotions',
+            'view-customers',
         ]);
         
         // Set token expiration (optional)
