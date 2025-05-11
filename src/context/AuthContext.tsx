@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
-import { authAPI } from '@/services/api';
+import { authService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 interface UpdateUserParams {
@@ -36,7 +36,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         } else {
           try {
-            const response = await authAPI.getCurrentUser();
+            const response = await authService.getCurrentUser();
             setCurrentUser(response.data);
             localStorage.setItem('currentUser', JSON.stringify(response.data));
             setIsAuthenticated(true);
@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }) => {
       }
       
       try {
-        const response = await authAPI.login({ email, password });
+        const response = await authService.login(email, password);
         localStorage.setItem('token', response.data.token);
         setCurrentUser(response.data.user);
         localStorage.setItem('currentUser', JSON.stringify(response.data.user));
@@ -207,7 +207,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     
     try {
-      authAPI.logout().catch(err => console.error('Logout API error:', err));
+      authService.logout().catch(err => console.error('Logout API error:', err));
     } catch (error) {
       console.error('Logout error:', error);
     }

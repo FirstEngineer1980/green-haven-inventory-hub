@@ -114,87 +114,171 @@ const App = () => {
                                               {/* Protected routes */}
                                               <Route 
                                                 path="/dashboard" 
-                                                element={<ProtectedRoute><Dashboard /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Dashboard />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/products" 
-                                                element={<ProtectedRoute><Products /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Products />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/categories" 
-                                                element={<ProtectedRoute><Categories /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Categories />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/customers" 
-                                                element={<ProtectedRoute><Customers /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Customers />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/customers/manage/:id?" 
-                                                element={<ProtectedRoute><ManageCustomer /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <ManageCustomer />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/customer-products" 
-                                                element={<ProtectedRoute><CustomerProducts /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <CustomerProducts />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/customer-list/:id?" 
-                                                element={<ProtectedRoute><CustomerList /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <CustomerList />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/rooms" 
-                                                element={<ProtectedRoute><Rooms /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Rooms />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/units" 
-                                                element={<ProtectedRoute><Units /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Units />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/purchase-orders" 
-                                                element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <PurchaseOrders />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/vendors" 
-                                                element={<ProtectedRoute><Vendors /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Vendors />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/stock-movements" 
-                                                element={<ProtectedRoute><StockMovements /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <StockMovements />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/bins" 
-                                                element={<ProtectedRoute><Bins /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Bins />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/unit-matrix" 
-                                                element={<ProtectedRoute><UnitMatrixPage /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <UnitMatrixPage />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/users" 
-                                                element={<ProtectedRoute><Users /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Users />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/notifications" 
-                                                element={<ProtectedRoute><Notifications /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Notifications />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/settings" 
-                                                element={<ProtectedRoute><Settings /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Settings />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/reports" 
-                                                element={<ProtectedRoute><Reports /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Reports />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/wizard" 
-                                                element={<ProtectedRoute><WizardPage /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <WizardPage />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/inventory" 
-                                                element={<ProtectedRoute><Inventory /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Inventory />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
                                               <Route 
                                                 path="/profile" 
-                                                element={<ProtectedRoute><Profile /></ProtectedRoute>} 
+                                                element={
+                                                  <ProtectedRoute>
+                                                    <Profile />
+                                                  </ProtectedRoute>
+                                                } 
                                               />
 
                                               {/* Catch all */}

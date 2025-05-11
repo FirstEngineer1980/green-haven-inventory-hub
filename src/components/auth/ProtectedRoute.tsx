@@ -1,28 +1,36 @@
 
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Permission } from '@/types';
 
-interface ProtectedRouteProps {
-  requiredPermission?: Permission;
+export interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredPermission?: string;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredPermission }) => {
-  const { isAuthenticated, hasPermission } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requiredPermission 
+}) => {
+  const { isAuthenticated, hasPermission, isLoading } = useAuth();
   
-  // Redirect to login if not authenticated
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
-  // If a specific permission is required, check if the user has it
   if (requiredPermission && !hasPermission(requiredPermission)) {
     return <Navigate to="/unauthorized" replace />;
   }
   
-  // If authenticated and has permission or no specific permission required, render the child routes
-  return <Outlet />;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

@@ -116,6 +116,27 @@ export const promotionService = {
     api.delete(`/promotions/${id}`),
 };
 
+// Export authAPI for backward compatibility
+export const authAPI = authService;
+
+// Namespace for API products
+api.products = {
+  getAll: productService.getProducts,
+  getOne: productService.getProduct,
+  create: productService.addProduct,
+  update: productService.updateProduct,
+  delete: productService.deleteProduct
+};
+
+// Namespace for API categories
+api.categories = {
+  getAll: categoryService.getCategories,
+  getOne: categoryService.getCategory,
+  create: categoryService.addCategory,
+  update: categoryService.updateCategory,
+  delete: categoryService.deleteCategory
+};
+
 // Combining all services for easier import
 export const apiService = {
   ...authService,
