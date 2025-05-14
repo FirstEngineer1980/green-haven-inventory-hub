@@ -3,13 +3,31 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+// Extend AxiosInstance with our custom properties
+interface ExtendedAxiosInstance extends axios.AxiosInstance {
+  products: {
+    getAll: () => Promise<any>;
+    getOne: (id: string) => Promise<any>;
+    create: (product: any) => Promise<any>;
+    update: (id: string, product: any) => Promise<any>;
+    delete: (id: string) => Promise<any>;
+  };
+  categories: {
+    getAll: () => Promise<any>;
+    getOne: (id: string) => Promise<any>;
+    create: (category: any) => Promise<any>;
+    update: (id: string, category: any) => Promise<any>;
+    delete: (id: string) => Promise<any>;
+  };
+}
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-});
+}) as ExtendedAxiosInstance;
 
 // Add request interceptor to include auth token
 api.interceptors.request.use(
