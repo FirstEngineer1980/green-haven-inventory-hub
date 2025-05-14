@@ -1,33 +1,16 @@
 
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
-// Extend AxiosInstance with our custom properties
-interface ExtendedAxiosInstance extends axios.AxiosInstance {
-  products: {
-    getAll: () => Promise<any>;
-    getOne: (id: string) => Promise<any>;
-    create: (product: any) => Promise<any>;
-    update: (id: string, product: any) => Promise<any>;
-    delete: (id: string) => Promise<any>;
-  };
-  categories: {
-    getAll: () => Promise<any>;
-    getOne: (id: string) => Promise<any>;
-    create: (category: any) => Promise<any>;
-    update: (id: string, category: any) => Promise<any>;
-    delete: (id: string) => Promise<any>;
-  };
-}
-
+// Create the base API instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-}) as ExtendedAxiosInstance;
+});
 
 // Add request interceptor to include auth token
 api.interceptors.request.use(
@@ -137,8 +120,9 @@ export const promotionService = {
 // Export authAPI for backward compatibility
 export const authAPI = authService;
 
-// Namespace for API products
-api.products = {
+// Instead of modifying the axios instance directly, we'll attach these as properties
+// after creating the instance
+(api as any).products = {
   getAll: productService.getProducts,
   getOne: productService.getProduct,
   create: productService.addProduct,
@@ -146,8 +130,7 @@ api.products = {
   delete: productService.deleteProduct
 };
 
-// Namespace for API categories
-api.categories = {
+(api as any).categories = {
   getAll: categoryService.getCategories,
   getOne: categoryService.getCategory,
   create: categoryService.addCategory,
@@ -164,4 +147,23 @@ export const apiService = {
   ...promotionService,
 };
 
-export default api;
+// Add TypeScript interface for better type checking where needed
+export interface ExtendedApi extends AxiosInstance {
+  products: {
+    getAll: () => Promise<any>;
+    getOne: (id: string) => Promise<any>;
+    create: (product: any) => Promise<any>;
+    update: (id: string, product: any) => Promise<any>;
+    delete: (id: string) => Promise<any>;
+  };
+  categories: {
+    getAll: () => Promise<any>;
+    getOne: (id: string) => Promise<any>;
+    create: (category: any) => Promise<any>;
+    update: (id: string, category: any) => Promise<any>;
+    delete: (id: string) => Promise<any>;
+  };
+}
+
+// We can cast api to ExtendedApi when needed in other files
+export default api as ExtendedApi;
