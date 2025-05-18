@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import { authService } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 
 // Define types
@@ -44,8 +44,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await authAPI.getUser();
-          setUser(response);
+          const response = await authService.getCurrentUser();
+          setUser(response.data);
         } catch (error) {
           console.error('Authentication error:', error);
           localStorage.removeItem('token');
@@ -61,12 +61,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await authAPI.login(email, password);
-      localStorage.setItem('token', response.token);
-      setUser(response.user);
+      const response = await authService.login(email, password);
+      localStorage.setItem('token', response.data.token);
+      setUser(response.data.user);
       toast({
         title: "Login successful",
-        description: `Welcome back, ${response.user.name}!`,
+        description: `Welcome back, ${response.data.user.name}!`,
       });
     } catch (error: any) {
       console.error('Login error:', error);
@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsLoading(true);
     try {
-      await authAPI.logout();
+      await authService.logout();
       localStorage.removeItem('token');
       setUser(null);
       toast({
@@ -103,12 +103,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string, passwordConfirmation: string) => {
     setIsLoading(true);
     try {
-      const response = await authAPI.register({ name, email, password, password_confirmation: passwordConfirmation });
-      localStorage.setItem('token', response.token);
-      setUser(response.user);
+      const response = await authService.register({ 
+        name, 
+        email, 
+        password, 
+        password_confirmation: passwordConfirmation 
+      });
+      localStorage.setItem('token', response.data.token);
+      setUser(response.data.user);
       toast({
         title: "Registration successful",
-        description: `Welcome, ${response.user.name}!`,
+        description: `Welcome, ${response.data.user.name}!`,
       });
     } catch (error: any) {
       console.error('Registration error:', error);

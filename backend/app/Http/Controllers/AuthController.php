@@ -1,66 +1,137 @@
+
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 class AuthController extends Controller
 {
     /**
-     * Handle user login request
+     * Login user and create token
      *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @param  [string] email
+     * @param  [string] password
+     * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string|min:6',
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $user = Auth::user();
-            $token = $user->createToken('auth-token')->plainTextToken;
-
+        if ($validator->fails()) {
             return response()->json([
-                'user' => $user,
-                'token' => $token,
-                'message' => 'Login successful'
-            ]);
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = Auth::user();
+            $tokenResult = $user->createToken('Personal Access Token');
+            $token = $tokenResult->accessToken;
+
+            // Load permissions for the user
+            $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+            $userData = $user->toArray();
+            $userData['permissions'] = $permissions;
+
+            return response()->json([
+                'message' => 'Login successful',
+                'token' => $token,
+                'user' => $userData,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
     }
 
     /**
-     * Handle user logout request
+     * Register a new user
      *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @param  [string] name
+     * @param  [string] email
+     * @param  [string] password
+     * @param  [string] password_confirmation
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Assign default role and permissions
+        $user->assignRole('user');
+
+        // Create token
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->accessToken;
+
+        // Load permissions for the user
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+        $userData = $user->toArray();
+        $userData['permissions'] = $permissions;
+
+        return response()->json([
+            'message' => 'Registration successful',
+            'token' => $token,
+            'user' => $userData,
+        ], 201);
+    }
+
+    /**
+     * Logout user (Revoke the token)
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
+        $request->user()->token()->revoke();
         return response()->json([
-            'message' => 'Logged out successfully'
+            'message' => 'Successfully logged out'
         ]);
     }
 
     /**
-     * Get authenticated user details
+     * Get the authenticated User
      *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @param  Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        
+        // Load permissions for the user
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+        $userData = $user->toArray();
+        $userData['permissions'] = $permissions;
+
+        return response()->json($userData);
     }
 }

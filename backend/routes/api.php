@@ -27,7 +27,7 @@ use App\Http\Controllers\EmailLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExportNotificationController;
 use App\Http\Controllers\StripeController;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use App\Http\Controllers\PromotionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,25 +41,21 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 */
 
 // Public routes
-Route::any('/login', [AuthController::class, 'login']);
-
-// Stripe routes
-Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
-Route::get('/checkout-success', [StripeController::class, 'handleSuccess']);
-
-// Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/csrf-cookie', function() {
     return response()->json(['message' => 'CSRF cookie set']);
 });
 
+// Stripe routes
+Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
+Route::get('/checkout-success', [StripeController::class, 'handleSuccess']);
+
 // Protected routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:api')->group(function () {
     // User routes
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/logout', [AuthController::class, 'logout']);
     Route::apiResource('users', UserController::class);
 
     // Profile routes
@@ -121,6 +117,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Category routes
     Route::apiResource('categories', CategoryController::class);
     Route::get('/categories/{category}/products', [CategoryController::class, 'getProducts']);
+
+    // Promotion routes
+    Route::apiResource('promotions', PromotionController::class);
+    Route::get('/active-promotions', [PromotionController::class, 'getActivePromotions']);
+    Route::get('/discounted-products', [PromotionController::class, 'getDiscountedProducts']);
 
     // Stock Movement routes
     Route::apiResource('stock-movements', StockMovementController::class);

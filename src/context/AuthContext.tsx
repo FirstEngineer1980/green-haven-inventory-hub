@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Permission } from '@/types';
 import axios from 'axios';
-import { authAPI } from '@/services/api';
+import { authService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 interface UpdateUserParams {
@@ -36,7 +36,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -54,9 +54,9 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         } else {
           try {
-            const response = await authAPI.getUser();
-            setCurrentUser(response);
-            localStorage.setItem('currentUser', JSON.stringify(response));
+            const response = await authService.getCurrentUser();
+            setCurrentUser(response.data);
+            localStorage.setItem('currentUser', JSON.stringify(response.data));
             setIsAuthenticated(true);
           } catch (error) {
             console.error('Failed to fetch user data:', error);
@@ -150,15 +150,15 @@ export const AuthProvider = ({ children }) => {
       }
       
       try {
-        const response = await authAPI.login(email, password);
-        localStorage.setItem('token', response.token);
-        setCurrentUser(response.user);
-        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        const response = await authService.login(email, password);
+        localStorage.setItem('token', response.data.token);
+        setCurrentUser(response.data.user);
+        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
         setIsAuthenticated(true);
         
         toast({
           title: "Login successful",
-          description: `Welcome back, ${response.user.name}!`,
+          description: `Welcome back, ${response.data.user.name}!`,
         });
         
         return true;
@@ -180,7 +180,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = async (userData: UpdateUserParams): Promise<boolean> => {
     try {
-      if (currentUser && currentUser.email.includes('@greenhaven.com') || currentUser?.email.includes('@example.com')) {
+      if (currentUser && (currentUser.email.includes('@greenhaven.com') || currentUser?.email.includes('@example.com'))) {
         const updatedUser = { ...currentUser, ...userData };
         setCurrentUser(updatedUser);
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
@@ -207,7 +207,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     
     try {
-      authAPI.logout().catch(err => console.error('Logout API error:', err));
+      authService.logout().catch(err => console.error('Logout API error:', err));
     } catch (error) {
       console.error('Logout error:', error);
     }

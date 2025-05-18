@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Product, StockMovement, Category } from '../types';
 import { useNotifications } from './NotificationContext';
-import api from '../services/api';
+import api, { ExtendedApi } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './AuthContext';
 
@@ -35,6 +35,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const { addNotification } = useNotifications();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
+  const typedApi = api as ExtendedApi;
 
   useEffect(() => {
     // Only fetch data if authenticated
@@ -49,7 +50,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       try {
         // Fetch products
-        const productsResponse = await api.products.getAll();
+        const productsResponse = await typedApi.products.getAll();
         console.log("Products API response:", productsResponse);
         
         if (productsResponse?.data) {
@@ -64,7 +65,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
         
         // Fetch categories
-        const categoriesResponse = await api.categories.getAll();
+        const categoriesResponse = await typedApi.categories.getAll();
         console.log("Categories API response:", categoriesResponse);
         
         if (categoriesResponse?.data) {
@@ -89,7 +90,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      const res = await api.products.create(product);
+      const res = await typedApi.products.create(product);
       console.log("Created product response:", res);
       
       const newProduct = {
@@ -126,7 +127,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const updateProduct = async (id: string, updates: Partial<Product>) => {
-    const res = await api.products.update(id, updates);
+    const res = await typedApi.products.update(id, updates);
     const updatedProduct = {
       ...res.data,
       price: typeof res.data.price === 'string' ? parseFloat(res.data.price) : Number(res.data.price),
@@ -160,7 +161,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteProduct = async (id: string) => {
     const prod = products.find(p => p.id == id);
-    await api.products.delete(id);
+    await typedApi.products.delete(id);
     setProducts(prev => prev.filter(product => product.id != id));
     if (prod) {
       addNotification({
@@ -173,7 +174,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const addCategory = async (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const res = await api.categories.create(category);
+    const res = await typedApi.categories.create(category);
     setCategories(prev => [...prev, res.data]);
     addNotification({
       title: 'New Category Added',
@@ -184,7 +185,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const updateCategory = async (id: string, updates: Partial<Category>) => {
-    const res = await api.categories.update(id, updates);
+    const res = await typedApi.categories.update(id, updates);
     setCategories(prev => 
       prev.map(category => 
         category.id == id 
@@ -202,7 +203,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteCategory = async (id: string) => {
     const cat = categories.find(c => c.id == id);
-    await api.categories.delete(id);
+    await typedApi.categories.delete(id);
     setCategories(prev => prev.filter(category => category.id != id));
     if (cat) {
       addNotification({

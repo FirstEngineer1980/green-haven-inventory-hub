@@ -1,224 +1,169 @@
 
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
-// Create axios instance with default config
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+// Create the base API instance
 const api = axios.create({
-  baseURL: 'https://backend.myphr.io/backend/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  withCredentials: true, // Important for cookies/CSRF/authentication
 });
 
-// Request interceptor for API calls
+// Add request interceptor to include auth token
 api.interceptors.request.use(
-    async (config) => {
-      // You can add logic here to attach tokens if needed
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor for API calls
-api.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    async (error) => {
-      const originalRequest = error.config;
-
-      // Handle 401 errors
-      if (error.response && error.response.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-
-        console.error('API Error: 401', error.message);
-
-        // Redirect to login page for authentication errors
-        console.log('Redirecting to login page due to 401 error');
-        window.location.href = '/login';
-
-        return Promise.reject(error);
-      }
-
-      return Promise.reject(error);
-    }
-);
-
-// Authentication endpoints
-export const authAPI = {
-  login: async (email: string, password: string) => {
-    try {
-      // First get CSRF cookie
-      await api.get('/csrf-cookie');
-
-      // Then attempt login
-      const response = await api.post('/login', { email, password });
-      return response.data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  },
-
-  logout: async () => {
-    try {
-      const response = await api.post('/logout');
-      return response.data;
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    }
-  },
-
-  getUser: async () => {
-    try {
-      const response = await api.get('/user');
-      return response.data;
-    } catch (error) {
-      console.error('Get user error:', error);
-      throw error;
-    }
-  },
-
-  // Adding the missing register method
-  register: async (userData: { name: string, email: string, password: string, password_confirmation: string }) => {
-    try {
-      // First get CSRF cookie
-      await api.get('/csrf-cookie');
-
-      // Then attempt registration
-      const response = await api.post('/register', userData);
-      return response.data;
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
-    }
-  },
-
-  // Alias for getUser to match the code in AuthContext and AuthProvider
-  getCurrentUser: async () => {
-    try {
-      const response = await api.get('/user');
-      return response.data;
-    } catch (error) {
-      console.error('Get current user error:', error);
-      throw error;
-    }
-  },
+// Auth APIs
+export const authService = {
+  login: (email: string, password: string) => 
+    api.post('/login', { email, password }),
+  
+  register: (userData: any) => 
+    api.post('/register', userData),
+  
+  logout: () => 
+    api.post('/logout'),
+  
+  getUser: () => 
+    api.get('/user'),
+    
+  getCurrentUser: () => 
+    api.get('/user/current'),
+  
+  updateProfile: (userData: any) => 
+    api.put('/user/profile', userData),
 };
 
-// Product endpoints
-export const productAPI = {
-  getAll: async () => {
-    try {
-      const response = await api.get('/products');
-      return response;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error;
-    }
-  },
-
-  getOne: async (id: string) => {
-    try {
-      const response = await api.get(`/products/${id}`);
-      return response;
-    } catch (error) {
-      console.error(`Error fetching product ${id}:`, error);
-      throw error;
-    }
-  },
-
-  create: async (productData: any) => {
-    try {
-      const response = await api.post('/products', productData);
-      return response;
-    } catch (error) {
-      console.error('Error creating product:', error);
-      throw error;
-    }
-  },
-
-  update: async (id: string, productData: any) => {
-    try {
-      const response = await api.put(`/products/${id}`, productData);
-      return response;
-    } catch (error) {
-      console.error(`Error updating product ${id}:`, error);
-      throw error;
-    }
-  },
-
-  delete: async (id: string) => {
-    try {
-      const response = await api.delete(`/products/${id}`);
-      return response;
-    } catch (error) {
-      console.error(`Error deleting product ${id}:`, error);
-      throw error;
-    }
-  },
+// Product APIs
+export const productService = {
+  getProducts: () => 
+    api.get('/products'),
+  
+  getProduct: (id: string) => 
+    api.get(`/products/${id}`),
+  
+  addProduct: (product: any) => 
+    api.post('/products', product),
+  
+  updateProduct: (id: string, product: any) => 
+    api.put(`/products/${id}`, product),
+  
+  deleteProduct: (id: string) => 
+    api.delete(`/products/${id}`),
 };
 
-// Category endpoints
-export const categoryAPI = {
-  getAll: async () => {
-    try {
-      const response = await api.get('/categories');
-      return response;
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      throw error;
-    }
-  },
-
-  getOne: async (id: string) => {
-    try {
-      const response = await api.get(`/categories/${id}`);
-      return response;
-    } catch (error) {
-      console.error(`Error fetching category ${id}:`, error);
-      throw error;
-    }
-  },
-
-  create: async (categoryData: any) => {
-    try {
-      const response = await api.post('/categories', categoryData);
-      return response;
-    } catch (error) {
-      console.error('Error creating category:', error);
-      throw error;
-    }
-  },
-
-  update: async (id: string, categoryData: any) => {
-    try {
-      const response = await api.put(`/categories/${id}`, categoryData);
-      return response;
-    } catch (error) {
-      console.error(`Error updating category ${id}:`, error);
-      throw error;
-    }
-  },
-
-  delete: async (id: string) => {
-    try {
-      const response = await api.delete(`/categories/${id}`);
-      return response;
-    } catch (error) {
-      console.error(`Error deleting category ${id}:`, error);
-      throw error;
-    }
-  },
+// Category APIs
+export const categoryService = {
+  getCategories: () => 
+    api.get('/categories'),
+  
+  getCategory: (id: string) => 
+    api.get(`/categories/${id}`),
+  
+  addCategory: (category: any) => 
+    api.post('/categories', category),
+  
+  updateCategory: (id: string, category: any) => 
+    api.put(`/categories/${id}`, category),
+  
+  deleteCategory: (id: string) => 
+    api.delete(`/categories/${id}`),
 };
 
-// Default export with all API services
-export default {
-  auth: authAPI,
-  products: productAPI,
-  categories: categoryAPI,
+// Customer APIs
+export const customerService = {
+  getCustomers: () => 
+    api.get('/customers'),
+  
+  getCustomer: (id: string) => 
+    api.get(`/customers/${id}`),
+  
+  addCustomer: (customer: any) => 
+    api.post('/customers', customer),
+  
+  updateCustomer: (id: string, customer: any) => 
+    api.put(`/customers/${id}`, customer),
+  
+  deleteCustomer: (id: string) => 
+    api.delete(`/customers/${id}`),
 };
+
+// Promotion APIs
+export const promotionService = {
+  getPromotions: () => 
+    api.get('/promotions'),
+  
+  getPromotion: (id: string) => 
+    api.get(`/promotions/${id}`),
+  
+  addPromotion: (promotion: any) => 
+    api.post('/promotions', promotion),
+  
+  updatePromotion: (id: string, promotion: any) => 
+    api.put(`/promotions/${id}`, promotion),
+  
+  deletePromotion: (id: string) => 
+    api.delete(`/promotions/${id}`),
+};
+
+// Export authAPI for backward compatibility
+export const authAPI = authService;
+
+// Instead of modifying the axios instance directly, we'll attach these as properties
+// after creating the instance
+(api as any).products = {
+  getAll: productService.getProducts,
+  getOne: productService.getProduct,
+  create: productService.addProduct,
+  update: productService.updateProduct,
+  delete: productService.deleteProduct
+};
+
+(api as any).categories = {
+  getAll: categoryService.getCategories,
+  getOne: categoryService.getCategory,
+  create: categoryService.addCategory,
+  update: categoryService.updateCategory,
+  delete: categoryService.deleteCategory
+};
+
+// Combining all services for easier import
+export const apiService = {
+  ...authService,
+  ...productService,
+  ...categoryService,
+  ...customerService,
+  ...promotionService,
+};
+
+// Add TypeScript interface for better type checking where needed
+export interface ExtendedApi extends AxiosInstance {
+  products: {
+    getAll: () => Promise<any>;
+    getOne: (id: string) => Promise<any>;
+    create: (product: any) => Promise<any>;
+    update: (id: string, product: any) => Promise<any>;
+    delete: (id: string) => Promise<any>;
+  };
+  categories: {
+    getAll: () => Promise<any>;
+    getOne: (id: string) => Promise<any>;
+    create: (category: any) => Promise<any>;
+    update: (id: string, category: any) => Promise<any>;
+    delete: (id: string) => Promise<any>;
+  };
+}
+
+// We can cast api to ExtendedApi when needed in other files
+export default api as ExtendedApi;
