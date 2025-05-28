@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,46 +29,7 @@ const Bins = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedBin, setSelectedBin] = useState<Bin | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    length: '',
-    width: '',
-    height: '',
-    volumeCapacity: '',
-    unitMatrixId: '',
-    roomId: '',
-    location: '',
-    currentStock: 0,
-    products: [],
-    status: 'active'
-  });
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (selectedBin) {
-      setFormData({
-        name: selectedBin.name,
-        length: selectedBin.length.toString(),
-        width: selectedBin.width.toString(),
-        height: selectedBin.height.toString(),
-        volumeCapacity: selectedBin.volumeCapacity.toString(),
-        unitMatrixId: selectedBin.unitMatrixId || '',
-        roomId: selectedBin.roomId || '',
-        location: selectedBin.location || '',
-        currentStock: selectedBin.currentStock,
-        products: selectedBin.products,
-        status: selectedBin.status || 'active'
-      });
-    }
-  }, [selectedBin]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
   const handleAddBin = (formData: any) => {
     addBin({
@@ -90,22 +50,9 @@ const Bins = () => {
       description: "The bin has been added successfully",
       variant: "default",
     });
-    setFormData({
-      name: '',
-      length: '',
-      width: '',
-      height: '',
-      volumeCapacity: '',
-      unitMatrixId: '',
-      roomId: '',
-      location: '',
-      currentStock: 0,
-      products: [],
-      status: 'active'
-    });
   };
 
-  const handleEditBin = () => {
+  const handleEditBin = (formData: any) => {
     if (!selectedBin) return;
 
     updateBin(selectedBin.id, {
@@ -126,19 +73,6 @@ const Bins = () => {
       title: "Bin updated",
       description: "The bin has been updated successfully",
       variant: "default",
-    });
-    setFormData({
-      name: '',
-      length: '',
-      width: '',
-      height: '',
-      volumeCapacity: '',
-      unitMatrixId: '',
-      roomId: '',
-      location: '',
-      currentStock: 0,
-      products: [],
-      status: 'active'
     });
   };
 
@@ -229,26 +163,17 @@ const Bins = () => {
           </div>
         </CardContent>
       </Card>
-
+      
       <AddBinDialog
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
-        formData={formData}
-        rooms={rooms}
-        unitMatrices={unitMatrices}
-        handleInputChange={handleInputChange}
-        handleAddBin={handleAddBin}
       />
 
       {selectedBin && (
         <EditBinDialog
           open={showEditDialog}
           onOpenChange={setShowEditDialog}
-          formData={formData}
-          rooms={rooms}
-          unitMatrices={unitMatrices}
-          handleInputChange={handleInputChange}
-          handleEditBin={handleEditBin}
+          bin={selectedBin}
         />
       )}
     </DashboardLayout>

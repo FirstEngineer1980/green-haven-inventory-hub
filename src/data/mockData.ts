@@ -221,7 +221,10 @@ export const mockStockMovements: StockMovement[] = [
     productName: 'Laptop',
     type: 'in',
     quantity: 20,
+    reason: 'Initial stock received',
     date: new Date(2023, 3, 1).toISOString(),
+    createdAt: new Date(2023, 3, 1).toISOString(),
+    userId: '1',
     description: 'Initial stock received'
   },
   {
@@ -230,7 +233,10 @@ export const mockStockMovements: StockMovement[] = [
     productName: 'Office Chair',
     type: 'in',
     quantity: 10,
+    reason: 'Restock of office chairs',
     date: new Date(2023, 3, 5).toISOString(),
+    createdAt: new Date(2023, 3, 5).toISOString(),
+    userId: '1',
     description: 'Restock of office chairs'
   },
   {
@@ -239,7 +245,10 @@ export const mockStockMovements: StockMovement[] = [
     productName: 'Laptop',
     type: 'out',
     quantity: 5,
+    reason: 'Sold to customer A',
     date: new Date(2023, 3, 10).toISOString(),
+    createdAt: new Date(2023, 3, 10).toISOString(),
+    userId: '1',
     description: 'Sold to customer A'
   },
   {
@@ -248,7 +257,10 @@ export const mockStockMovements: StockMovement[] = [
     productName: 'Notebook',
     type: 'in',
     quantity: 50,
+    reason: 'New stock of notebooks',
     date: new Date(2023, 3, 15).toISOString(),
+    createdAt: new Date(2023, 3, 15).toISOString(),
+    userId: '1',
     description: 'New stock of notebooks'
   },
   {
@@ -257,7 +269,10 @@ export const mockStockMovements: StockMovement[] = [
     productName: 'Low Stock Product',
     type: 'out',
     quantity: 2,
+    reason: 'Sample product dispatched',
     date: new Date(2023, 3, 20).toISOString(),
+    createdAt: new Date(2023, 3, 20).toISOString(),
+    userId: '1',
     description: 'Sample product dispatched'
   },
 ];
@@ -308,29 +323,29 @@ export const mockCategories: Category[] = [
     id: '1',
     name: 'Electronics',
     description: 'Electronic devices and accessories',
-    createdAt: new Date(2023, 0, 15).toISOString(),
-    updatedAt: new Date(2023, 0, 15).toISOString()
+    productCount: 0,
+    createdAt: new Date(2023, 0, 15).toISOString()
   },
   {
     id: '2',
     name: 'Office Supplies',
     description: 'Supplies for office and business use',
-    createdAt: new Date(2023, 0, 20).toISOString(),
-    updatedAt: new Date(2023, 0, 20).toISOString()
+    productCount: 0,
+    createdAt: new Date(2023, 0, 20).toISOString()
   },
   {
     id: '3',
     name: 'Furniture',
     description: 'Office and home furniture',
-    createdAt: new Date(2023, 1, 5).toISOString(),
-    updatedAt: new Date(2023, 1, 5).toISOString()
+    productCount: 0,
+    createdAt: new Date(2023, 1, 5).toISOString()
   },
   {
     id: '4',
     name: 'Groceries',
     description: 'Food and household items',
-    createdAt: new Date(2023, 1, 10).toISOString(),
-    updatedAt: new Date(2023, 1, 10).toISOString()
+    productCount: 0,
+    createdAt: new Date(2023, 1, 10).toISOString()
   }
 ];
 

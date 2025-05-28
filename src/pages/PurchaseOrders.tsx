@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table"
 import { PurchaseOrder } from '@/types';
 import { AddPurchaseOrderDialog } from '@/components/purchase-orders/AddPurchaseOrderDialog';
-import EditPurchaseOrderDialog from '@/components/purchase-orders/EditPurchaseOrderDialog';
+import { EditPurchaseOrderDialog } from '@/components/purchase-orders/EditPurchaseOrderDialog';
 import { formatDate } from '@/lib/utils';
 
 const PurchaseOrders = () => {

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -32,6 +33,7 @@ const UnitMatrixPage = () => {
         const matrix = {
           roomId: matrixData.roomId,
           name: matrixData.name,
+          description: matrixData.description || '',
           rows: matrixData.rows || []
         };
         addUnitMatrix(matrix);

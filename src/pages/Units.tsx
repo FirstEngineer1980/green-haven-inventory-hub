@@ -32,8 +32,8 @@ const Units = () => {
     roomId: '',
     number: '',
     size: 0,
-    sizeUnit: 'sqft',
-    status: 'available',
+    sizeUnit: 'sqft' as 'sqft' | 'sqm' | 'm²',
+    status: 'available' as 'available' | 'occupied' | 'maintenance',
     description: ''
   });
   const { toast } = useToast();
@@ -45,6 +45,8 @@ const Units = () => {
           name: unitData.name || `Unit ${unitData.number}`,
           roomId: unitData.roomId,
           number: unitData.number,
+          capacity: unitData.size || 0,
+          currentStock: 0,
           size: unitData.size,
           sizeUnit: unitData.sizeUnit,
           status: unitData.status,
@@ -76,11 +78,11 @@ const Units = () => {
       capacity: formData.size,
       currentStock: 0,
       size: formData.size,
-      sizeUnit: formData.sizeUnit as 'sqft' | 'sqm' | 'm²',
-      status: formData.status as 'available' | 'occupied' | 'maintenance',
+      sizeUnit: formData.sizeUnit,
+      status: formData.status,
       description: formData.description
     });
-    setShowAddDialog(false);
+    setOpenAddDialog(false);
   };
 
   const handleEditUnit = () => {
@@ -91,11 +93,11 @@ const Units = () => {
       capacity: formData.size,
       currentStock: selectedUnit!.currentStock,
       size: formData.size,
-      sizeUnit: formData.sizeUnit as 'sqft' | 'sqm' | 'm²',
-      status: formData.status as 'available' | 'occupied' | 'maintenance',
+      sizeUnit: formData.sizeUnit,
+      status: formData.status,
       description: formData.description
     });
-    setShowEditDialog(false);
+    setOpenEditDialog(false);
     setSelectedUnit(null);
   };
 
@@ -116,6 +118,15 @@ const Units = () => {
 
   const handleDeleteConfirm = (id: string) => {
     setCurrentPage(1);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData({ ...formData, [name]: value });
   };
 
   return (
@@ -181,8 +192,8 @@ const Units = () => {
         setShowAddDialog={setOpenAddDialog}
         formData={formData}
         rooms={rooms}
-        handleInputChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
-        handleSelectChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+        handleInputChange={handleInputChange}
+        handleSelectChange={handleSelectChange}
         handleAddUnit={handleAddUnit}
       />
       
@@ -196,13 +207,13 @@ const Units = () => {
               roomId: selectedUnit.roomId,
               number: selectedUnit.number,
               size: selectedUnit.size || 0,
-              sizeUnit: selectedUnit.sizeUnit || 'sqft',
-              status: selectedUnit.status || 'available',
+              sizeUnit: (selectedUnit.sizeUnit || 'sqft') as 'sqft' | 'sqm' | 'm²',
+              status: (selectedUnit.status || 'available') as 'available' | 'occupied' | 'maintenance',
               description: selectedUnit.description || ''
             }}
             rooms={rooms}
-            handleInputChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
-            handleSelectChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+            handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
             handleEditUnit={handleEditUnit}
           />
           
