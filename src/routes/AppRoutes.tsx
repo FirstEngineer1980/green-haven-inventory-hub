@@ -5,6 +5,7 @@ import Dashboard from '@/pages/Dashboard';
 import SellersPage from '@/pages/crm/SellersPage';
 import SellerCommissionPage from '@/pages/crm/SellerCommissionPage';
 import ExportImportManager from '@/pages/ExportImportManager';
+import InvoicesPage from '@/pages/InvoicesPage';
 import { useAuth } from '@/context/AuthContext';
 
 const AppRoutes: React.FC = () => {
@@ -21,6 +22,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/crm/sellers" element={<SellersPage />} />
       <Route path="/crm/commission" element={<SellerCommissionPage />} />
       <Route path="/data-management" element={<ExportImportManager />} />
+      <Route path="/invoices" element={<InvoicesPage />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

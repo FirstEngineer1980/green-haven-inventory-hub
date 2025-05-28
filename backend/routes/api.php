@@ -30,6 +30,7 @@ use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\SellerCommissionController;
 use App\Http\Controllers\ExportImportController;
+use App\Http\Controllers\InvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -132,4 +133,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Seller Commission Routes
     Route::apiResource('seller-commissions', SellerCommissionController::class);
     Route::post('seller-commissions/{sellerCommission}/calculate', [SellerCommissionController::class, 'calculateCommission']);
+
+    // Invoice Routes
+    Route::apiResource('invoices', InvoiceController::class);
+    Route::patch('invoices/{invoice}/status', [InvoiceController::class, 'updateStatus']);
 });
