@@ -1,7 +1,8 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Promotion } from '../types';
 import { useAuth } from './AuthContext';
-import { apiServices } from '@/services/api';
+import { apiInstance } from '../services/api';
 
 interface PromotionContextProps {
   promotions: Promotion[];
@@ -27,8 +28,8 @@ export const PromotionProvider: React.FC<{ children: ReactNode }> = ({ children 
     setLoading(true);
     setError(null);
     try {
-      const data = await apiServices.promotions.getPromotions();
-      setPromotions(data);
+      const response = await apiInstance.get('/promotions');
+      setPromotions(response.data);
     } catch (err) {
       console.error('Error fetching promotions:', err);
       setError('Failed to fetch promotions');
@@ -43,8 +44,8 @@ export const PromotionProvider: React.FC<{ children: ReactNode }> = ({ children 
     setLoading(true);
     setError(null);
     try {
-      const newPromotion = await apiServices.promotions.addPromotion(promotion);
-      setPromotions(prev => [...prev, newPromotion]);
+      const response = await apiInstance.post('/promotions', promotion);
+      setPromotions(prev => [...prev, response.data]);
     } catch (err) {
       console.error('Error adding promotion:', err);
       setError('Failed to add promotion');
@@ -60,9 +61,9 @@ export const PromotionProvider: React.FC<{ children: ReactNode }> = ({ children 
     setLoading(true);
     setError(null);
     try {
-      const updatedPromotion = await apiServices.promotions.updatePromotion(id, promotion);
+      const response = await apiInstance.put(`/promotions/${id}`, promotion);
       setPromotions(prev => 
-        prev.map(p => p.id === id ? updatedPromotion : p)
+        prev.map(p => p.id === id ? response.data : p)
       );
     } catch (err) {
       console.error('Error updating promotion:', err);
@@ -77,7 +78,7 @@ export const PromotionProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (!user) return;
     
     try {
-      await apiServices.promotions.deletePromotion(id);
+      await apiInstance.delete(`/promotions/${id}`);
       setPromotions(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       console.error('Error deleting promotion:', err);

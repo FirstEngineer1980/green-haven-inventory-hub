@@ -2,14 +2,14 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from '../types';
 import { useAuth } from './AuthContext';
-import { apiServices } from '../services/api';
+import { apiInstance } from '../services/api';
 
 interface ProductContextProps {
   products: Product[];
   loading: boolean;
   error: string | null;
   fetchProducts: () => Promise<void>;
-  addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
 }
@@ -28,8 +28,8 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const response = await apiServices.products.getProducts();
-      setProducts(response);
+      const response = await apiInstance.get('/products');
+      setProducts(response.data);
     } catch (err: any) {
       console.error('Error fetching products:', err);
       setError(err.message || 'Failed to fetch products');
@@ -38,14 +38,14 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
   };
 
-  const addProduct = async (product: Omit<Product, 'id'>) => {
+  const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!user) return;
 
     setLoading(true);
     setError(null);
     try {
-      const newProduct = await apiServices.products.addProduct(product);
-      setProducts(prev => [...prev, newProduct]);
+      const response = await apiInstance.post('/products', product);
+      setProducts(prev => [...prev, response.data]);
     } catch (err: any) {
       console.error('Error adding product:', err);
       setError(err.message || 'Failed to add product');
@@ -61,9 +61,9 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const updatedProduct = await apiServices.products.updateProduct(id, product);
+      const response = await apiInstance.put(`/products/${id}`, product);
       setProducts(prev =>
-        prev.map(p => p.id === id ? updatedProduct : p)
+        prev.map(p => p.id === id ? response.data : p)
       );
     } catch (err: any) {
       console.error('Error updating product:', err);
@@ -80,7 +80,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      await apiServices.products.deleteProduct(id);
+      await apiInstance.delete(`/products/${id}`);
       setProducts(prev => prev.filter(p => p.id !== id));
     } catch (err: any) {
       console.error('Error deleting product:', err);

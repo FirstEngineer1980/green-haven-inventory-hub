@@ -28,7 +28,13 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
   const handleSubmit = async (data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       setIsSubmitting(true);
-      addProduct(data);
+      // Transform the data to match the expected type
+      const productData = {
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      await addProduct(productData);
       
       toast({
         title: "Product added",

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProducts } from '@/context/ProductContext';
+import { useCategories } from '@/context/CategoryContext';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +20,8 @@ import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 import { useAuth } from '@/context/AuthContext';
 
 const Products = () => {
-  const { products, categories, addProduct, isLoading, error } = useProducts();
+  const { products, addProduct, loading, error } = useProducts();
+  const { categories } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -28,8 +30,6 @@ const Products = () => {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  
-  // DashboardLayout now handles authentication checks, no need for separate effect here
   
   const handleProductImport = (data: any[]) => {
     try {
@@ -143,7 +143,7 @@ const Products = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {loading ? (
             <div className="w-full py-8 text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
               <p className="mt-4 text-muted-foreground">Loading products...</p>

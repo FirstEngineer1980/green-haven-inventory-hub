@@ -1,7 +1,8 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Category } from '../types';
 import { useAuth } from './AuthContext';
-import { apiServices } from '@/services/api';
+import { apiInstance } from '../services/api';
 
 interface CategoryContextProps {
   categories: Category[];
@@ -18,16 +19,18 @@ const CategoryContext = createContext<CategoryContextProps | undefined>(undefine
 export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
   const fetchCategories = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const data = await apiServices.categories.getCategories();
-      setCategories(data);
+      const response = await apiInstance.get('/categories');
+      setCategories(response.data);
     } catch (error: any) {
       console.error('Error fetching categories:', error);
+      setError('Failed to fetch categories');
     } finally {
       setLoading(false);
     }
@@ -37,10 +40,11 @@ export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (!user) return;
     setLoading(true);
     try {
-      const newCategory = await apiServices.categories.addCategory(category);
-      setCategories([...categories, newCategory]);
+      const response = await apiInstance.post('/categories', category);
+      setCategories([...categories, response.data]);
     } catch (error: any) {
       console.error('Error adding category:', error);
+      setError('Failed to add category');
     } finally {
       setLoading(false);
     }
@@ -50,12 +54,13 @@ export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (!user) return;
     setLoading(true);
     try {
-      await apiServices.categories.updateCategory(id, category);
+      const response = await apiInstance.put(`/categories/${id}`, category);
       setCategories(
-        categories.map((cat) => (cat.id === id ? { ...cat, ...category } : cat))
+        categories.map((cat) => (cat.id === id ? response.data : cat))
       );
     } catch (error: any) {
       console.error('Error updating category:', error);
+      setError('Failed to update category');
     } finally {
       setLoading(false);
     }
@@ -65,10 +70,11 @@ export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (!user) return;
     setLoading(true);
     try {
-      await apiServices.categories.deleteCategory(id);
+      await apiInstance.delete(`/categories/${id}`);
       setCategories(categories.filter((cat) => cat.id !== id));
     } catch (error: any) {
       console.error('Error deleting category:', error);
+      setError('Failed to delete category');
     } finally {
       setLoading(false);
     }
@@ -77,7 +83,7 @@ export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }
   const value: CategoryContextProps = {
     categories,
     loading,
-    error: null,
+    error,
     fetchCategories,
     addCategory,
     updateCategory,

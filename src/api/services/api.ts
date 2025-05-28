@@ -1,7 +1,16 @@
 
-import api from '@/services/api';
+import axios from 'axios';
 
-// Re-export the main api instance as apiInstance for consistency
-export const apiInstance = api;
+// Create the main axios instance
+const apiInstance = axios.create({
+  baseURL: '/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+});
 
-export default api;
+// Re-export the main api instance
+export { apiInstance };
+export default apiInstance;

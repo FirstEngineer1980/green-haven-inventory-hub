@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useProducts } from '@/context/ProductContext';
+import { useCategories } from '@/context/CategoryContext';
 import { Product } from '@/types';
 
 interface ProductFormProps {
@@ -44,7 +44,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }, 
   isSubmitting = false 
 }) => {
-  const { categories } = useProducts();
+  const { categories } = useCategories();
   
   const form = useForm({
     defaultValues: defaultValues as any,
