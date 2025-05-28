@@ -19,15 +19,15 @@ export const useNotifications = () => useContext(NotificationContext);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
 
   // Filter notifications for the current user based on role
   const userNotifications = notifications.filter(notification => {
-    if (!currentUser) return false;
+    if (!user) return false;
     
     // Check if this notification is for the current user based on role or ID
-    return notification.for.includes(currentUser.role) || 
-           notification.for.includes(currentUser.id) ||
+    return notification.for.includes(user.role) || 
+           notification.for.includes(user.id) ||
            notification.for.includes('all');
   });
 

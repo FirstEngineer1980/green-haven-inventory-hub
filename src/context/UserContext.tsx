@@ -20,7 +20,7 @@ export const useUsers = () => useContext(UserContext);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const { addNotification } = useNotifications();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
 
   // Define default permissions for each role
   const rolePermissions: Record<Role, Permission[]> = {
@@ -46,7 +46,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUsers(prev => [...prev, newUser]);
     
     // Send notification about new user
-    if (currentUser) {
+    if (user) {
       addNotification({
         title: 'User Added',
         message: `New user ${newUser.name} has been added to the system`,
@@ -67,7 +67,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       )
     );
     
-    if (userToUpdate && currentUser) {
+    if (userToUpdate && user) {
       // Send notification about update
       addNotification({
         title: 'User Updated',
@@ -83,13 +83,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const userToDelete = users.find(u => u.id === id);
     
     // Don't allow deleting the current user
-    if (currentUser && id === currentUser.id) {
+    if (user && id === user.id) {
       return;
     }
     
     setUsers(prev => prev.filter(user => user.id !== id));
     
-    if (userToDelete && currentUser) {
+    if (userToDelete && user) {
       addNotification({
         title: 'User Deleted',
         message: `User ${userToDelete.name} has been removed from the system`,

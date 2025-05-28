@@ -1,7 +1,8 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from '../types';
 import { useAuth } from './AuthContext';
-import api from '../services/api';
+import { apiServices } from '../services/api';
 
 interface ProductContextProps {
   products: Product[];
@@ -27,7 +28,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const response = await api.productService.getProducts();
+      const response = await apiServices.products.getProducts();
       setProducts(response);
     } catch (err: any) {
       console.error('Error fetching products:', err);
@@ -43,7 +44,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const newProduct = await api.productService.addProduct(product);
+      const newProduct = await apiServices.products.addProduct(product);
       setProducts(prev => [...prev, newProduct]);
     } catch (err: any) {
       console.error('Error adding product:', err);
@@ -60,7 +61,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const updatedProduct = await api.productService.updateProduct(id, product);
+      const updatedProduct = await apiServices.products.updateProduct(id, product);
       setProducts(prev =>
         prev.map(p => p.id === id ? updatedProduct : p)
       );
@@ -79,7 +80,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      await api.productService.deleteProduct(id);
+      await apiServices.products.deleteProduct(id);
       setProducts(prev => prev.filter(p => p.id !== id));
     } catch (err: any) {
       console.error('Error deleting product:', err);

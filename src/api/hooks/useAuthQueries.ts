@@ -55,10 +55,10 @@ export const useLogoutMutation = () => {
   
   return useMutation({
     mutationFn: logout,
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.setQueryData(['user'], null);
       queryClient.invalidateQueries({ queryKey: ['forms'] });
-      toast.success(data.message || 'Logout successful');
+      toast.success('Logout successful');
       navigate('/login');
     },
     onError: (error: Error) => {
