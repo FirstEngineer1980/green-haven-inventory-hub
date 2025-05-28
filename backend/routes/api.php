@@ -28,6 +28,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ClientOrderTemplateController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\SellerCommissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -121,4 +122,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // CRM Routes
     Route::apiResource('sellers', SellerController::class);
     Route::apiResource('clients', ClientController::class);
+    
+    // Seller Commission Routes
+    Route::apiResource('seller-commissions', SellerCommissionController::class);
+    Route::post('seller-commissions/{sellerCommission}/calculate', [SellerCommissionController::class, 'calculateCommission']);
 });

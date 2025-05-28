@@ -102,4 +102,66 @@ export const crmService = {
       throw error;
     }
   },
+
+  // Seller Commission services
+  getSellerCommissions: async (): Promise<any[]> => {
+    try {
+      const response = await apiInstance.get('/seller-commissions');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching seller commissions:', error);
+      throw error;
+    }
+  },
+
+  getSellerCommission: async (id: string): Promise<any> => {
+    try {
+      const response = await apiInstance.get(`/seller-commissions/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching seller commission ${id}:`, error);
+      throw error;
+    }
+  },
+
+  createSellerCommission: async (commission: any): Promise<any> => {
+    try {
+      const response = await apiInstance.post('/seller-commissions', commission);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating seller commission:', error);
+      throw error;
+    }
+  },
+
+  updateSellerCommission: async (id: string, commission: any): Promise<any> => {
+    try {
+      const response = await apiInstance.put(`/seller-commissions/${id}`, commission);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating seller commission ${id}:`, error);
+      throw error;
+    }
+  },
+
+  deleteSellerCommission: async (id: string): Promise<void> => {
+    try {
+      await apiInstance.delete(`/seller-commissions/${id}`);
+    } catch (error) {
+      console.error(`Error deleting seller commission ${id}:`, error);
+      throw error;
+    }
+  },
+
+  calculateCommission: async (id: string, orderAmount: number): Promise<any> => {
+    try {
+      const response = await apiInstance.post(`/seller-commissions/${id}/calculate`, {
+        order_amount: orderAmount
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error calculating commission for ${id}:`, error);
+      throw error;
+    }
+  },
 };
