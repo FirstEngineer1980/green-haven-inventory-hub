@@ -10,12 +10,19 @@ import {
 import { useUsers } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import UserForm from './UserForm';
-import { User } from '@/types';
 
 interface AddUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+type UserFormData = {
+  name: string;
+  email: string;
+  role: "admin" | "manager" | "staff" | "viewer";
+  avatar?: string;
+  permissions?: string[];
+};
 
 const AddUserDialog: React.FC<AddUserDialogProps> = ({ 
   open, 
@@ -25,10 +32,16 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (data: Omit<User, 'id' | 'createdAt' | 'lastActive'>) => {
+  const handleSubmit = async (data: UserFormData) => {
     try {
       setIsSubmitting(true);
-      addUser(data);
+      addUser({
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        permissions: data.permissions || [],
+        avatar: data.avatar
+      });
       
       toast({
         title: "User added",

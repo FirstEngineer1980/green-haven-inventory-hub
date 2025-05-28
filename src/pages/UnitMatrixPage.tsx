@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -51,6 +50,16 @@ const UnitMatrixPage = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleAddUnitMatrix = (formData: any) => {
+    addUnitMatrix({
+      roomId: formData.roomId,
+      name: formData.name,
+      description: formData.description || '',
+      rows: formData.rows || []
+    });
+    setShowAddDialog(false);
   };
 
   // Filter unit matrices based on search and filters

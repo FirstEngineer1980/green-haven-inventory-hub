@@ -17,7 +17,7 @@ import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const Units = () => {
-  const { units, addUnit } = useUnits();
+  const { units, addUnit, updateUnit } = useUnits();
   const { rooms } = useRooms();
   const [searchTerm, setSearchTerm] = useState('');
   const [roomFilter, setRoomFilter] = useState<string>('all');
@@ -27,6 +27,15 @@ const Units = () => {
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    roomId: '',
+    number: '',
+    size: 0,
+    sizeUnit: 'sqft',
+    status: 'available',
+    description: ''
+  });
   const { toast } = useToast();
   
   const handleUnitImport = (data: any[]) => {
@@ -57,6 +66,37 @@ const Units = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleAddUnit = () => {
+    addUnit({
+      name: formData.name,
+      roomId: formData.roomId,
+      number: formData.number,
+      capacity: formData.size,
+      currentStock: 0,
+      size: formData.size,
+      sizeUnit: formData.sizeUnit as 'sqft' | 'sqm' | 'm²',
+      status: formData.status as 'available' | 'occupied' | 'maintenance',
+      description: formData.description
+    });
+    setShowAddDialog(false);
+  };
+
+  const handleEditUnit = () => {
+    updateUnit(selectedUnit!.id, {
+      name: formData.name,
+      roomId: formData.roomId,
+      number: formData.number,
+      capacity: formData.size,
+      currentStock: selectedUnit!.currentStock,
+      size: formData.size,
+      sizeUnit: formData.sizeUnit as 'sqft' | 'sqm' | 'm²',
+      status: formData.status as 'available' | 'occupied' | 'maintenance',
+      description: formData.description
+    });
+    setShowEditDialog(false);
+    setSelectedUnit(null);
   };
 
   const filteredUnits = units.filter(unit => {
@@ -139,19 +179,11 @@ const Units = () => {
       <AddUnitDialog 
         showAddDialog={openAddDialog} 
         setShowAddDialog={setOpenAddDialog}
-        formData={{
-          name: '',
-          roomId: '',
-          number: '',
-          size: 0,
-          sizeUnit: 'sqft',
-          status: 'available',
-          description: ''
-        }}
+        formData={formData}
         rooms={rooms}
-        handleInputChange={() => {}}
-        handleSelectChange={() => {}}
-        handleAddUnit={() => {}}
+        handleInputChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+        handleSelectChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+        handleAddUnit={handleAddUnit}
       />
       
       {selectedUnit && (
@@ -169,9 +201,9 @@ const Units = () => {
               description: selectedUnit.description || ''
             }}
             rooms={rooms}
-            handleInputChange={() => {}}
-            handleSelectChange={() => {}}
-            handleEditUnit={() => {}}
+            handleInputChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+            handleSelectChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+            handleEditUnit={handleEditUnit}
           />
           
           <UnitDetails

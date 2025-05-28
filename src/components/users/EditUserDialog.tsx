@@ -18,6 +18,14 @@ interface EditUserDialogProps {
   user: User;
 }
 
+type UserFormData = {
+  name: string;
+  email: string;
+  role: "admin" | "manager" | "staff" | "viewer";
+  avatar?: string;
+  permissions?: string[];
+};
+
 const EditUserDialog: React.FC<EditUserDialogProps> = ({ 
   open, 
   onOpenChange, 
@@ -27,10 +35,16 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (data: Omit<User, 'id' | 'createdAt' | 'lastActive'>) => {
+  const handleSubmit = async (data: UserFormData) => {
     try {
       setIsSubmitting(true);
-      updateUser(user.id, data);
+      updateUser(user.id, {
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        permissions: data.permissions || [],
+        avatar: data.avatar
+      });
       
       toast({
         title: "User updated",
@@ -51,6 +65,15 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
     }
   };
 
+  // Convert user role 'employee' to 'staff' for the form
+  const formDefaultValues = {
+    name: user.name,
+    email: user.email,
+    role: (user.role === 'employee' ? 'staff' : user.role) as "admin" | "manager" | "staff" | "viewer",
+    permissions: user.permissions || [],
+    avatar: user.avatar || '',
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
@@ -64,7 +87,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
         <div className="py-4">
           <UserForm 
             onSubmit={handleSubmit} 
-            defaultValues={user}
+            defaultValues={formDefaultValues}
             isSubmitting={isSubmitting} 
           />
         </div>

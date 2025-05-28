@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,7 +30,7 @@ const Users = () => {
         const user = {
           name: userData.name,
           email: userData.email,
-          role: userData.role as Role,
+          role: userData.role as "admin" | "manager" | "staff" | "viewer",
           permissions: userData.permissions || [],
           avatar: userData.avatar
         };

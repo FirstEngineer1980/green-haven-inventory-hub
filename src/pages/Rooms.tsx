@@ -1,45 +1,59 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useRooms } from '@/context/RoomContext';
 import { useCustomers } from '@/context/CustomerContext';
-import RoomTable from '@/components/rooms/RoomTable';
-import RoomFilters from '@/components/rooms/RoomFilters';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import RoomTable from '@/components/rooms/RoomTable';
 import AddRoomDialog from '@/components/rooms/AddRoomDialog';
 import EditRoomDialog from '@/components/rooms/EditRoomDialog';
-import RoomDetails from '@/components/rooms/RoomDetails';
-import { Room } from '@/types';
-import { useToast } from '@/hooks/use-toast';
 import ExportButton from '@/components/shared/ExportButton';
 import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const Rooms = () => {
-  const { rooms, addRoom, deleteRoom } = useRooms();
+  const { rooms, addRoom, updateRoom, deleteRoom } = useRooms();
   const { customers } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
   const [customerFilter, setCustomerFilter] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState(1);
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    customerId: '',
+    unit: '',
+  });
   const { toast } = useToast();
-  
+
+  useEffect(() => {
+    if (selectedRoom) {
+      setFormData({
+        name: selectedRoom.name,
+        customerId: selectedRoom.customerId,
+        unit: selectedRoom.unit || '',
+      });
+    }
+  }, [selectedRoom]);
+
   const handleRoomImport = (data: any[]) => {
     try {
       data.forEach(roomData => {
         const room = {
           name: roomData.name,
           customerId: roomData.customerId,
-          unit: roomData.unit
+          description: roomData.description || `Room for customer`,
+          capacity: parseInt(roomData.capacity, 10) || 100,
+          unit: roomData.unit || '',
+          units: []
         };
         addRoom(room);
       });
-      
+
       toast({
         title: "Rooms imported",
         description: `${data.length} rooms have been imported successfully`,
@@ -55,46 +69,78 @@ const Rooms = () => {
     }
   };
 
-  // Filter rooms by search term and customer
-  const filteredRooms = rooms.filter(room => {
-    const matchesSearch = room.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCustomer = customerFilter === 'all' || room.customerId === customerFilter;
-    
-    return matchesSearch && matchesCustomer;
-  });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  // Calculate pagination
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
-  const paginatedRooms = filteredRooms.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
-  const handleDeleteRoom = (id: string) => {
-    deleteRoom(id);
+  const handleAddRoom = (formData: any) => {
+    addRoom({
+      name: formData.name,
+      customerId: formData.customerId,
+      unit: formData.unit,
+      description: `Room for customer`,
+      capacity: 100,
+      units: []
+    });
+    setShowAddDialog(false);
+    setFormData({ name: '', customerId: '', unit: '' });
     toast({
-      title: "Room Deleted",
-      description: "The room has been successfully deleted",
+      title: "Room added",
+      description: "The room has been added successfully",
       variant: "default",
     });
   };
+
+  const handleEditRoom = () => {
+    updateRoom(selectedRoom.id, {
+      name: formData.name,
+      customerId: formData.customerId,
+      description: `Room for customer`,
+      capacity: 100,
+      unit: formData.unit,
+      units: []
+    });
+    setShowEditDialog(false);
+    setSelectedRoom(null);
+    setFormData({ name: '', customerId: '', unit: '' });
+    toast({
+      title: "Room updated",
+      description: "The room has been updated successfully",
+      variant: "default",
+    });
+  };
+
+  const handleDeleteRoom = (roomId: string) => {
+    deleteRoom(roomId);
+    toast({
+      title: "Room deleted",
+      description: "The room has been deleted successfully",
+      variant: "default",
+    });
+  };
+
+  const filteredRooms = rooms.filter(room => {
+    const matchesSearch = room.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCustomer = customerFilter === 'all' || room.customerId === customerFilter;
+    return matchesSearch && matchesCustomer;
+  });
 
   return (
     <DashboardLayout>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Rooms</h1>
         <div className="flex gap-2">
-          <ImportButton 
-            onImport={handleRoomImport} 
+          <ImportButton
+            onImport={handleRoomImport}
             templateUrl={getTemplateUrl('rooms')}
             validationFn={(data) => validateTemplate(data, 'rooms')}
           />
-          <ExportButton 
-            data={rooms} 
-            filename="rooms" 
-            fields={['id', 'customerId', 'customerName', 'name', 'unit', 'createdAt', 'updatedAt']}
-          />
+          <ExportButton data={rooms} filename="rooms" fields={['id', 'name', 'customerId', 'unit']} />
           <Button onClick={() => setOpenAddDialog(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Room
@@ -102,32 +148,42 @@ const Rooms = () => {
         </div>
       </div>
 
-      <RoomFilters 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        customerFilter={customerFilter}
-        onCustomerFilterChange={setCustomerFilter}
-        customers={customers}
-      />
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <Input
+            placeholder="Search rooms..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="md:w-64">
+          <Select value={customerFilter} onValueChange={setCustomerFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by customer" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Customers</SelectItem>
+              {customers.map(customer => (
+                <SelectItem key={customer.id} value={customer.id}>
+                  {customer.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
-      <Card className="mt-6">
+      <Card>
         <CardHeader>
-          <CardTitle>Customer Rooms</CardTitle>
+          <CardTitle>Rooms</CardTitle>
           <CardDescription>
-            Manage customer storage rooms and locations
+            Manage rooms and their details
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RoomTable 
-            rooms={paginatedRooms}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            totalPages={totalPages}
-            onView={(room) => {
-              setSelectedRoom(room);
-              setOpenDetailsDialog(true);
-            }}
-            onEdit={(room) => {
+          <RoomTable
+            rooms={filteredRooms}
+            onEdit={room => {
               setSelectedRoom(room);
               setOpenEditDialog(true);
             }}
@@ -136,31 +192,26 @@ const Rooms = () => {
         </CardContent>
       </Card>
 
-      <AddRoomDialog 
-        open={openAddDialog} 
-        onOpenChange={setOpenAddDialog}
+      <AddRoomDialog
+        showAddDialog={openAddDialog}
+        setShowAddDialog={setOpenAddDialog}
+        formData={formData}
+        customers={customers}
+        handleInputChange={handleInputChange}
+        handleSelectChange={handleSelectChange}
+        handleAddRoom={handleAddRoom}
       />
-      
+
       {selectedRoom && (
-        <>
-          <EditRoomDialog 
-            open={openEditDialog} 
-            onOpenChange={setOpenEditDialog} 
-            room={selectedRoom} 
-          />
-          
-          <RoomDetails
-            open={openDetailsDialog}
-            onOpenChange={setOpenDetailsDialog}
-            room={selectedRoom}
-            onEdit={(room) => {
-              setSelectedRoom(room);
-              setOpenDetailsDialog(false);
-              setOpenEditDialog(true);
-            }}
-            onDelete={handleDeleteRoom}
-          />
-        </>
+        <EditRoomDialog
+          showEditDialog={openEditDialog}
+          setShowEditDialog={setOpenEditDialog}
+          formData={formData}
+          customers={customers}
+          handleInputChange={handleInputChange}
+          handleSelectChange={handleSelectChange}
+          handleEditRoom={handleEditRoom}
+        />
       )}
     </DashboardLayout>
   );
