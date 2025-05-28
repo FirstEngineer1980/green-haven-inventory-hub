@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -21,6 +20,7 @@ import {
   AccordionTrigger 
 } from '@/components/ui/accordion';
 import { useProducts } from '@/context/ProductContext';
+import { useCategories } from '@/context/CategoryContext';
 import { Product } from '@/types';
 import { Grid2X2, List, Search, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '@/components/products/ProductCard';
@@ -28,7 +28,8 @@ import ProductPreviewDialog from '@/components/products/ProductPreviewDialog';
 import { useToast } from '@/hooks/use-toast';
 
 const ProductsPage = () => {
-  const { products, categories } = useProducts();
+  const { products } = useProducts();
+  const { categories } = useCategories();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);

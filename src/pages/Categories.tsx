@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useProducts } from '@/context/ProductContext';
+import { useCategories } from '@/context/CategoryContext';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -19,7 +18,7 @@ import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const Categories = () => {
-  const { categories, addCategory, updateCategory, deleteCategory } = useProducts();
+  const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

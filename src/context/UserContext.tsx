@@ -1,112 +1,84 @@
 
-import React, { createContext, useState, useContext } from 'react';
-import { User, Role, Permission } from '../types';
-import { mockUsers } from '../data/mockData';
-import { useNotifications } from './NotificationContext';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { User } from '../types';
+import { mockUsers } from '../data/mockData';
 
 interface UserContextType {
   users: User[];
-  addUser: (user: Omit<User, 'id' | 'createdAt' | 'lastActive'>) => void;
-  updateUser: (id: string, updates: Partial<User>) => void;
+  loading: boolean;
+  error: string | null;
+  addUser: (user: Omit<User, 'id'>) => void;
+  updateUser: (id: string, user: Partial<User>) => void;
   deleteUser: (id: string) => void;
-  getRolePermissions: (role: Role) => Permission[];
+  getUserById: (id: string) => User | undefined;
 }
 
 const UserContext = createContext<UserContextType>({} as UserContextType);
 
 export const useUsers = () => useContext(UserContext);
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>(mockUsers);
-  const { addNotification } = useNotifications();
-  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useAuth();
 
-  // Define default permissions for each role
-  const rolePermissions: Record<Role, Permission[]> = {
-    admin: ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'],
-    manager: ['manage_products', 'view_reports', 'manage_inventory'],
-    staff: ['view_reports', 'manage_inventory'],
-    viewer: ['view_reports']
-  };
-  
-  const getRolePermissions = (role: Role): Permission[] => {
-    return rolePermissions[role] || [];
-  };
+  useEffect(() => {
+    // Initialize with mock data - in a real app, this would fetch from API
+    setUsers(mockUsers);
+  }, []);
 
-  const addUser = (user: Omit<User, 'id' | 'createdAt' | 'lastActive'>) => {
-    const now = new Date().toISOString();
+  const addUser = (userData: Omit<User, 'id'>) => {
     const newUser: User = {
-      ...user,
+      ...userData,
       id: Date.now().toString(),
-      createdAt: now,
-      lastActive: now
     };
-    
     setUsers(prev => [...prev, newUser]);
-    
-    // Send notification about new user
-    if (user) {
-      addNotification({
-        title: 'User Added',
-        message: `New user ${newUser.name} has been added to the system`,
-        type: 'info',
-        for: ['admin'], // Admin only
-      });
-    }
   };
 
-  const updateUser = (id: string, updates: Partial<User>) => {
-    const userToUpdate = users.find(u => u.id === id);
-    
-    setUsers(prev => 
-      prev.map(user => 
-        user.id === id 
-          ? { ...user, ...updates } 
-          : user
-      )
+  const updateUser = (id: string, userData: Partial<User>) => {
+    setUsers(prev =>
+      prev.map(user => (user.id === id ? { ...user, ...userData } : user))
     );
-    
-    if (userToUpdate && user) {
-      // Send notification about update
-      addNotification({
-        title: 'User Updated',
-        message: `User ${userToUpdate.name} has been updated`,
-        type: 'info',
-        for: ['admin'], // Admin only
-      });
-    }
   };
 
   const deleteUser = (id: string) => {
-    // Get the user before deleting
-    const userToDelete = users.find(u => u.id === id);
-    
-    // Don't allow deleting the current user
-    if (user && id === user.id) {
-      return;
-    }
-    
     setUsers(prev => prev.filter(user => user.id !== id));
+  };
+
+  const getUserById = (id: string) => {
+    return users.find(user => user.id === id);
+  };
+
+  // Filter users based on current user's role
+  const filteredUsers = users.filter(user => {
+    if (!currentUser) return false;
     
-    if (userToDelete && user) {
-      addNotification({
-        title: 'User Deleted',
-        message: `User ${userToDelete.name} has been removed from the system`,
-        type: 'info',
-        for: ['admin'], // Admin only
-      });
+    // Admin can see all users
+    if (currentUser.role === 'admin') return true;
+    
+    // Manager can see managers and employees
+    if (currentUser.role === 'manager') {
+      return user.role === 'manager' || user.role === 'employee';
     }
+    
+    // Employee can only see themselves
+    return user.id === currentUser.id;
+  });
+
+  const value: UserContextType = {
+    users: filteredUsers,
+    loading,
+    error,
+    addUser,
+    updateUser,
+    deleteUser,
+    getUserById,
   };
 
   return (
-    <UserContext.Provider value={{ 
-      users, 
-      addUser, 
-      updateUser, 
-      deleteUser,
-      getRolePermissions
-    }}>
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   );

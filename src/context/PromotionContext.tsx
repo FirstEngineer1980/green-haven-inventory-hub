@@ -1,8 +1,7 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Promotion } from '../types';
 import { useAuth } from './AuthContext';
-import { apiInstance } from '../services/api';
+import { apiInstance } from '../api/services/api';
 
 interface PromotionContextProps {
   promotions: Promotion[];
