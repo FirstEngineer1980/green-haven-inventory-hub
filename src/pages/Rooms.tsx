@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -204,7 +205,7 @@ const Rooms = () => {
         customers={customers}
         handleInputChange={handleInputChange}
         handleSelectChange={handleSelectChange}
-        handleAddRoom={handleAddRoom}
+        handleAddRoom={() => handleAddRoom(formData)}
       />
 
       {selectedRoom && (
