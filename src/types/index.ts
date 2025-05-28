@@ -57,7 +57,6 @@ export interface Notification {
   read: boolean;
 }
 
-// Additional types that were missing
 export interface Permission {
   id: string;
   name: string;
@@ -73,18 +72,28 @@ export interface Role {
 export interface Bin {
   id: string;
   name: string;
+  length: number;
+  width: number;
+  height: number;
+  volumeCapacity: number;
   location: string;
-  capacity: number;
+  unitMatrixId?: string;
+  roomId?: string;
+  status?: string;
   currentStock: number;
   products: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface StockMovement {
   id: string;
   productId: string;
+  productName: string;
   type: 'in' | 'out' | 'adjustment';
   quantity: number;
   reason: string;
+  date: string;
   createdAt: string;
   userId: string;
 }
@@ -103,8 +112,11 @@ export interface Room {
   name: string;
   description: string;
   customerId: string;
+  customerName?: string;
   capacity: number;
   units: Unit[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Unit {
@@ -117,21 +129,29 @@ export interface Unit {
 
 export interface PurchaseOrder {
   id: string;
+  poNumber: string;
   vendorId: string;
-  status: 'pending' | 'approved' | 'received' | 'cancelled';
+  vendorName: string;
+  status: 'draft' | 'pending' | 'approved' | 'received' | 'cancelled';
   orderDate: string;
   expectedDate?: string;
+  expectedDeliveryDate?: string;
   receivedDate?: string;
   items: PurchaseOrderItem[];
   total: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PurchaseOrderItem {
   id: string;
   productId: string;
+  productName: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  total: number;
 }
 
 export interface Vendor {
@@ -141,24 +161,30 @@ export interface Vendor {
   phone?: string;
   address?: string;
   contactPerson?: string;
+  createdAt: string;
 }
 
 export interface UnitMatrix {
   id: string;
   name: string;
   description: string;
+  roomId?: string;
   rows: UnitMatrixRow[];
 }
 
 export interface UnitMatrixRow {
   id: string;
   name: string;
+  label?: string;
+  color?: string;
   cells: UnitMatrixCell[];
 }
 
 export interface UnitMatrixCell {
   id: string;
   value: string;
+  content?: string;
+  columnId?: string;
   productId?: string;
   quantity?: number;
 }

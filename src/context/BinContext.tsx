@@ -1,148 +1,111 @@
 
-import React, { createContext, useState, useContext } from 'react';
-import { Bin } from '@/types';
-import { useNotifications } from './NotificationContext';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Bin } from '../types';
+import { useAuth } from './AuthContext';
+import apiInstance from '../api/services/api';
 
-const initialBins: Bin[] = [
-  {
-    id: '1',
-    name: 'Bin A1',
-    length: 10,
-    width: 10,
-    height: 10,
-    volumeCapacity: 1000,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '2',
-    name: 'Bin B2',
-    length: 15,
-    width: 15,
-    height: 20,
-    volumeCapacity: 4500,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-];
-
-interface BinContextType {
+interface BinContextProps {
   bins: Bin[];
-  addBin: (bin: Omit<Bin, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateBin: (id: string, updates: Partial<Bin>) => void;
-  deleteBin: (id: string) => void;
-  getBinById: (id: string) => Bin | undefined;
+  loading: boolean;
+  error: string | null;
+  fetchBins: () => Promise<void>;
+  addBin: (bin: Omit<Bin, 'id' | 'createdAt' | 'updatedAt' | 'volumeCapacity'>) => Promise<void>;
+  updateBin: (id: string, bin: Partial<Bin>) => Promise<void>;
+  deleteBin: (id: string) => Promise<void>;
   getBinsByUnitMatrix: (unitMatrixId: string) => Bin[];
 }
 
-const BinContext = createContext<BinContextType>({
-  bins: [],
-  addBin: () => {},
-  updateBin: () => {},
-  deleteBin: () => {},
-  getBinById: () => undefined,
-  getBinsByUnitMatrix: () => []
-});
+const BinContext = createContext<BinContextProps | undefined>(undefined);
 
-export const useBins = () => useContext(BinContext);
+export const BinProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [bins, setBins] = useState<Bin[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
-export const BinProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [bins, setBins] = useState<Bin[]>(initialBins);
-  const { addNotification } = useNotifications();
-
-  const addBin = (bin: Omit<Bin, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!bin || !bin.name) {
-      console.error('Invalid bin data');
-      return;
+  const fetchBins = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const response = await apiInstance.get('/bins');
+      setBins(response.data);
+    } catch (error: any) {
+      console.error('Error fetching bins:', error);
+      setError('Failed to fetch bins');
+    } finally {
+      setLoading(false);
     }
-
-    const now = new Date().toISOString();
-    
-    const newBin: Bin = {
-      ...bin,
-      id: Date.now().toString(),
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    setBins(prev => [...prev, newBin]);
-    
-    // Send notification about new bin
-    addNotification({
-      title: 'New Bin Added',
-      message: `Bin "${newBin.name}" has been added`,
-      type: 'info',
-      for: ['1', '2'], // Admin, Manager
-    });
   };
 
-  const updateBin = (id: string, updates: Partial<Bin>) => {
-    if (!id) return;
-
-    setBins(prev => 
-      prev.map(bin => 
-        bin.id === id 
-          ? { 
-              ...bin, 
-              ...updates,
-              updatedAt: new Date().toISOString() 
-            } 
-          : bin
-      )
-    );
-    
-    // Get the updated bin
-    const updatedBin = bins.find(b => b.id === id);
-    if (updatedBin) {
-      // Send notification about update
-      addNotification({
-        title: 'Bin Updated',
-        message: `Bin "${updatedBin.name}" has been updated`,
-        type: 'success',
-        for: ['1', '2'], // Admin, Manager
+  const addBin = async (binData: Omit<Bin, 'id' | 'createdAt' | 'updatedAt' | 'volumeCapacity'>) => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const volumeCapacity = binData.length * binData.width * binData.height;
+      const response = await apiInstance.post('/bins', {
+        ...binData,
+        volumeCapacity,
       });
+      setBins([...bins, response.data]);
+    } catch (error: any) {
+      console.error('Error adding bin:', error);
+      setError('Failed to add bin');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteBin = (id: string) => {
-    if (!id) return;
-
-    // Get the bin before deleting
-    const binToDelete = bins.find(b => b.id === id);
-    
-    setBins(prev => prev.filter(bin => bin.id !== id));
-    
-    if (binToDelete) {
-      addNotification({
-        title: 'Bin Deleted',
-        message: `Bin "${binToDelete.name}" has been removed`,
-        type: 'info',
-        for: ['1', '2'], // Admin, Manager
-      });
+  const updateBin = async (id: string, binData: Partial<Bin>) => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const response = await apiInstance.put(`/bins/${id}`, binData);
+      setBins(bins.map(bin => bin.id === id ? response.data : bin));
+    } catch (error: any) {
+      console.error('Error updating bin:', error);
+      setError('Failed to update bin');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getBinById = (id: string): Bin | undefined => {
-    if (!id) return undefined;
-    return bins.find(bin => bin.id === id);
+  const deleteBin = async (id: string) => {
+    if (!user) return;
+    try {
+      await apiInstance.delete(`/bins/${id}`);
+      setBins(bins.filter(bin => bin.id !== id));
+    } catch (error: any) {
+      console.error('Error deleting bin:', error);
+      setError('Failed to delete bin');
+    }
   };
-  
-  // Get bins by unit matrix ID
-  const getBinsByUnitMatrix = (unitMatrixId: string): Bin[] => {
-    if (!unitMatrixId) return [];
+
+  const getBinsByUnitMatrix = (unitMatrixId: string) => {
     return bins.filter(bin => bin.unitMatrixId === unitMatrixId);
   };
 
+  const value: BinContextProps = {
+    bins,
+    loading,
+    error,
+    fetchBins,
+    addBin,
+    updateBin,
+    deleteBin,
+    getBinsByUnitMatrix,
+  };
+
   return (
-    <BinContext.Provider value={{ 
-      bins, 
-      addBin, 
-      updateBin, 
-      deleteBin,
-      getBinById,
-      getBinsByUnitMatrix
-    }}>
+    <BinContext.Provider value={value}>
       {children}
     </BinContext.Provider>
   );
+};
+
+export const useBins = (): BinContextProps => {
+  const context = useContext(BinContext);
+  if (!context) {
+    throw new Error('useBins must be used within a BinProvider');
+  }
+  return context;
 };
