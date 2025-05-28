@@ -1,181 +1,112 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Promotion } from '../types';
+import { useAuth } from './AuthContext';
 import { apiServices } from '@/services/api';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from './AuthContext'; // Import useAuth to check permissions
 
-// Define the Promotion interface
-interface Promotion {
-  id: string;
-  title: string;
-  description: string;
-  discount: number;
-  start_date: string;
-  end_date: string;
-  image: string;
-  categories: string[];
-  active: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
-// Define the context props interface
 interface PromotionContextProps {
   promotions: Promotion[];
   loading: boolean;
   error: string | null;
+  fetchPromotions: () => Promise<void>;
   addPromotion: (promotion: Omit<Promotion, 'id'>) => Promise<void>;
   updatePromotion: (id: string, promotion: Partial<Promotion>) => Promise<void>;
   deletePromotion: (id: string) => Promise<void>;
-  refreshPromotions: () => Promise<void>;
 }
 
-// Create the context with default values
-const PromotionContext = createContext<PromotionContextProps>({
-  promotions: [],
-  loading: false,
-  error: null,
-  addPromotion: async () => {},
-  updatePromotion: async () => {},
-  deletePromotion: async () => {},
-  refreshPromotions: async () => {},
-});
+const PromotionContext = createContext<PromotionContextProps | undefined>(undefined);
 
-export const usePromotions = () => useContext(PromotionContext);
-
-export const PromotionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PromotionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-  const { hasPermission } = useAuth(); // Use the hasPermission function from AuthContext
+  const { user } = useAuth();
 
-  // Fetch promotions from the API
   const fetchPromotions = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      const response = await apiServices.getPromotions();
-      setPromotions(response.data);
-      setError(null);
+      const data = await apiServices.promotions.getPromotions();
+      setPromotions(data);
     } catch (err) {
       console.error('Error fetching promotions:', err);
       setError('Failed to fetch promotions');
-      toast({
-        title: 'Error',
-        description: 'Failed to load promotions',
-        variant: 'destructive',
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Load promotions on component mount
-  useEffect(() => {
-    fetchPromotions();
-  }, []);
-
-  // Add a new promotion with permission check
   const addPromotion = async (promotion: Omit<Promotion, 'id'>) => {
-    // Check if the user has permission to create a promotion
-    if (!hasPermission('create:promotion')) {
-      toast({
-        title: 'Permission Denied',
-        description: 'You do not have permission to add promotions',
-        variant: 'destructive',
-      });
-      throw new Error('Permission denied');
-    }
-
+    if (!user) return;
+    
+    setLoading(true);
+    setError(null);
     try {
-      const response = await apiServices.addPromotion(promotion);
-      setPromotions([...promotions, response.data]);
-      toast({
-        title: 'Success',
-        description: 'Promotion added successfully',
-      });
+      const newPromotion = await apiServices.promotions.addPromotion(promotion);
+      setPromotions(prev => [...prev, newPromotion]);
     } catch (err) {
       console.error('Error adding promotion:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to add promotion',
-        variant: 'destructive',
-      });
+      setError('Failed to add promotion');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Update an existing promotion with permission check
-  const updatePromotion = async (id: string, promotionData: Partial<Promotion>) => {
-    // Check if the user has permission to update a promotion
-    if (!hasPermission('update:promotion')) {
-      toast({
-        title: 'Permission Denied',
-        description: 'You do not have permission to update promotions',
-        variant: 'destructive',
-      });
-      throw new Error('Permission denied');
-    }
-
+  const updatePromotion = async (id: string, promotion: Partial<Promotion>) => {
+    if (!user) return;
+    
+    setLoading(true);
+    setError(null);
     try {
-      const response = await apiServices.updatePromotion(id, promotionData);
-      setPromotions(
-          promotions.map((promotion) => (promotion.id === id ? { ...promotion, ...response.data } : promotion))
+      const updatedPromotion = await apiServices.promotions.updatePromotion(id, promotion);
+      setPromotions(prev => 
+        prev.map(p => p.id === id ? updatedPromotion : p)
       );
-      toast({
-        title: 'Success',
-        description: 'Promotion updated successfully',
-      });
     } catch (err) {
       console.error('Error updating promotion:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to update promotion',
-        variant: 'destructive',
-      });
+      setError('Failed to update promotion');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Delete a promotion with permission check
   const deletePromotion = async (id: string) => {
-    // Check if the user has permission to delete a promotion
-    if (!hasPermission('delete:promotion')) {
-      toast({
-        title: 'Permission Denied',
-        description: 'You do not have permission to delete promotions',
-        variant: 'destructive',
-      });
-      throw new Error('Permission denied');
-    }
-
+    if (!user) return;
+    
     try {
-      await apiServices.deletePromotion(id);
-      setPromotions(promotions.filter((promotion) => promotion.id !== id));
-      toast({
-        title: 'Success',
-        description: 'Promotion deleted successfully',
-      });
+      await apiServices.promotions.deletePromotion(id);
+      setPromotions(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       console.error('Error deleting promotion:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete promotion',
-        variant: 'destructive',
-      });
+      setError('Failed to delete promotion');
       throw err;
     }
   };
 
-  // Context value to be provided
-  const contextValue: PromotionContextProps = {
+  const value: PromotionContextProps = {
     promotions,
     loading,
     error,
+    fetchPromotions,
     addPromotion,
     updatePromotion,
     deletePromotion,
-    refreshPromotions: fetchPromotions,
   };
 
-  return <PromotionContext.Provider value={contextValue}>{children}</PromotionContext.Provider>;
+  return (
+    <PromotionContext.Provider value={value}>
+      {children}
+    </PromotionContext.Provider>
+  );
+};
+
+export const usePromotions = (): PromotionContextProps => {
+  const context = useContext(PromotionContext);
+  if (!context) {
+    throw new Error('usePromotions must be used within a PromotionProvider');
+  }
+  return context;
 };

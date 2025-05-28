@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -105,43 +104,41 @@ function App() {
                                                 <Route path="/contact" element={<ContactPage />} />
                                                 <Route path="/order-success" element={<OrderSuccessPage />} />
 
-                                                <Route element={<ProtectedRoute />}>
-                                                  <Route path="/dashboard" element={<Dashboard />} />
-                                                  <Route path="/products" element={<ProductsPage />} />
-                                                  <Route path="/products/:id" element={<ProductPage />} />
-                                                  <Route path="/categories" element={<Categories />} />
-                                                  <Route path="/customers" element={<Customers />} />
-                                                  <Route path="/customers/:id" element={<ManageCustomer />} />
-                                                  <Route path="/customer-products" element={<CustomerProducts />} />
-                                                  <Route path="/customer-list" element={<CustomerList />} />
-                                                  <Route path="/rooms" element={<Rooms />} />
-                                                  <Route path="/units" element={<Units />} />
-                                                  <Route path="/purchase-orders" element={<PurchaseOrders />} />
-                                                  <Route path="/vendors" element={<Vendors />} />
-                                                  <Route path="/stock-movements" element={<StockMovements />} />
-                                                  <Route path="/bins" element={<Bins />} />
-                                                  <Route path="/sku-matrix" element={<UnitMatrixPage />} />
-                                                  <Route path="/users" element={<Users />} />
-                                                  <Route path="/notifications" element={<Notifications />} />
-                                                  <Route path="/settings" element={<Settings />} />
-                                                  <Route path="/reports" element={<Reports />} />
-                                                  <Route path="/wizard" element={<WizardPage />} />
-                                                  <Route path="/inventory" element={<Inventory />} />
-                                                  <Route path="/profile" element={<Profile />} />
+                                                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                                                <Route path="/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
+                                                <Route path="/products/:id" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
+                                                <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
+                                                <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+                                                <Route path="/customers/:id" element={<ProtectedRoute><ManageCustomer /></ProtectedRoute>} />
+                                                <Route path="/customer-products" element={<ProtectedRoute><CustomerProducts /></ProtectedRoute>} />
+                                                <Route path="/customer-list" element={<ProtectedRoute><CustomerList /></ProtectedRoute>} />
+                                                <Route path="/rooms" element={<ProtectedRoute><Rooms /></ProtectedRoute>} />
+                                                <Route path="/units" element={<ProtectedRoute><Units /></ProtectedRoute>} />
+                                                <Route path="/purchase-orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
+                                                <Route path="/vendors" element={<ProtectedRoute><Vendors /></ProtectedRoute>} />
+                                                <Route path="/stock-movements" element={<ProtectedRoute><StockMovements /></ProtectedRoute>} />
+                                                <Route path="/bins" element={<ProtectedRoute><Bins /></ProtectedRoute>} />
+                                                <Route path="/sku-matrix" element={<ProtectedRoute><UnitMatrixPage /></ProtectedRoute>} />
+                                                <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+                                                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                                                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                                                <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+                                                <Route path="/wizard" element={<ProtectedRoute><WizardPage /></ProtectedRoute>} />
+                                                <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+                                                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-                                                  <Route path="/favorites" element={<FavoritesPage />} />
-                                                  <Route path="/compare" element={<ComparePage />} />
-                                                  <Route path="/cart" element={<CartPage />} />
-                                                  <Route path="/checkout" element={<CheckoutPage />} />
-                                                  <Route path="/promotions" element={<PromotionsPage />} />
-                                                  <Route path="/orders" element={<OrdersPage />} />
-                                                  <Route path="/orders/:id" element={<OrderDetailsPage />} />
+                                                <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
+                                                <Route path="/compare" element={<ProtectedRoute><ComparePage /></ProtectedRoute>} />
+                                                <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+                                                <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+                                                <Route path="/promotions" element={<ProtectedRoute><PromotionsPage /></ProtectedRoute>} />
+                                                <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+                                                <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailsPage /></ProtectedRoute>} />
 
-                                                  {/* CRM Routes */}
-                                                  <Route path="/crm" element={<CRMDashboard />} />
-                                                  <Route path="/crm/sellers" element={<SellersPage />} />
-                                                  <Route path="/crm/clients" element={<ClientsPage />} />
-                                                </Route>
+                                                {/* CRM Routes */}
+                                                <Route path="/crm" element={<ProtectedRoute><CRMDashboard /></ProtectedRoute>} />
+                                                <Route path="/crm/sellers" element={<ProtectedRoute><SellersPage /></ProtectedRoute>} />
+                                                <Route path="/crm/clients" element={<ProtectedRoute><ClientsPage /></ProtectedRoute>} />
 
                                                 <Route path="*" element={<NotFound />} />
                                               </Routes>

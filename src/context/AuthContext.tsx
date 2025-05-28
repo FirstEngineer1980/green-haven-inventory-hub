@@ -9,11 +9,13 @@ import { addLanguageToPath } from '@/i18n/languageUtils';
 
 interface AuthContextProps {
   user: User | null;
+  currentUser: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
   hasPermission: (permission: string) => boolean;
 }
 
@@ -98,6 +100,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserHandler = (userData: Partial<User>): void => {
+    if (user) {
+      setUser({ ...user, ...userData });
+    }
+  };
+
   // Simple permission check function
   const hasPermission = (permission: string): boolean => {
     // For now, just check if the user exists
@@ -107,11 +115,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const authContextValue: AuthContextProps = {
     user,
+    currentUser: user, // Alias for backward compatibility
     isLoading,
     isAuthenticated,
     token,
     login: loginHandler,
     logout: logoutHandler,
+    updateUser: updateUserHandler,
     hasPermission
   };
 

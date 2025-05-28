@@ -1,137 +1,100 @@
-
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import { useToast } from '@/hooks/use-toast';
-import { apiService } from '@/services/api';
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  productCount: number;
-  parent_id?: string | null;
-  children?: Category[];
-}
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Category } from '../types';
+import { useAuth } from './AuthContext';
+import { apiServices } from '@/services/api';
 
 interface CategoryContextProps {
   categories: Category[];
   loading: boolean;
   error: string | null;
+  fetchCategories: () => Promise<void>;
   addCategory: (category: Omit<Category, 'id'>) => Promise<void>;
   updateCategory: (id: string, category: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
-  refreshCategories: () => Promise<void>;
 }
 
-const CategoryContext = createContext<CategoryContextProps>({
-  categories: [],
-  loading: false,
-  error: null,
-  addCategory: async () => {},
-  updateCategory: async () => {},
-  deleteCategory: async () => {},
-  refreshCategories: async () => {},
-});
+const CategoryContext = createContext<CategoryContextProps | undefined>(undefined);
 
-export const useCategories = () => useContext(CategoryContext);
-
-export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const fetchCategories = async () => {
+    if (!user) return;
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await apiService.getCategories();
-      setCategories(response.data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching categories:', err);
-      setError('Failed to fetch categories');
-      toast({
-        title: 'Error',
-        description: 'Failed to load categories',
-        variant: 'destructive',
-      });
+      const data = await apiServices.categories.getCategories();
+      setCategories(data);
+    } catch (error: any) {
+      console.error('Error fetching categories:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const addCategory = async (category: Omit<Category, 'id'>) => {
+    if (!user) return;
+    setLoading(true);
     try {
-      const response = await apiService.addCategory(category);
-      setCategories([...categories, response.data]);
-      toast({
-        title: 'Success',
-        description: 'Category added successfully',
-      });
-    } catch (err) {
-      console.error('Error adding category:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to add category',
-        variant: 'destructive',
-      });
-      throw err;
+      const newCategory = await apiServices.categories.addCategory(category);
+      setCategories([...categories, newCategory]);
+    } catch (error: any) {
+      console.error('Error adding category:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const updateCategory = async (id: string, categoryData: Partial<Category>) => {
+  const updateCategory = async (id: string, category: Partial<Category>) => {
+    if (!user) return;
+    setLoading(true);
     try {
-      const response = await apiService.updateCategory(id, categoryData);
+      await apiServices.categories.updateCategory(id, category);
       setCategories(
-        categories.map((category) => (category.id === id ? { ...category, ...response.data } : category))
+        categories.map((cat) => (cat.id === id ? { ...cat, ...category } : cat))
       );
-      toast({
-        title: 'Success',
-        description: 'Category updated successfully',
-      });
-    } catch (err) {
-      console.error('Error updating category:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to update category',
-        variant: 'destructive',
-      });
-      throw err;
+    } catch (error: any) {
+      console.error('Error updating category:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const deleteCategory = async (id: string) => {
+    if (!user) return;
+    setLoading(true);
     try {
-      await apiService.deleteCategory(id);
-      setCategories(categories.filter((category) => category.id !== id));
-      toast({
-        title: 'Success',
-        description: 'Category deleted successfully',
-      });
-    } catch (err) {
-      console.error('Error deleting category:', err);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete category',
-        variant: 'destructive',
-      });
-      throw err;
+      await apiServices.categories.deleteCategory(id);
+      setCategories(categories.filter((cat) => cat.id !== id));
+    } catch (error: any) {
+      console.error('Error deleting category:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const contextValue: CategoryContextProps = {
+  const value: CategoryContextProps = {
     categories,
     loading,
-    error,
+    error: null,
+    fetchCategories,
     addCategory,
     updateCategory,
     deleteCategory,
-    refreshCategories: fetchCategories,
   };
 
-  return <CategoryContext.Provider value={contextValue}>{children}</CategoryContext.Provider>;
+  return (
+    <CategoryContext.Provider value={value}>
+      {children}
+    </CategoryContext.Provider>
+  );
+};
+
+export const useCategories = (): CategoryContextProps => {
+  const context = useContext(CategoryContext);
+  if (!context) {
+    throw new Error('useCategories must be used within a CategoryProvider');
+  }
+  return context;
 };
