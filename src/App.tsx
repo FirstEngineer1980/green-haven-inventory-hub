@@ -63,93 +63,110 @@ import OrdersPage from './pages/OrdersPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 
+// CRM Pages
+import CRMDashboard from './pages/crm/CRMDashboard';
+import SellersPage from './pages/crm/SellersPage';
+import ClientsPage from './pages/crm/ClientsPage';
+
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import './App.css';
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <TranslationProvider>
+          <ThemeProvider defaultTheme="light" storageKey="inventory-theme">
+            <AuthProvider>
+              <NotificationProvider>
+                <UserProvider>
+                  <CustomerProvider>
+                    <RoomProvider>
+                      <UnitProvider>
+                        <CustomerProductProvider>
+                          <ProductProvider>
+                            <BinProvider>
+                              <UnitMatrixProvider>
+                                <POProvider>
+                                  <WizardProvider>
+                                    <FavoritesProvider>
+                                      <ComparisonProvider>
+                                        <CartProvider>
+                                          <CategoryProvider>
+                                            <PromotionProvider>
+                                              <Routes>
+                                                <Route path="/" element={<Index />} />
+                                                <Route path="/login" element={<Login />} />
+                                                <Route path="/unauthorized" element={<Unauthorized />} />
+                                                <Route path="/about" element={<AboutPage />} />
+                                                <Route path="/contact" element={<ContactPage />} />
+                                                <Route path="/order-success" element={<OrderSuccessPage />} />
 
-        <ThemeProvider defaultTheme="light" storageKey="inventory-theme">
-          <AuthProvider>
-            <NotificationProvider>
-              <UserProvider>
-                <CustomerProvider>
-                  <RoomProvider>
-                    <UnitProvider>
-                      <CustomerProductProvider>
-                        <ProductProvider>
-                          <BinProvider>
-                            <UnitMatrixProvider>
-                              <POProvider>
-                                <WizardProvider>
-                                  <FavoritesProvider>
-                                    <ComparisonProvider>
-                                      <CartProvider>
-                                        <Routes>
-                                        <Route path="/" element={<Index />} />
-                                        <Route path="/login" element={<Login />} />
-                                        <Route path="/unauthorized" element={<Unauthorized />} />
-                                        <Route path="/about" element={<AboutPage />} />
-                                        <Route path="/contact" element={<ContactPage />} />
-                                        <Route path="/order-success" element={<OrderSuccessPage />} />
+                                                <Route element={<ProtectedRoute />}>
+                                                  <Route path="/dashboard" element={<Dashboard />} />
+                                                  <Route path="/products" element={<ProductsPage />} />
+                                                  <Route path="/products/:id" element={<ProductPage />} />
+                                                  <Route path="/categories" element={<Categories />} />
+                                                  <Route path="/customers" element={<Customers />} />
+                                                  <Route path="/customers/:id" element={<ManageCustomer />} />
+                                                  <Route path="/customer-products" element={<CustomerProducts />} />
+                                                  <Route path="/customer-list" element={<CustomerList />} />
+                                                  <Route path="/rooms" element={<Rooms />} />
+                                                  <Route path="/units" element={<Units />} />
+                                                  <Route path="/purchase-orders" element={<PurchaseOrders />} />
+                                                  <Route path="/vendors" element={<Vendors />} />
+                                                  <Route path="/stock-movements" element={<StockMovements />} />
+                                                  <Route path="/bins" element={<Bins />} />
+                                                  <Route path="/sku-matrix" element={<UnitMatrixPage />} />
+                                                  <Route path="/users" element={<Users />} />
+                                                  <Route path="/notifications" element={<Notifications />} />
+                                                  <Route path="/settings" element={<Settings />} />
+                                                  <Route path="/reports" element={<Reports />} />
+                                                  <Route path="/wizard" element={<WizardPage />} />
+                                                  <Route path="/inventory" element={<Inventory />} />
+                                                  <Route path="/profile" element={<Profile />} />
 
-                                        <Route element={<ProtectedRoute />}>
-                                          <Route path="/dashboard" element={<Dashboard />} />
-                                          <Route path="/products" element={<ProductsPage />} />
-                                          <Route path="/products/:id" element={<ProductPage />} />
-                                          <Route path="/categories" element={<Categories />} />
-                                          <Route path="/customers" element={<Customers />} />
-                                          <Route path="/customers/:id" element={<ManageCustomer />} />
-                                          <Route path="/customer-products" element={<CustomerProducts />} />
-                                          <Route path="/customer-list" element={<CustomerList />} />
-                                          <Route path="/rooms" element={<Rooms />} />
-                                          <Route path="/units" element={<Units />} />
-                                          <Route path="/purchase-orders" element={<PurchaseOrders />} />
-                                          <Route path="/vendors" element={<Vendors />} />
-                                          <Route path="/stock-movements" element={<StockMovements />} />
-                                          <Route path="/bins" element={<Bins />} />
-                                          <Route path="/sku-matrix" element={<UnitMatrixPage />} />
-                                          <Route path="/users" element={<Users />} />
-                                          <Route path="/notifications" element={<Notifications />} />
-                                          <Route path="/settings" element={<Settings />} />
-                                          <Route path="/reports" element={<Reports />} />
-                                          <Route path="/wizard" element={<WizardPage />} />
-                                          <Route path="/inventory" element={<Inventory />} />
-                                          <Route path="/profile" element={<Profile />} />
+                                                  <Route path="/favorites" element={<FavoritesPage />} />
+                                                  <Route path="/compare" element={<ComparePage />} />
+                                                  <Route path="/cart" element={<CartPage />} />
+                                                  <Route path="/checkout" element={<CheckoutPage />} />
+                                                  <Route path="/promotions" element={<PromotionsPage />} />
+                                                  <Route path="/orders" element={<OrdersPage />} />
+                                                  <Route path="/orders/:id" element={<OrderDetailsPage />} />
 
-                                          <Route path="/favorites" element={<FavoritesPage />} />
-                                          <Route path="/compare" element={<ComparePage />} />
-                                          <Route path="/cart" element={<CartPage />} />
-                                          <Route path="/checkout" element={<CheckoutPage />} />
-                                          <Route path="/promotions" element={<PromotionsPage />} />
-                                          <Route path="/orders" element={<OrdersPage />} />
-                                          <Route path="/orders/:id" element={<OrderDetailsPage />} />
-                                        </Route>
+                                                  {/* CRM Routes */}
+                                                  <Route path="/crm" element={<CRMDashboard />} />
+                                                  <Route path="/crm/sellers" element={<SellersPage />} />
+                                                  <Route path="/crm/clients" element={<ClientsPage />} />
+                                                </Route>
 
-                                        <Route path="*" element={<NotFound />} />
-                                        </Routes>
-                                        <Toaster />
-                                      </CartProvider>
-                                    </ComparisonProvider>
-                                  </FavoritesProvider>
-                                </WizardProvider>
-                              </POProvider>
-                            </UnitMatrixProvider>
-                          </BinProvider>
-                        </ProductProvider>
-                      </CustomerProductProvider>
-                    </UnitProvider>
-                  </RoomProvider>
-                </CustomerProvider>
-              </UserProvider>
-            </NotificationProvider>
-          </AuthProvider>
-        </ThemeProvider>
+                                                <Route path="*" element={<NotFound />} />
+                                              </Routes>
+                                              <Toaster />
+                                            </PromotionProvider>
+                                          </CategoryProvider>
+                                        </CartProvider>
+                                      </ComparisonProvider>
+                                    </FavoritesProvider>
+                                  </WizardProvider>
+                                </POProvider>
+                              </UnitMatrixProvider>
+                            </BinProvider>
+                          </ProductProvider>
+                        </CustomerProductProvider>
+                      </UnitProvider>
+                    </RoomProvider>
+                  </CustomerProvider>
+                </UserProvider>
+              </NotificationProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </TranslationProvider>
       </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

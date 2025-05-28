@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Http\Request;
@@ -27,6 +28,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExportNotificationController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\SellerController;
+use App\Http\Controllers\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +67,10 @@ Route::middleware('auth:api')->group(function () {
         return $request->user();
     });
     Route::apiResource('users', UserController::class);
+
+    // CRM routes
+    Route::apiResource('sellers', SellerController::class);
+    Route::apiResource('clients', ClientController::class);
 
     // Profile routes
     Route::put('/profile', [ProfileController::class, 'updateProfile']);
