@@ -204,7 +204,7 @@ const Rooms = () => {
         }}
         customers={customers}
         handleInputChange={handleInputChange}
-        handleSelectChange={handleSelectChange}
+        handleCustomerChange={(value: string) => handleSelectChange('customerId', value)}
         handleAddRoom={() => handleAddRoom(formData)}
       />
 
