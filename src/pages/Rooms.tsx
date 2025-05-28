@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -87,7 +88,7 @@ const Rooms = () => {
       capacity: 100,
       units: []
     });
-    setShowAddDialog(false);
+    setOpenAddDialog(false);
     setFormData({ name: '', customerId: '', unit: '' });
     toast({
       title: "Room added",
@@ -105,7 +106,7 @@ const Rooms = () => {
       unit: formData.unit,
       units: []
     });
-    setShowEditDialog(false);
+    setOpenEditDialog(false);
     setSelectedRoom(null);
     setFormData({ name: '', customerId: '', unit: '' });
     toast({
@@ -188,6 +189,7 @@ const Rooms = () => {
               setOpenEditDialog(true);
             }}
             onDelete={handleDeleteRoom}
+            onView={() => {}}
           />
         </CardContent>
       </Card>
@@ -195,7 +197,11 @@ const Rooms = () => {
       <AddRoomDialog
         showAddDialog={openAddDialog}
         setShowAddDialog={setOpenAddDialog}
-        formData={formData}
+        formData={{
+          customerId: formData.customerId,
+          name: formData.name,
+          unit: parseFloat(formData.unit) || 0
+        }}
         customers={customers}
         handleInputChange={handleInputChange}
         handleSelectChange={handleSelectChange}
@@ -206,7 +212,11 @@ const Rooms = () => {
         <EditRoomDialog
           showEditDialog={openEditDialog}
           setShowEditDialog={setOpenEditDialog}
-          formData={formData}
+          formData={{
+            customerId: formData.customerId,
+            name: formData.name,
+            unit: parseFloat(formData.unit) || 0
+          }}
           customers={customers}
           handleInputChange={handleInputChange}
           handleSelectChange={handleSelectChange}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { usePurchaseOrders } from '@/context/PurchaseOrderContext';
+import { usePO } from '@/context/POContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Table,
@@ -16,12 +17,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { PurchaseOrder } from '@/types';
-import AddPurchaseOrderDialog from '@/components/purchase-orders/AddPurchaseOrderDialog';
+import { AddPurchaseOrderDialog } from '@/components/purchase-orders/AddPurchaseOrderDialog';
 import EditPurchaseOrderDialog from '@/components/purchase-orders/EditPurchaseOrderDialog';
 import { formatDate } from '@/lib/utils';
 
 const PurchaseOrders = () => {
-  const { purchaseOrders, addPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder } = usePurchaseOrders();
+  const { purchaseOrders, addPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder } = usePO();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -182,7 +183,6 @@ const PurchaseOrders = () => {
       <AddPurchaseOrderDialog
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
-        onSubmit={handleAddPurchaseOrder}
       />
 
       {selectedPurchaseOrder && (
