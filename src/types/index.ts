@@ -100,7 +100,12 @@ export interface Customer {
   email: string;
   phone?: string;
   address?: string;
+  company?: string;
+  totalOrders?: number;
+  totalSpent?: number;
+  status?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface Room {

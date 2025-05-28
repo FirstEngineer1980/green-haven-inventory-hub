@@ -11,8 +11,8 @@ import {
 import { Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Role } from '@/types';
-import { formatDate } from '@/utils/formatters';
+import { User } from '@/types';
+import { formatDate } from '@/lib/utils';
 
 interface UserTableProps {
   users: User[];
@@ -21,7 +21,7 @@ interface UserTableProps {
 
 const UserTable: React.FC<UserTableProps> = ({ users, onEdit }) => {
   // Helper function to render role badge with appropriate color
-  const getRoleBadge = (role: Role) => {
+  const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
         return <Badge variant="destructive">Admin</Badge>;

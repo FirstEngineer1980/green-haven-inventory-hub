@@ -11,7 +11,10 @@ const mockRooms: Room[] = [
     customerId: '1',
     customerName: 'Jane Smith',
     name: 'Storage Room A',
+    description: 'Main storage area',
+    capacity: 100,
     unit: '101',
+    units: [],
     createdAt: '2023-04-15T08:30:00Z',
     updatedAt: '2023-07-10T11:45:00Z'
   },
@@ -20,7 +23,10 @@ const mockRooms: Room[] = [
     customerId: '3',
     customerName: 'Emily Davis',
     name: 'Warehouse Space',
+    description: 'Large warehouse area',
+    capacity: 500,
     unit: '203',
+    units: [],
     createdAt: '2023-05-22T09:15:00Z',
     updatedAt: '2023-08-05T14:20:00Z'
   },
@@ -29,7 +35,10 @@ const mockRooms: Room[] = [
     customerId: '2',
     customerName: 'Michael Johnson',
     name: 'Garden Shed',
+    description: 'Outdoor storage shed',
+    capacity: 25,
     unit: '105',
+    units: [],
     createdAt: '2023-06-18T13:40:00Z',
     updatedAt: '2023-09-02T10:30:00Z'
   }

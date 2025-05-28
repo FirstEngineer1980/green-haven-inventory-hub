@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, Permission } from '../types';
+import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -9,7 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  hasPermission: (permission: Permission) => boolean;
+  hasPermission: (permission: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -53,9 +53,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('user');
   };
 
-  const hasPermission = (permission: Permission) => {
+  const hasPermission = (permission: string) => {
     if (!user) return false;
-    return user.permissions?.includes('all') || user.permissions?.includes(permission.name) || false;
+    return user.permissions?.includes('all') || user.permissions?.includes(permission) || false;
   };
 
   const value: AuthContextType = {

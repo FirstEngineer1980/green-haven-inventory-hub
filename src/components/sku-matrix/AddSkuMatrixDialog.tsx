@@ -77,13 +77,14 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
       // Create cells for each column in this row
       const cellsForRow = columns.map(column => ({
         id: `${rowId}-${column.id}`,
-        rowId: rowId,
         columnId: column.id,
+        value: '',
         content: ''
       }));
       
       return {
         id: rowId,
+        name: row.label,
         label: row.label,
         color: row.color,
         cells: cellsForRow
@@ -93,6 +94,7 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
     addUnitMatrix({
       name: formData.name,
       roomId: formData.roomId,
+      description: '',
       rows: rowsWithIds,
     });
     
