@@ -1,7 +1,5 @@
-
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Notification } from '../types';
-import { mockNotifications } from '../data/mockData';
 import { useAuth } from './AuthContext';
 
 interface NotificationContextType {
@@ -10,31 +8,16 @@ interface NotificationContextType {
   addNotification: (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => void;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
-  deleteNotification: (id: string) => void;
+  removeNotification: (id: string) => void;
+  clearAll: () => void;
 }
 
-const NotificationContext = createContext<NotificationContextType>({} as NotificationContextType);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-export const useNotifications = () => useContext(NotificationContext);
-
-export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
 
-  // Filter notifications for the current user based on role
-  const userNotifications = notifications.filter(notification => {
-    if (!user) return false;
-    
-    // Check if this notification is for the current user based on role or ID
-    return notification.for.includes(user.role) || 
-           notification.for.includes(user.id) ||
-           notification.for.includes('all');
-  });
-
-  // Count unread notifications
-  const unreadCount = userNotifications.filter(n => !n.read).length;
-
-  // Add a new notification
   const addNotification = (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
     const newNotification: Notification = {
       ...notification,
@@ -42,43 +25,60 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       createdAt: new Date().toISOString(),
       read: false,
     };
-    
     setNotifications(prev => [newNotification, ...prev]);
   };
 
-  // Mark a notification as read
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id 
-          ? { ...notification, read: true } 
-          : notification
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === id ? { ...notification, read: true } : notification
       )
     );
   };
 
-  // Mark all notifications as read
   const markAllAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(notification => ({ ...notification, read: true }))
     );
   };
 
-  // Delete a notification
-  const deleteNotification = (id: string) => {
+  const removeNotification = (id: string) => {
     setNotifications(prev => prev.filter(notification => notification.id !== id));
   };
 
+  const clearAll = () => {
+    setNotifications([]);
+  };
+
+  const unreadCount = notifications.filter(notification => !notification.read).length;
+
+  // Filter notifications based on user roles
+  const filteredNotifications = notifications.filter(notification => {
+    if (!user) return false;
+    return notification.for.includes(user.role) || notification.for.includes(user.id);
+  });
+
+  const value: NotificationContextType = {
+    notifications: filteredNotifications,
+    unreadCount,
+    addNotification,
+    markAsRead,
+    markAllAsRead,
+    removeNotification,
+    clearAll,
+  };
+
   return (
-    <NotificationContext.Provider value={{
-      notifications: userNotifications,
-      unreadCount,
-      addNotification,
-      markAsRead,
-      markAllAsRead,
-      deleteNotification,
-    }}>
+    <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
   );
+};
+
+export const useNotifications = (): NotificationContextType => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotifications must be used within a NotificationProvider');
+  }
+  return context;
 };
