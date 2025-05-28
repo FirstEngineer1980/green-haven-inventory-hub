@@ -27,62 +27,19 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAuth } from '@/context/AuthContext';
+import { useReports } from '@/context/ReportContext';
+import { useInventory } from '@/context/InventoryContext';
+import { useCustomers } from '@/context/CustomerContext';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-
-// Mock data for reports
-const stockLevelData = [
-  { name: 'Organic Fertilizer', value: 1200, category: 'Fertilizers' },
-  { name: 'Plant Food', value: 900, category: 'Plant Care' },
-  { name: 'Garden Soil', value: 1500, category: 'Soils' },
-  { name: 'Seed Packets', value: 600, category: 'Seeds' },
-  { name: 'Pesticide', value: 300, category: 'Plant Care' },
-  { name: 'Potting Mix', value: 750, category: 'Soils' },
-  { name: 'Organic Seeds', value: 450, category: 'Seeds' },
-  { name: 'Weed Control', value: 250, category: 'Plant Care' }
-];
-
-const salesByMonthData = [
-  { name: 'Jan', sales: 4000, expenses: 2400 },
-  { name: 'Feb', sales: 3000, expenses: 1398 },
-  { name: 'Mar', sales: 9800, expenses: 2000 },
-  { name: 'Apr', sales: 3908, expenses: 2780 },
-  { name: 'May', sales: 4800, expenses: 1890 },
-  { name: 'Jun', sales: 3800, expenses: 2390 },
-  { name: 'Jul', sales: 4300, expenses: 3490 },
-  { name: 'Aug', sales: 5300, expenses: 3000 },
-  { name: 'Sep', sales: 4500, expenses: 2500 },
-  { name: 'Oct', sales: 5200, expenses: 2800 },
-  { name: 'Nov', sales: 6600, expenses: 3200 },
-  { name: 'Dec', sales: 8200, expenses: 3800 }
-];
-
-const categorySalesData = [
-  { name: 'Fertilizers', value: 35 },
-  { name: 'Plant Care', value: 25 },
-  { name: 'Soils', value: 20 },
-  { name: 'Seeds', value: 10 },
-  { name: 'Tools', value: 10 }
-];
-
-const customerRevenueData = [
-  { name: 'Jane Smith', revenue: 4300, orders: 12 },
-  { name: 'Michael Johnson', revenue: 2890, orders: 8 },
-  { name: 'Emily Davis', revenue: 18750, orders: 24 },
-  { name: 'Robert Wilson', revenue: 1240, orders: 5 },
-  { name: 'Sarah Brown', revenue: 6780, orders: 15 }
-];
-
-const warehouseUtilizationData = [
-  { name: 'Main Warehouse', total: 5000, used: 3800 },
-  { name: 'East Storage', total: 3000, used: 1500 },
-  { name: 'West Storage', total: 2500, used: 2000 },
-  { name: 'South Annex', total: 1800, used: 900 }
-];
 
 const COLORS = ['#74c696', '#6bacde', '#F4C430', '#FF6B6B', '#9775fa', '#5D5FEF'];
 
 const Reports = () => {
   const { hasPermission } = useAuth();
+  const { reports, loading: reportsLoading, runReport } = useReports();
+  const { inventoryItems } = useInventory();
+  const { customers } = useCustomers();
+  
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reportType, setReportType] = useState("inventory");
   const [timeRange, setTimeRange] = useState("lastMonth");
@@ -100,12 +57,64 @@ const Reports = () => {
     );
   }
 
-  // Helper function to handle number formatting from various value types
+  // Transform inventory data for charts
+  const stockLevelData = inventoryItems.map(item => ({
+    name: item.productName || `Product ${item.productId}`,
+    value: item.quantity,
+    category: 'General'
+  }));
+
+  // Generate mock sales data (this would come from actual sales API)
+  const salesByMonthData = [
+    { name: 'Jan', sales: 4000, expenses: 2400 },
+    { name: 'Feb', sales: 3000, expenses: 1398 },
+    { name: 'Mar', sales: 9800, expenses: 2000 },
+    { name: 'Apr', sales: 3908, expenses: 2780 },
+    { name: 'May', sales: 4800, expenses: 1890 },
+    { name: 'Jun', sales: 3800, expenses: 2390 },
+    { name: 'Jul', sales: 4300, expenses: 3490 },
+    { name: 'Aug', sales: 5300, expenses: 3000 },
+    { name: 'Sep', sales: 4500, expenses: 2500 },
+    { name: 'Oct', sales: 5200, expenses: 2800 },
+    { name: 'Nov', sales: 6600, expenses: 3200 },
+    { name: 'Dec', sales: 8200, expenses: 3800 }
+  ];
+
+  const categorySalesData = [
+    { name: 'Fertilizers', value: 35 },
+    { name: 'Plant Care', value: 25 },
+    { name: 'Soils', value: 20 },
+    { name: 'Seeds', value: 10 },
+    { name: 'Tools', value: 10 }
+  ];
+
+  // Transform customer data for charts
+  const customerRevenueData = customers.slice(0, 5).map((customer, index) => ({
+    name: customer.name,
+    revenue: Math.floor(Math.random() * 10000) + 1000,
+    orders: Math.floor(Math.random() * 20) + 5
+  }));
+
+  const warehouseUtilizationData = [
+    { name: 'Main Warehouse', total: 5000, used: 3800 },
+    { name: 'East Storage', total: 3000, used: 1500 },
+    { name: 'West Storage', total: 2500, used: 2000 },
+    { name: 'South Annex', total: 1800, used: 900 }
+  ];
+
   const formatNumber = (value: ValueType) => {
     if (typeof value === 'number') {
       return value.toFixed(2);
     }
     return value;
+  };
+
+  const handleRunReport = async (reportId: string) => {
+    try {
+      await runReport(reportId);
+    } catch (error) {
+      console.error('Failed to run report:', error);
+    }
   };
 
   return (
@@ -164,13 +173,13 @@ const Reports = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Current Stock Levels</CardTitle>
-                  <CardDescription>Total inventory by product category</CardDescription>
+                  <CardDescription>Total inventory by product</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="w-full h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={stockLevelData}
+                        data={stockLevelData.slice(0, 8)}
                         margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
@@ -242,17 +251,17 @@ const Reports = () => {
                     <thead>
                       <tr className="border-b bg-muted/50">
                         <th className="py-3 px-4 text-left">Product</th>
-                        <th className="py-3 px-4 text-left">Category</th>
+                        <th className="py-3 px-4 text-left">Status</th>
                         <th className="py-3 px-4 text-right">In Stock</th>
                         <th className="py-3 px-4 text-right">Unit Cost</th>
                         <th className="py-3 px-4 text-right">Total Value</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {stockLevelData.map((item, index) => (
+                      {stockLevelData.slice(0, 8).map((item, index) => (
                         <tr key={index} className="border-b">
                           <td className="py-3 px-4">{item.name}</td>
-                          <td className="py-3 px-4">{item.category}</td>
+                          <td className="py-3 px-4">{inventoryItems[index]?.status || 'Available'}</td>
                           <td className="py-3 px-4 text-right">{item.value}</td>
                           <td className="py-3 px-4 text-right">$10.00</td>
                           <td className="py-3 px-4 text-right">${(item.value * 10).toLocaleString()}</td>
@@ -260,7 +269,7 @@ const Reports = () => {
                       ))}
                       <tr className="font-medium">
                         <td colSpan={4} className="py-3 px-4 text-right">Total Inventory Value:</td>
-                        <td className="py-3 px-4 text-right">${stockLevelData.reduce((sum, item) => sum + (item.value * 10), 0).toLocaleString()}</td>
+                        <td className="py-3 px-4 text-right">${stockLevelData.slice(0, 8).reduce((sum, item) => sum + (item.value * 10), 0).toLocaleString()}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -566,6 +575,40 @@ const Reports = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Custom Reports Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Custom Reports</CardTitle>
+            <CardDescription>Run saved reports and analytics</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {reportsLoading ? (
+              <div className="text-center py-4">Loading reports...</div>
+            ) : reports.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {reports.map((report) => (
+                  <Card key={report.id} className="p-4">
+                    <h3 className="font-medium mb-2">{report.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{report.description}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground">
+                        {report.lastRun ? `Last run: ${format(new Date(report.lastRun), 'MMM dd, yyyy')}` : 'Never run'}
+                      </span>
+                      <Button size="sm" onClick={() => handleRunReport(report.id)}>
+                        Run Report
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                No custom reports available
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

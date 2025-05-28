@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { User } from '@/types';
+import { apiInstance } from '@/api/services/api';
 
 // Interface for password update
 interface PasswordUpdate {
@@ -20,14 +21,14 @@ interface PasswordUpdate {
 }
 
 const Profile = () => {
-  const { currentUser, updateUser } = useAuth();
+  const { user: currentUser, updateUser } = useAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
-    name: currentUser?.name || '',
-    email: currentUser?.email || '',
-    phone: currentUser?.phone || '',
-    position: currentUser?.position || '',
+    name: '',
+    email: '',
+    phone: '',
+    position: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -35,6 +36,19 @@ const Profile = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        name: currentUser.name || '',
+        email: currentUser.email || '',
+        phone: currentUser.phone || '',
+        position: currentUser.position || '',
+      }));
+    }
+  }, [currentUser]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,8 +56,18 @@ const Profile = () => {
   };
 
   const handleSaveProfile = async () => {
+    if (!currentUser) return;
+    
+    setLoading(true);
     try {
-      // Call API to update user profile
+      await apiInstance.put('/user/profile', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        position: formData.position
+      });
+      
+      // Update local user data
       await updateUser({
         name: formData.name,
         email: formData.email,
@@ -64,6 +88,8 @@ const Profile = () => {
         description: "There was an error updating your profile. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,15 +103,12 @@ const Profile = () => {
       return;
     }
     
+    setLoading(true);
     try {
-      // Call API to change password with the password update object
-      const passwordData: PasswordUpdate = {
-        currentPassword: formData.currentPassword,
-        newPassword: formData.newPassword
-      };
-      
-      // Using a different method or approach to update password
-      await updateUser(passwordData as any);
+      await apiInstance.put('/user/password', {
+        current_password: formData.currentPassword,
+        new_password: formData.newPassword
+      });
       
       toast({
         title: "Password changed",
@@ -106,6 +129,8 @@ const Profile = () => {
         description: "There was an error changing your password. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,7 +170,7 @@ const Profile = () => {
                         <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
                       ) : (
                         <AvatarFallback className="text-2xl bg-gh-blue text-white">
-                          {currentUser?.name.charAt(0)}
+                          {currentUser?.name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       )}
                     </Avatar>
@@ -207,11 +232,11 @@ const Profile = () => {
                         </div>
                         
                         <div className="flex gap-2 justify-end mt-4">
-                          <Button variant="outline" onClick={() => setIsEditing(false)}>
+                          <Button variant="outline" onClick={() => setIsEditing(false)} disabled={loading}>
                             Cancel
                           </Button>
-                          <Button onClick={handleSaveProfile}>
-                            Save Changes
+                          <Button onClick={handleSaveProfile} disabled={loading}>
+                            {loading ? 'Saving...' : 'Save Changes'}
                           </Button>
                         </div>
                       </>
