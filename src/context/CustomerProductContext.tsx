@@ -1,8 +1,9 @@
 
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNotifications } from './NotificationContext';
+import { useAuth } from './AuthContext';
+import { apiInstance } from '../api/services/api';
 
-// Define the CustomerProduct type
 export interface CustomerProduct {
   id: string;
   sku: string;
@@ -15,124 +16,124 @@ export interface CustomerProduct {
   updatedAt: string;
 }
 
-// Mock data for customer products
-const mockCustomerProducts: CustomerProduct[] = [
-  {
-    id: '1',
-    sku: 'CP001',
-    qty: 5,
-    name: 'Premium Storage Box',
-    picture: '/lovable-uploads/d91b21ec-f9f8-4a7c-a56d-b27e4f102321.png',
-    description: 'High-quality storage box for secure storage',
-    customerId: '1',
-    createdAt: '2023-05-10T08:30:00Z',
-    updatedAt: '2023-05-10T08:30:00Z'
-  },
-  {
-    id: '2',
-    sku: 'CP002',
-    qty: 3,
-    name: 'Document Container',
-    description: 'Fireproof container for important documents',
-    customerId: '1',
-    createdAt: '2023-06-15T14:20:00Z',
-    updatedAt: '2023-06-15T14:20:00Z'
-  },
-  {
-    id: '3',
-    sku: 'CP003',
-    qty: 10,
-    name: 'Plastic Bin Large',
-    picture: '/placeholder.svg',
-    description: 'Large plastic bin for general storage needs',
-    customerId: '2',
-    createdAt: '2023-07-22T11:45:00Z',
-    updatedAt: '2023-07-22T11:45:00Z'
-  },
-];
-
-// Define the context type
 interface CustomerProductContextType {
   customerProducts: CustomerProduct[];
-  addCustomerProduct: (product: Omit<CustomerProduct, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateCustomerProduct: (id: string, updates: Partial<CustomerProduct>) => void;
-  deleteCustomerProduct: (id: string) => void;
+  loading: boolean;
+  error: string | null;
+  addCustomerProduct: (product: Omit<CustomerProduct, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateCustomerProduct: (id: string, updates: Partial<CustomerProduct>) => Promise<void>;
+  deleteCustomerProduct: (id: string) => Promise<void>;
   getCustomerProducts: (customerId?: string) => CustomerProduct[];
+  fetchCustomerProducts: () => Promise<void>;
 }
 
-// Create the context
 const CustomerProductContext = createContext<CustomerProductContextType>({} as CustomerProductContextType);
 
-// Create a hook to use the context
 export const useCustomerProducts = () => useContext(CustomerProductContext);
 
-// Create the provider component
 export const CustomerProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [customerProducts, setCustomerProducts] = useState<CustomerProduct[]>(mockCustomerProducts);
+  const [customerProducts, setCustomerProducts] = useState<CustomerProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { addNotification } = useNotifications();
+  const { user } = useAuth();
 
-  // Add a new customer product
-  const addCustomerProduct = (product: Omit<CustomerProduct, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
-    const newProduct: CustomerProduct = {
-      ...product,
-      id: Date.now().toString(),
-      createdAt: now,
-      updatedAt: now
-    };
+  const fetchCustomerProducts = async () => {
+    if (!user) return;
     
-    setCustomerProducts(prev => [...prev, newProduct]);
-    
-    // Send notification about new product
-    addNotification({
-      title: 'New Customer Product Added',
-      message: `${newProduct.name} has been added to customer's products`,
-      type: 'info',
-      for: ['1', '2'], // Admin, Manager
-    });
-  };
-
-  // Update an existing customer product
-  const updateCustomerProduct = (id: string, updates: Partial<CustomerProduct>) => {
-    setCustomerProducts(prev => 
-      prev.map(product => 
-        product.id === id 
-          ? { ...product, ...updates, updatedAt: new Date().toISOString() } 
-          : product
-      )
-    );
-    
-    // Get the updated product
-    const updatedProduct = customerProducts.find(p => p.id === id);
-    if (updatedProduct) {
-      // Send notification about update
-      addNotification({
-        title: 'Customer Product Updated',
-        message: `${updatedProduct.name} has been updated`,
-        type: 'success',
-        for: ['1', '2'], // Admin, Manager
-      });
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiInstance.get('/customer-products');
+      setCustomerProducts(response.data);
+    } catch (err: any) {
+      console.error('Error fetching customer products:', err);
+      setError('Failed to fetch customer products');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Delete a customer product
-  const deleteCustomerProduct = (id: string) => {
-    // Get the product before deleting
-    const productToDelete = customerProducts.find(p => p.id === id);
+  useEffect(() => {
+    if (user) {
+      fetchCustomerProducts();
+    }
+  }, [user]);
+
+  const addCustomerProduct = async (product: Omit<CustomerProduct, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) return;
     
-    setCustomerProducts(prev => prev.filter(product => product.id !== id));
-    
-    if (productToDelete) {
+    setLoading(true);
+    try {
+      const response = await apiInstance.post('/customer-products', product);
+      setCustomerProducts(prev => [...prev, response.data]);
+      
       addNotification({
-        title: 'Customer Product Deleted',
-        message: `${productToDelete.name} has been removed from customer's products`,
+        title: 'New Customer Product Added',
+        message: `${response.data.name} has been added to customer's products`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
+    } catch (err: any) {
+      console.error('Error adding customer product:', err);
+      setError('Failed to add customer product');
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Get customer products, optionally filtered by customer ID
+  const updateCustomerProduct = async (id: string, updates: Partial<CustomerProduct>) => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const response = await apiInstance.put(`/customer-products/${id}`, updates);
+      setCustomerProducts(prev => 
+        prev.map(product => 
+          product.id === id ? response.data : product
+        )
+      );
+      
+      addNotification({
+        title: 'Customer Product Updated',
+        message: `${response.data.name} has been updated`,
+        type: 'success',
+        for: ['1', '2'], // Admin, Manager
+      });
+    } catch (err: any) {
+      console.error('Error updating customer product:', err);
+      setError('Failed to update customer product');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteCustomerProduct = async (id: string) => {
+    if (!user) return;
+    
+    const productToDelete = customerProducts.find(p => p.id === id);
+    
+    try {
+      await apiInstance.delete(`/customer-products/${id}`);
+      setCustomerProducts(prev => prev.filter(product => product.id !== id));
+      
+      if (productToDelete) {
+        addNotification({
+          title: 'Customer Product Deleted',
+          message: `${productToDelete.name} has been removed from customer's products`,
+          type: 'info',
+          for: ['1', '2'], // Admin, Manager
+        });
+      }
+    } catch (err: any) {
+      console.error('Error deleting customer product:', err);
+      setError('Failed to delete customer product');
+      throw err;
+    }
+  };
+
   const getCustomerProducts = (customerId?: string): CustomerProduct[] => {
     if (customerId) {
       return customerProducts.filter(product => product.customerId === customerId);
@@ -143,10 +144,13 @@ export const CustomerProductProvider: React.FC<{ children: React.ReactNode }> = 
   return (
     <CustomerProductContext.Provider value={{ 
       customerProducts, 
+      loading,
+      error,
       addCustomerProduct, 
       updateCustomerProduct, 
       deleteCustomerProduct,
-      getCustomerProducts
+      getCustomerProducts,
+      fetchCustomerProducts
     }}>
       {children}
     </CustomerProductContext.Provider>

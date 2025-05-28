@@ -1,56 +1,20 @@
 
-import React, { createContext, useState, useContext } from 'react';
-import { Room, Customer } from '../types';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { Room } from '../types';
 import { useNotifications } from './NotificationContext';
-import { useCustomers } from './CustomerContext';
-
-// Mock room data
-const mockRooms: Room[] = [
-  {
-    id: '1',
-    customerId: '1',
-    customerName: 'Jane Smith',
-    name: 'Storage Room A',
-    description: 'Main storage area',
-    capacity: 100,
-    unit: '101',
-    units: [],
-    createdAt: '2023-04-15T08:30:00Z',
-    updatedAt: '2023-07-10T11:45:00Z'
-  },
-  {
-    id: '2',
-    customerId: '3',
-    customerName: 'Emily Davis',
-    name: 'Warehouse Space',
-    description: 'Large warehouse area',
-    capacity: 500,
-    unit: '203',
-    units: [],
-    createdAt: '2023-05-22T09:15:00Z',
-    updatedAt: '2023-08-05T14:20:00Z'
-  },
-  {
-    id: '3',
-    customerId: '2',
-    customerName: 'Michael Johnson',
-    name: 'Garden Shed',
-    description: 'Outdoor storage shed',
-    capacity: 25,
-    unit: '105',
-    units: [],
-    createdAt: '2023-06-18T13:40:00Z',
-    updatedAt: '2023-09-02T10:30:00Z'
-  }
-];
+import { useAuth } from './AuthContext';
+import { apiInstance } from '../api/services/api';
 
 interface RoomContextType {
   rooms: Room[];
-  addRoom: (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => void;
-  updateRoom: (id: string, updates: Partial<Room>) => void;
-  deleteRoom: (id: string) => void;
+  loading: boolean;
+  error: string | null;
+  addRoom: (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateRoom: (id: string, updates: Partial<Room>) => Promise<void>;
+  deleteRoom: (id: string) => Promise<void>;
   getRoomsByCustomerId: (customerId: string) => Room[];
   getRoomById: (id: string) => Room | undefined;
+  fetchRooms: () => Promise<void>;
 }
 
 const RoomContext = createContext<RoomContextType>({} as RoomContextType);
@@ -58,70 +22,102 @@ const RoomContext = createContext<RoomContextType>({} as RoomContextType);
 export const useRooms = () => useContext(RoomContext);
 
 export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [rooms, setRooms] = useState<Room[]>(mockRooms);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { addNotification } = useNotifications();
-  const { customers } = useCustomers();
+  const { user } = useAuth();
 
-  const getCustomerName = (customerId: string): string => {
-    const customer = customers.find(c => c.id === customerId);
-    return customer ? customer.name : 'Unknown Customer';
+  const fetchRooms = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiInstance.get('/rooms');
+      setRooms(response.data);
+    } catch (err: any) {
+      console.error('Error fetching rooms:', err);
+      setError('Failed to fetch rooms');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchRooms();
+    }
+  }, [user]);
 
   const getRoomById = (id: string): Room | undefined => {
     return rooms.find(room => room.id === id);
   };
 
-  const addRoom = (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
-    const customerName = getCustomerName(room.customerId || '');
+  const addRoom = async (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) return;
     
-    const newRoom: Room = {
-      ...room,
-      id: Date.now().toString(),
-      customerName,
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    setRooms(prev => [...prev, newRoom]);
-    
-    // Send notification about new room
-    addNotification({
-      title: 'New Room Added',
-      message: `Room "${newRoom.name}" has been added for ${customerName}`,
-      type: 'info',
-      for: ['1', '2'], // Admin, Manager
-    });
-  };
-
-  const updateRoom = (id: string, updates: Partial<Room>) => {
-    setRooms(prev => 
-      prev.map(room => 
-        room.id === id 
-          ? { 
-              ...room, 
-              ...updates, 
-              customerName: updates.customerId ? getCustomerName(updates.customerId) : room.customerName,
-              updatedAt: new Date().toISOString() 
-            } 
-          : room
-      )
-    );
-  };
-
-  const deleteRoom = (id: string) => {
-    const roomToDelete = rooms.find(room => room.id === id);
-    
-    if (roomToDelete) {
-      setRooms(prev => prev.filter(room => room.id !== id));
+    setLoading(true);
+    try {
+      const response = await apiInstance.post('/rooms', room);
+      setRooms(prev => [...prev, response.data]);
       
-      // Send notification about room deletion
       addNotification({
-        title: 'Room Deleted',
-        message: `Room "${roomToDelete.name}" has been removed from the system`,
+        title: 'New Room Added',
+        message: `Room "${response.data.name}" has been added`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
+    } catch (err: any) {
+      console.error('Error adding room:', err);
+      setError('Failed to add room');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateRoom = async (id: string, updates: Partial<Room>) => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const response = await apiInstance.put(`/rooms/${id}`, updates);
+      setRooms(prev => 
+        prev.map(room => 
+          room.id === id ? response.data : room
+        )
+      );
+    } catch (err: any) {
+      console.error('Error updating room:', err);
+      setError('Failed to update room');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteRoom = async (id: string) => {
+    if (!user) return;
+    
+    const roomToDelete = rooms.find(room => room.id === id);
+    
+    try {
+      await apiInstance.delete(`/rooms/${id}`);
+      setRooms(prev => prev.filter(room => room.id !== id));
+      
+      if (roomToDelete) {
+        addNotification({
+          title: 'Room Deleted',
+          message: `Room "${roomToDelete.name}" has been removed from the system`,
+          type: 'info',
+          for: ['1', '2'], // Admin, Manager
+        });
+      }
+    } catch (err: any) {
+      console.error('Error deleting room:', err);
+      setError('Failed to delete room');
+      throw err;
     }
   };
 
@@ -132,11 +128,14 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <RoomContext.Provider value={{ 
       rooms, 
+      loading,
+      error,
       addRoom, 
       updateRoom, 
       deleteRoom,
       getRoomsByCustomerId,
-      getRoomById
+      getRoomById,
+      fetchRooms
     }}>
       {children}
     </RoomContext.Provider>

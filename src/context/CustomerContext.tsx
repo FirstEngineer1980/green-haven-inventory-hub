@@ -1,58 +1,20 @@
 
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Customer } from '../types';
 import { useNotifications } from './NotificationContext';
-
-// Mock customer data
-const mockCustomers: Customer[] = [
-  {
-    id: '1',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    phone: '555-1234',
-    address: '123 Main St, Anytown',
-    company: 'ABC Corporation',
-    totalOrders: 15,
-    totalSpent: 2450.75,
-    status: 'active',
-    createdAt: '2023-03-10T10:30:00Z',
-    updatedAt: '2023-06-15T14:45:00Z'
-  },
-  {
-    id: '2',
-    name: 'Michael Johnson',
-    email: 'michael@example.com',
-    phone: '555-5678',
-    address: '456 Oak Ave, Somewhere',
-    company: 'XYZ Solutions',
-    totalOrders: 8,
-    totalSpent: 1280.50,
-    status: 'active',
-    createdAt: '2023-04-05T09:15:00Z',
-    updatedAt: '2023-07-20T11:30:00Z'
-  },
-  {
-    id: '3',
-    name: 'Emily Davis',
-    email: 'emily@example.com',
-    phone: '555-9012',
-    address: '789 Pine Blvd, Nowhere',
-    company: 'Tech Innovators',
-    totalOrders: 22,
-    totalSpent: 3750.25,
-    status: 'active',
-    createdAt: '2023-02-15T15:20:00Z',
-    updatedAt: '2023-08-10T16:40:00Z'
-  }
-];
+import { useAuth } from './AuthContext';
+import { apiInstance } from '../api/services/api';
 
 interface CustomerContextType {
   customers: Customer[];
-  addCustomer: (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateCustomer: (id: string, updates: Partial<Customer>) => void;
-  deleteCustomer: (id: string) => void;
+  loading: boolean;
+  error: string | null;
+  addCustomer: (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateCustomer: (id: string, updates: Partial<Customer>) => Promise<void>;
+  deleteCustomer: (id: string) => Promise<void>;
   getCustomerById: (id: string) => Customer | undefined;
-  toggleCustomerStatus: (id: string, status: 'active' | 'paused' | 'inactive') => void;
+  toggleCustomerStatus: (id: string, status: 'active' | 'paused' | 'inactive') => Promise<void>;
+  fetchCustomers: () => Promise<void>;
 }
 
 const CustomerContext = createContext<CustomerContextType>({} as CustomerContextType);
@@ -60,81 +22,133 @@ const CustomerContext = createContext<CustomerContextType>({} as CustomerContext
 export const useCustomers = () => useContext(CustomerContext);
 
 export const CustomerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { addNotification } = useNotifications();
+  const { user } = useAuth();
+
+  const fetchCustomers = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await apiInstance.get('/customers');
+      setCustomers(response.data);
+    } catch (err: any) {
+      console.error('Error fetching customers:', err);
+      setError('Failed to fetch customers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchCustomers();
+    }
+  }, [user]);
 
   const getCustomerById = (id: string): Customer | undefined => {
     return customers.find(customer => customer.id === id);
   };
 
-  const addCustomer = (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
+  const addCustomer = async (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) return;
     
-    const newCustomer: Customer = {
-      ...customer,
-      id: Date.now().toString(),
-      createdAt: now,
-      updatedAt: now,
-      totalOrders: customer.totalOrders || 0,
-      totalSpent: customer.totalSpent || 0,
-      status: customer.status || 'active'
-    };
-    
-    setCustomers(prev => [...prev, newCustomer]);
-    
-    // Send notification about new customer
-    addNotification({
-      title: 'New Customer Added',
-      message: `Customer ${newCustomer.name} from ${newCustomer.company || 'N/A'} has been added`,
-      type: 'info',
-      for: ['1', '2'], // Admin, Manager
-    });
-  };
-
-  const updateCustomer = (id: string, updates: Partial<Customer>) => {
-    setCustomers(prev => 
-      prev.map(customer => 
-        customer.id === id 
-          ? { ...customer, ...updates, updatedAt: new Date().toISOString() } 
-          : customer
-      )
-    );
-  };
-
-  const deleteCustomer = (id: string) => {
-    const customerToDelete = customers.find(customer => customer.id === id);
-    
-    if (customerToDelete) {
-      setCustomers(prev => prev.filter(customer => customer.id !== id));
+    setLoading(true);
+    try {
+      const response = await apiInstance.post('/customers', customer);
+      setCustomers(prev => [...prev, response.data]);
       
-      // Send notification about customer deletion
       addNotification({
-        title: 'Customer Deleted',
-        message: `Customer ${customerToDelete.name} has been removed from the system`,
+        title: 'New Customer Added',
+        message: `Customer ${response.data.name} from ${response.data.company || 'N/A'} has been added`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
+    } catch (err: any) {
+      console.error('Error adding customer:', err);
+      setError('Failed to add customer');
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const toggleCustomerStatus = (id: string, newStatus: 'active' | 'paused' | 'inactive') => {
-    setCustomers(prev => 
-      prev.map(customer => 
-        customer.id === id 
-          ? { ...customer, status: newStatus, updatedAt: new Date().toISOString() } 
-          : customer
-      )
-    );
+  const updateCustomer = async (id: string, updates: Partial<Customer>) => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const response = await apiInstance.put(`/customers/${id}`, updates);
+      setCustomers(prev => 
+        prev.map(customer => 
+          customer.id === id ? response.data : customer
+        )
+      );
+    } catch (err: any) {
+      console.error('Error updating customer:', err);
+      setError('Failed to update customer');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteCustomer = async (id: string) => {
+    if (!user) return;
+    
+    const customerToDelete = customers.find(customer => customer.id === id);
+    
+    try {
+      await apiInstance.delete(`/customers/${id}`);
+      setCustomers(prev => prev.filter(customer => customer.id !== id));
+      
+      if (customerToDelete) {
+        addNotification({
+          title: 'Customer Deleted',
+          message: `Customer ${customerToDelete.name} has been removed from the system`,
+          type: 'info',
+          for: ['1', '2'], // Admin, Manager
+        });
+      }
+    } catch (err: any) {
+      console.error('Error deleting customer:', err);
+      setError('Failed to delete customer');
+      throw err;
+    }
+  };
+
+  const toggleCustomerStatus = async (id: string, newStatus: 'active' | 'paused' | 'inactive') => {
+    if (!user) return;
+    
+    try {
+      const response = await apiInstance.put(`/customers/${id}`, { status: newStatus });
+      setCustomers(prev => 
+        prev.map(customer => 
+          customer.id === id ? response.data : customer
+        )
+      );
+    } catch (err: any) {
+      console.error('Error updating customer status:', err);
+      setError('Failed to update customer status');
+      throw err;
+    }
   };
 
   return (
     <CustomerContext.Provider value={{ 
       customers, 
+      loading,
+      error,
       addCustomer, 
       updateCustomer, 
       deleteCustomer,
       getCustomerById,
-      toggleCustomerStatus
+      toggleCustomerStatus,
+      fetchCustomers
     }}>
       {children}
     </CustomerContext.Provider>
