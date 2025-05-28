@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWizard } from '@/context/WizardContext';
 import { useRooms } from '@/context/RoomContext';
@@ -69,11 +68,14 @@ const RoomStep = () => {
     
     // Add all rooms
     roomForms.forEach(form => {
-      // Add new room
+      // Add new room with all required properties
       addRoom({
         customerId: selectedCustomer.id,
         name: form.name,
-        unit: form.unit
+        description: `Room for ${selectedCustomer.name}`,
+        capacity: 100, // Default capacity
+        unit: form.unit,
+        units: [] // Initialize empty units array
       });
       
       // Find the newly created room

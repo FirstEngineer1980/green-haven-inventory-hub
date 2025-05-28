@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
 import { useRooms } from '@/context/RoomContext';
@@ -28,6 +27,8 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
   const [rows, setRows] = useState<{ label: string; color: string; }[]>([]);
   const [newRowLabel, setNewRowLabel] = useState('');
   const [newRowColor, setNewRowColor] = useState('#FFFFFF');
+  
+  const [columns, setColumns] = useState<{ id: string; name: string; }[]>([]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -82,17 +83,32 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
       return;
     }
     
-    // Add IDs to rows
-    const rowsWithIds = rows.map((row, index) => ({
-      id: `row-${Date.now()}-${index}`,
-      label: row.label,
-      color: row.color,
-      cells: [] // Cells will be created in the context
-    }));
+    // Add IDs to rows and create cells for each row
+    const timestamp = Date.now();
+    const rowsWithIds = rows.map((row, index) => {
+      const rowId = `row-${timestamp}-${index}`;
+      
+      // Create cells for each column in this row
+      const cellsForRow = columns.map(column => ({
+        id: `${rowId}-${column.id}`,
+        columnId: column.id,
+        value: '',
+        content: ''
+      }));
+      
+      return {
+        id: rowId,
+        name: row.label, // Add the missing name property
+        label: row.label,
+        color: row.color,
+        cells: cellsForRow
+      };
+    });
     
     addUnitMatrix({
       name: formData.name,
       roomId: formData.roomId,
+      description: '',
       rows: rowsWithIds,
     });
     

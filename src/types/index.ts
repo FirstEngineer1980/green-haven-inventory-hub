@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -33,16 +32,21 @@ export interface Category {
   name: string;
   description: string;
   productCount: number;
+  createdAt?: string;
 }
 
 export interface Promotion {
   id: string;
   name: string;
+  title?: string;
   description: string;
   startDate: string;
+  start_date?: string;
   endDate: string;
+  end_date?: string;
   discount: number;
   products: string[]; // Array of product IDs
+  active?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -92,6 +96,8 @@ export interface StockMovement {
   date: string;
   createdAt: string;
   userId: string;
+  description?: string;
+  performedBy?: string;
 }
 
 export interface Customer {
@@ -104,6 +110,7 @@ export interface Customer {
   totalOrders?: number;
   totalSpent?: number;
   status?: string;
+  notes?: string;
   createdAt: string;
   updatedAt?: string;
 }

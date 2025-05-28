@@ -35,24 +35,24 @@ type UserFormValues = z.infer<typeof userFormSchema>;
 
 interface UserFormProps {
   onSubmit: (data: UserFormValues) => void;
-  defaultValues?: Partial<UserFormValues>;
+  defaultValues?: Partial<User>;
   isSubmitting: boolean;
 }
 
 const UserForm: React.FC<UserFormProps> = ({ 
   onSubmit, 
-  defaultValues = {
-    name: '',
-    email: '',
-    role: 'viewer',
-    permissions: [],
-    avatar: '',
-  }, 
+  defaultValues, 
   isSubmitting 
 }) => {
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
-    defaultValues,
+    defaultValues: {
+      name: defaultValues?.name || '',
+      email: defaultValues?.email || '',
+      role: (defaultValues?.role === 'employee' ? 'staff' : defaultValues?.role) || 'viewer',
+      permissions: defaultValues?.permissions || [],
+      avatar: defaultValues?.avatar || '',
+    },
   });
 
   const role = form.watch('role');
