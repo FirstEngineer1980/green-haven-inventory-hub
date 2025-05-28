@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '@/pages/Dashboard';
 import SellersPage from '@/pages/crm/SellersPage';
 import SellerCommissionPage from '@/pages/crm/SellerCommissionPage';
+import ExportImportManager from '@/pages/ExportImportManager';
 import { useAuth } from '@/context/AuthContext';
 
 const AppRoutes: React.FC = () => {
@@ -19,6 +20,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/crm/sellers" element={<SellersPage />} />
       <Route path="/crm/commission" element={<SellerCommissionPage />} />
+      <Route path="/data-management" element={<ExportImportManager />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

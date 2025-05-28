@@ -29,6 +29,7 @@ use App\Http\Controllers\ClientOrderTemplateController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\SellerCommissionController;
+use App\Http\Controllers\ExportImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +60,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // Export/Import routes
+    Route::get('/export/{type}', [ExportImportController::class, 'export']);
+    Route::post('/import/{type}', [ExportImportController::class, 'import']);
+    Route::get('/export-logs', [ExportImportController::class, 'exportLogs']);
 
     // Products
     Route::apiResource('products', ProductController::class);
