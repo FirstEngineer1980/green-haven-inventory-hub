@@ -13,6 +13,7 @@ const binSchema = z.object({
   length: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Length must be a positive number'),
   width: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Width must be a positive number'),
   height: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, 'Height must be a positive number'),
+  location: z.string().min(1, 'Location is required'),
 });
 
 type BinFormValues = z.infer<typeof binSchema>;
@@ -35,6 +36,7 @@ export const BinForm: React.FC<BinFormProps> = ({
       length: defaultValues.length?.toString() || '',
       width: defaultValues.width?.toString() || '',
       height: defaultValues.height?.toString() || '',
+      location: defaultValues.location || '',
     }
   });
 
@@ -44,8 +46,12 @@ export const BinForm: React.FC<BinFormProps> = ({
       length: Number(values.length),
       width: Number(values.width),
       height: Number(values.height),
+      location: values.location,
       unitMatrixId: defaultValues.unitMatrixId,
-      roomId: defaultValues.roomId
+      roomId: defaultValues.roomId,
+      status: defaultValues.status || 'active',
+      currentStock: 0,
+      products: []
     });
   };
 
@@ -60,6 +66,20 @@ export const BinForm: React.FC<BinFormProps> = ({
               <FormLabel>Bin Name</FormLabel>
               <FormControl>
                 <Input placeholder="Enter bin name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter location" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

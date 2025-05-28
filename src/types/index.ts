@@ -3,7 +3,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'employee';
+  role: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
   avatar?: string;
   phone?: string;
   position?: string;
@@ -57,11 +57,7 @@ export interface Notification {
   read: boolean;
 }
 
-export interface Permission {
-  id: string;
-  name: string;
-  description: string;
-}
+export type Permission = string;
 
 export interface Role {
   id: string;
@@ -114,6 +110,7 @@ export interface Room {
   customerId: string;
   customerName?: string;
   capacity: number;
+  unit?: string; // Single unit identifier
   units: Unit[];
   createdAt: string;
   updatedAt: string;
@@ -122,9 +119,17 @@ export interface Room {
 export interface Unit {
   id: string;
   name: string;
+  number?: string;
   roomId: string;
+  roomName?: string;
   capacity: number;
   currentStock: number;
+  size?: number;
+  sizeUnit?: string;
+  status?: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PurchaseOrder {
@@ -169,7 +174,10 @@ export interface UnitMatrix {
   name: string;
   description: string;
   roomId?: string;
+  roomName?: string;
   rows: UnitMatrixRow[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UnitMatrixRow {
@@ -187,4 +195,16 @@ export interface UnitMatrixCell {
   columnId?: string;
   productId?: string;
   quantity?: number;
+}
+
+export interface CustomerProduct {
+  id: string;
+  name: string;
+  sku: string;
+  qty: number;
+  picture?: string;
+  description?: string;
+  customerId: string;
+  createdAt: string;
+  updatedAt: string;
 }

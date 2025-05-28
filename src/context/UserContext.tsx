@@ -12,6 +12,7 @@ interface UserContextType {
   updateUser: (id: string, user: Partial<User>) => void;
   deleteUser: (id: string) => void;
   getUserById: (id: string) => User | undefined;
+  getRolePermissions: (role: string) => string[];
 }
 
 const UserContext = createContext<UserContextType>({} as UserContextType);
@@ -28,6 +29,21 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Initialize with mock data - in a real app, this would fetch from API
     setUsers(mockUsers);
   }, []);
+
+  const getRolePermissions = (role: string): string[] => {
+    switch (role) {
+      case 'admin':
+        return ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'];
+      case 'manager':
+        return ['manage_products', 'view_reports', 'manage_inventory'];
+      case 'staff':
+        return ['manage_products', 'manage_inventory'];
+      case 'viewer':
+        return ['view_reports'];
+      default:
+        return [];
+    }
+  };
 
   const addUser = (userData: Omit<User, 'id'>) => {
     const newUser: User = {
@@ -60,7 +76,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     // Manager can see managers and employees
     if (currentUser.role === 'manager') {
-      return user.role === 'manager' || user.role === 'employee';
+      return user.role === 'manager' || user.role === 'employee' || user.role === 'staff';
     }
     
     // Employee can only see themselves
@@ -75,6 +91,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     updateUser,
     deleteUser,
     getUserById,
+    getRolePermissions,
   };
 
   return (

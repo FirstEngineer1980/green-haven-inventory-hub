@@ -21,8 +21,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useUsers } from '@/context/UserContext';
-import { Role, Permission, User } from '@/types';
+import { User } from '@/types';
 
 const userFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -51,18 +50,33 @@ const UserForm: React.FC<UserFormProps> = ({
   }, 
   isSubmitting 
 }) => {
-  const { getRolePermissions } = useUsers();
-  
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues,
   });
 
-  const role = form.watch('role') as Role;
+  const role = form.watch('role');
+
+  // Default permissions for each role
+  const getRolePermissions = (role: string): string[] => {
+    switch (role) {
+      case 'admin':
+        return ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'];
+      case 'manager':
+        return ['manage_products', 'view_reports', 'manage_inventory'];
+      case 'staff':
+        return ['manage_products', 'manage_inventory'];
+      case 'viewer':
+        return ['view_reports'];
+      default:
+        return [];
+    }
+  };
+
   const defaultPermissions = getRolePermissions(role);
 
   // All possible permissions
-  const allPermissions: Permission[] = ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'];
+  const allPermissions: string[] = ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'];
 
   return (
     <Form {...form}>
@@ -106,7 +120,7 @@ const UserForm: React.FC<UserFormProps> = ({
                   field.onChange(value);
                   
                   // When role changes, update permissions to the default for that role
-                  const permissions = getRolePermissions(value as Role);
+                  const permissions = getRolePermissions(value);
                   form.setValue('permissions', permissions);
                 }}
                 value={field.value}
