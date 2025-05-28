@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
-
 // Define types
 type AuthUser = {
   id: string;
@@ -44,8 +43,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await authService.getCurrentUser();
-          setUser(response.data);
+          const response = await authService.getUser();
+          setUser(response);
         } catch (error) {
           console.error('Authentication error:', error);
           localStorage.removeItem('token');
@@ -62,11 +61,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const response = await authService.login(email, password);
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data.user);
+      localStorage.setItem('token', response.token);
+      setUser(response.user);
       toast({
         title: "Login successful",
-        description: `Welcome back, ${response.data.user.name}!`,
+        description: `Welcome back, ${response.user.name}!`,
       });
     } catch (error: any) {
       console.error('Login error:', error);
@@ -99,21 +98,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+
   // Register function
   const register = async (name: string, email: string, password: string, passwordConfirmation: string) => {
     setIsLoading(true);
     try {
-      const response = await authService.register({ 
-        name, 
-        email, 
-        password, 
-        password_confirmation: passwordConfirmation 
-      });
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data.user);
+      // Call the register API with the correct arguments
+      const response = await authService.register(email, name, password, passwordConfirmation);
+      // Store the token and user data
+      localStorage.setItem('token', response.token); // Ensure the backend returns 'token'
+      setUser(response.user); // Ensure the backend returns 'user'
       toast({
         title: "Registration successful",
-        description: `Welcome, ${response.data.user.name}!`,
+        description: `Welcome, ${response.user.name}!`,
       });
     } catch (error: any) {
       console.error('Registration error:', error);

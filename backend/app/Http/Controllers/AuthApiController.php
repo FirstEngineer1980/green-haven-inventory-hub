@@ -1,57 +1,42 @@
-
 <?php
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use App\Models\User;
+use Illuminate\Validation\ValidationException;
 
-class AuthController extends Controller
+class AuthApiController extends Controller
 {
     /**
-     * Login user and create token
+     * Handle user login request
      *
-     * @param  [string] email
-     * @param  [string] password
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $tokenResult = $user->createToken('Personal Access Token');
             $token = $tokenResult->accessToken;
 
-            // Load permissions for the user
-            $permissions = $user->getAllPermissions()->pluck('name')->toArray();
-            $userData = $user->toArray();
-            $userData['permissions'] = $permissions;
-
             return response()->json([
-                'message' => 'Login successful',
+                'user' => $user,
                 'token' => $token,
-                'user' => $userData,
+                'message' => 'Login successful'
             ]);
-        } else {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
         }
+
+        throw ValidationException::withMessages([
+            'email' => ['The provided credentials are incorrect.'],
+        ]);
     }
 
     /**
@@ -102,31 +87,31 @@ class AuthController extends Controller
             'user' => $userData,
         ], 201);
     }
-
     /**
-     * Logout user (Revoke the token)
+     * Handle user logout request
      *
-     * @param  Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return \Illuminate\Http\Response
      */
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
+        $request->user()->currentAccessToken()->delete();
+
         return response()->json([
-            'message' => 'Successfully logged out'
+            'message' => 'Logged out successfully'
         ]);
     }
 
     /**
-     * Get the authenticated User
+     * Get authenticated user details
      *
-     * @param  Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return \Illuminate\Http\Response
      */
     public function user(Request $request)
     {
         $user = $request->user();
-        
+
         // Load permissions for the user
         $permissions = $user->getAllPermissions()->pluck('name')->toArray();
         $userData = $user->toArray();

@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -55,7 +54,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Customer::class);
     }
-    
+
     /**
      * Check if user has a specific permission
      */

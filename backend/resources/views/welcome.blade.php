@@ -56,19 +56,19 @@
 <body>
     <div class="container">
         <h1>Welcome to Inventory System</h1>
-        
+
         <div class="status-card">
             <h2>System Status</h2>
             <div class="info">
-                Database Connection: 
-                @if($dbStatus)
-                    <span class="status status-success">Connected</span>
-                @else
-                    <span class="status status-error">Not Connected</span>
-                @endif
+                Database Connection:
+{{--                @if($dbStatus)--}}
+{{--                    <span class="status status-success">Connected</span>--}}
+{{--                @else--}}
+{{--                    <span class="status status-error">Not Connected</span>--}}
+{{--                @endif--}}
             </div>
-            <div class="info">PHP Version: {{ $phpVersion }}</div>
-            <div class="info">Laravel Version: {{ $laravelVersion }}</div>
+{{--            <div class="info">PHP Version: {{ $phpVersion }}</div>--}}
+{{--            <div class="info">Laravel Version: {{ $laravelVersion }}</div>--}}
         </div>
 
         <div class="status-card">

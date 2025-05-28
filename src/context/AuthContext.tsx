@@ -1,234 +1,127 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Permission } from '@/types';
-import axios from 'axios';
-import { authService } from '@/services/api';
-import { useToast } from '@/hooks/use-toast';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { login as loginService, logout as logoutService, getCurrentUser } from '@/api/services/authService';
+import { User } from '@/api/types/authTypes';
+import { toast } from 'sonner';
+import { useTranslation } from './TranslationContext';
+import { addLanguageToPath } from '@/i18n/languageUtils';
 
-interface UpdateUserParams {
-  name?: string;
-  email?: string;
-  phone?: string;
-  position?: string;
-  currentPassword?: string;
-  newPassword?: string;
-}
-
-interface AuthContextType {
-  isAuthenticated: boolean;
+interface AuthContextProps {
+  user: User | null;
   isLoading: boolean;
-  currentUser: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  hasPermission: (permission: Permission) => boolean;
-  updateUser: (userData: UpdateUserParams) => Promise<boolean>;
+  isAuthenticated: boolean;
+  token: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  hasPermission: (permission: string) => boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: false,
-  isLoading: true,
-  currentUser: null,
-  login: () => Promise.resolve(false),
-  logout: () => {},
-  hasPermission: () => false,
-  updateUser: () => Promise.resolve(false)
-});
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { currentLanguage } = useTranslation();
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const { toast } = useToast();
+  // Derived state for authentication status
+  const isAuthenticated = !!user && !!token;
 
   useEffect(() => {
-    const checkAuth = async () => {
-      setIsLoading(true);
-      const token = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('currentUser');
-      
-      if (token) {
-        if (storedUser) {
-          setCurrentUser(JSON.parse(storedUser));
-          setIsAuthenticated(true);
+    const checkAuthStatus = async () => {
+      try {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+          setToken(storedToken);
+          const userData = await getCurrentUser();
+          setUser(userData);
         } else {
-          try {
-            const response = await authService.getCurrentUser();
-            setCurrentUser(response.data);
-            localStorage.setItem('currentUser', JSON.stringify(response.data));
-            setIsAuthenticated(true);
-          } catch (error) {
-            console.error('Failed to fetch user data:', error);
-            localStorage.removeItem('token');
-            setIsAuthenticated(false);
-          }
+          setUser(null); // Explicitly set user to null if no token
         }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        localStorage.removeItem('token');
+        setToken(null);
+        setUser(null);
+        // Avoid redirect here to prevent immediate logout after login
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
-    
-    checkAuth();
+
+    checkAuthStatus();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const loginHandler = async (email: string, password: string): Promise<void> => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      
-      if (email.includes('@greenhaven.com') || email.includes('@example.com')) {
-        if (email === 'admin@example.com' || email === 'admin@greenhaven.com') {
-          const demoUser: User = {
-            id: '1',
-            name: 'Admin User',
-            email: email,
-            role: 'admin',
-            permissions: ['manage_users', 'manage_products', 'view_reports', 'manage_inventory', 'manage_notifications'],
-            avatar: 'https://i.pravatar.cc/150?img=1',
-            createdAt: new Date().toISOString(),
-            lastActive: new Date().toISOString()
-          };
-          setCurrentUser(demoUser);
-          setIsAuthenticated(true);
-          localStorage.setItem('currentUser', JSON.stringify(demoUser));
-          localStorage.setItem('token', 'demo-token-admin');
-          
-          toast({
-            title: "Login successful",
-            description: `Welcome back, ${demoUser.name}!`,
-          });
-          
-          return true;
-        } else if (email === 'manager@example.com' || email === 'john@greenhaven.com') {
-          const demoUser: User = {
-            id: '2',
-            name: 'Manager User',
-            email: email,
-            role: 'manager',
-            permissions: ['manage_products', 'view_reports', 'manage_inventory'],
-            avatar: 'https://i.pravatar.cc/150?img=2',
-            createdAt: new Date().toISOString(),
-            lastActive: new Date().toISOString()
-          };
-          setCurrentUser(demoUser);
-          setIsAuthenticated(true);
-          localStorage.setItem('currentUser', JSON.stringify(demoUser));
-          localStorage.setItem('token', 'demo-token-manager');
-          return true;
-        } else if (email === 'staff@example.com' || email === 'sarah@greenhaven.com') {
-          const demoUser: User = {
-            id: '3',
-            name: 'Staff User',
-            email: email,
-            role: 'staff',
-            permissions: ['view_reports', 'manage_inventory'],
-            avatar: 'https://i.pravatar.cc/150?img=3',
-            createdAt: new Date().toISOString(),
-            lastActive: new Date().toISOString()
-          };
-          setCurrentUser(demoUser);
-          setIsAuthenticated(true);
-          localStorage.setItem('currentUser', JSON.stringify(demoUser));
-          localStorage.setItem('token', 'demo-token-staff');
-          return true;
-        } else if (email === 'viewer@example.com' || email === 'michael@greenhaven.com') {
-          const demoUser: User = {
-            id: '4',
-            name: 'Viewer User',
-            email: email,
-            role: 'viewer',
-            permissions: ['view_reports'],
-            createdAt: new Date().toISOString(),
-            lastActive: new Date().toISOString()
-          };
-          setCurrentUser(demoUser);
-          setIsAuthenticated(true);
-          localStorage.setItem('currentUser', JSON.stringify(demoUser));
-          localStorage.setItem('token', 'demo-token-viewer');
-          return true;
-        }
-      }
-      
-      try {
-        const response = await authService.login(email, password);
-        localStorage.setItem('token', response.data.token);
-        setCurrentUser(response.data.user);
-        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
-        setIsAuthenticated(true);
-        
-        toast({
-          title: "Login successful",
-          description: `Welcome back, ${response.data.user.name}!`,
-        });
-        
-        return true;
-      } catch (error: any) {
-        console.error('Login error:', error);
-        
-        toast({
-          title: "Login failed",
-          description: error.response?.data?.message || "Invalid credentials",
-          variant: "destructive",
-        });
-        
-        return false;
-      }
+      const response = await loginService(email, password);
+      const newToken = response.access_token || '';
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
+      setUser(response.user);
+
+      // Use the language parameter in the URL if it exists
+      navigate(addLanguageToPath('/dashboard', currentLanguage));
+      toast.success('Login successful');
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Login failed. Please check your credentials.');
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updateUser = async (userData: UpdateUserParams): Promise<boolean> => {
+  const logoutHandler = async (): Promise<void> => {
+    setIsLoading(true);
     try {
-      if (currentUser && (currentUser.email.includes('@greenhaven.com') || currentUser?.email.includes('@example.com'))) {
-        const updatedUser = { ...currentUser, ...userData };
-        setCurrentUser(updatedUser);
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        return true;
-      }
-      
-      const response = await axios.put(`/api/users/${currentUser?.id}`, userData);
-      const updatedUser = response.data;
-      
-      setCurrentUser(prev => prev ? { ...prev, ...updatedUser } : null);
-      localStorage.setItem('currentUser', JSON.stringify({ ...currentUser, ...updatedUser }));
-      
-      return true;
-    } catch (error) {
-      console.error('Update user error:', error);
-      return false;
-    }
-  };
-
-  const logout = () => {
-    setCurrentUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('token');
-    
-    try {
-      authService.logout().catch(err => console.error('Logout API error:', err));
+      await logoutService();
+      localStorage.removeItem('token');
+      setToken(null);
+      setUser(null);
+      navigate(addLanguageToPath('/login', currentLanguage));
+      toast.success('Logged out successfully');
     } catch (error) {
       console.error('Logout error:', error);
+      // Even if server logout fails, clear local data
+      localStorage.removeItem('token');
+      setToken(null);
+      setUser(null);
+      navigate(addLanguageToPath('/login', currentLanguage));
+      toast.error('Error during logout. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const hasPermission = (permission: Permission): boolean => {
-    if (!currentUser) return false;
-    return currentUser.permissions.includes(permission);
+  // Simple permission check function
+  const hasPermission = (permission: string): boolean => {
+    // For now, just check if the user exists
+    // In a real app, this would check user roles or permissions
+    return !!user;
   };
 
-  return (
-    <AuthContext.Provider value={{
-      isAuthenticated,
-      isLoading,
-      currentUser,
-      login,
-      logout,
-      hasPermission,
-      updateUser
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const authContextValue: AuthContextProps = {
+    user,
+    isLoading,
+    isAuthenticated,
+    token,
+    login: loginHandler,
+    logout: logoutHandler,
+    hasPermission
+  };
+
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = (): AuthContextProps => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

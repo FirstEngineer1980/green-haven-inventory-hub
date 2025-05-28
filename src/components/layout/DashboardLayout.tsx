@@ -13,18 +13,26 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, requiredPermission }) => {
-  const { isAuthenticated, hasPermission } = useAuth();
+  // const { isAuthenticated, hasPermission } = useAuth();
   const isMobile = useIsMobile();
+  const { user, isLoading } = useAuth();
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+  if (isLoading) {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+    );
   }
 
-  // Check for required permission
-  if (requiredPermission && !hasPermission(requiredPermission)) {
-    return <Navigate to="/unauthorized" />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
+  // Check for required permission
+  // if (requiredPermission && !hasPermission(requiredPermission)) {
+  //   return <Navigate to="/unauthorized" />;
+  // }
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>

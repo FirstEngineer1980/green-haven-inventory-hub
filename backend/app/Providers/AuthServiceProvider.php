@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Providers;
@@ -26,8 +25,8 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Register Passport routes
-        Passport::routes();
-        
+//        Passport::routes();
+
         // Define token scopes if needed
         Passport::tokensCan([
             'view-products' => 'View products',
@@ -42,14 +41,14 @@ class AuthServiceProvider extends ServiceProvider
             'view-customers' => 'View customers',
             'manage-customers' => 'Create, update and delete customers',
         ]);
-        
+
         // Set default scope
         Passport::setDefaultScope([
             'view-products',
             'view-promotions',
             'view-customers',
         ]);
-        
+
         // Set token expiration (optional)
         Passport::tokensExpireIn(now()->addDays(15));
         Passport::refreshTokensExpireIn(now()->addDays(30));

@@ -1,10 +1,9 @@
-
 <?php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthApiController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerProductController;
 use App\Http\Controllers\CustomerListController;
@@ -41,8 +40,15 @@ use App\Http\Controllers\PromotionController;
 */
 
 // Public routes
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::any('/login', [AuthApiController::class, 'login']);
+
+// Stripe routes
+Route::post('/create-checkout-session', [StripeController::class, 'createCheckoutSession']);
+Route::get('/checkout-success', [StripeController::class, 'handleSuccess']);
+
+// Public routes
+Route::post('/login', [AuthApiController::class, 'login']);
+Route::post('/register', [AuthApiController::class, 'register']);
 Route::get('/csrf-cookie', function() {
     return response()->json(['message' => 'CSRF cookie set']);
 });
@@ -54,8 +60,9 @@ Route::get('/checkout-success', [StripeController::class, 'handleSuccess']);
 // Protected routes
 Route::middleware('auth:api')->group(function () {
     // User routes
-    Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
     Route::apiResource('users', UserController::class);
 
     // Profile routes
