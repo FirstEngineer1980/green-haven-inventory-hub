@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -190,7 +189,6 @@ const PurchaseOrders = () => {
           open={showEditDialog}
           onOpenChange={setShowEditDialog}
           purchaseOrder={selectedPurchaseOrder}
-          onSubmit={handleUpdatePurchaseOrder}
         />
       )}
     </DashboardLayout>

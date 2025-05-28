@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 import { CONFIG } from 'src/config-global';
@@ -82,12 +81,78 @@ const Dashboard = () => {
 
   // Define recentMovements with correct StockMovement type
   const [recentMovements] = useState<StockMovement[]>([
-    { id: '1', productId: 'p1', productName: 'Desk Chair', type: 'in', quantity: 10, date: '2023-06-12T15:30:00Z', reason: 'restock', performedBy: 'user1' },
-    { id: '2', productId: 'p2', productName: 'Desk Lamp', type: 'out', quantity: 5, date: '2023-06-11T13:45:00Z', reason: 'sale', performedBy: 'user2' },
-    { id: '3', productId: 'p3', productName: 'Notebook', type: 'in', quantity: 50, date: '2023-06-10T09:20:00Z', reason: 'restock', performedBy: 'user1' },
-    { id: '4', productId: 'p4', productName: 'Monitor', type: 'out', quantity: 8, date: '2023-06-09T14:15:00Z', reason: 'sale', performedBy: 'user3' },
-    { id: '5', productId: 'p5', productName: 'Keyboard', type: 'out', quantity: 12, date: '2023-06-08T11:30:00Z', reason: 'sale', performedBy: 'user2' },
-    { id: '6', productId: 'p6', productName: 'Mouse', type: 'in', quantity: 25, date: '2023-06-07T10:00:00Z', reason: 'restock', performedBy: 'user1' },
+    { 
+      id: '1', 
+      productId: 'p1', 
+      productName: 'Desk Chair', 
+      type: 'in', 
+      quantity: 10, 
+      date: '2023-06-12T15:30:00Z', 
+      reason: 'restock', 
+      performedBy: 'user1',
+      createdAt: '2023-06-12T15:30:00Z',
+      userId: 'user1'
+    },
+    { 
+      id: '2', 
+      productId: 'p2', 
+      productName: 'Desk Lamp', 
+      type: 'out', 
+      quantity: 5, 
+      date: '2023-06-11T13:45:00Z', 
+      reason: 'sale', 
+      performedBy: 'user2',
+      createdAt: '2023-06-11T13:45:00Z',
+      userId: 'user2'
+    },
+    { 
+      id: '3', 
+      productId: 'p3', 
+      productName: 'Notebook', 
+      type: 'in', 
+      quantity: 50, 
+      date: '2023-06-10T09:20:00Z', 
+      reason: 'restock', 
+      performedBy: 'user1',
+      createdAt: '2023-06-10T09:20:00Z',
+      userId: 'user1'
+    },
+    { 
+      id: '4', 
+      productId: 'p4', 
+      productName: 'Monitor', 
+      type: 'out', 
+      quantity: 8, 
+      date: '2023-06-09T14:15:00Z', 
+      reason: 'sale', 
+      performedBy: 'user3',
+      createdAt: '2023-06-09T14:15:00Z',
+      userId: 'user3'
+    },
+    { 
+      id: '5', 
+      productId: 'p5', 
+      productName: 'Keyboard', 
+      type: 'out', 
+      quantity: 12, 
+      date: '2023-06-08T11:30:00Z', 
+      reason: 'sale', 
+      performedBy: 'user2',
+      createdAt: '2023-06-08T11:30:00Z',
+      userId: 'user2'
+    },
+    { 
+      id: '6', 
+      productId: 'p6', 
+      productName: 'Mouse', 
+      type: 'in', 
+      quantity: 25, 
+      date: '2023-06-07T10:00:00Z', 
+      reason: 'restock', 
+      performedBy: 'user1',
+      createdAt: '2023-06-07T10:00:00Z',
+      userId: 'user1'
+    },
   ]);
 
   return (

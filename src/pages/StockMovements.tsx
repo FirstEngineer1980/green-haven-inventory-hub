@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,7 +25,9 @@ const mockStockMovements: StockMovement[] = [
     type: 'in',
     reason: 'Restocking',
     performedBy: 'John Doe',
-    date: '2023-08-15T10:30:00Z'
+    date: '2023-08-15T10:30:00Z',
+    createdAt: '2023-08-15T10:30:00Z',
+    userId: 'user1'
   },
   {
     id: '2',
@@ -36,7 +37,9 @@ const mockStockMovements: StockMovement[] = [
     type: 'out',
     reason: 'Customer order #12345',
     performedBy: 'John Doe',
-    date: '2023-08-14T14:45:00Z'
+    date: '2023-08-14T14:45:00Z',
+    createdAt: '2023-08-14T14:45:00Z',
+    userId: 'user1'
   },
   {
     id: '3',
@@ -46,7 +49,9 @@ const mockStockMovements: StockMovement[] = [
     type: 'in',
     reason: 'Purchase order #789',
     performedBy: 'Jane Smith',
-    date: '2023-08-13T09:15:00Z'
+    date: '2023-08-13T09:15:00Z',
+    createdAt: '2023-08-13T09:15:00Z',
+    userId: 'user2'
   },
   {
     id: '4',
@@ -56,7 +61,9 @@ const mockStockMovements: StockMovement[] = [
     type: 'out',
     reason: 'Internal use',
     performedBy: 'Jane Smith',
-    date: '2023-08-12T16:20:00Z'
+    date: '2023-08-12T16:20:00Z',
+    createdAt: '2023-08-12T16:20:00Z',
+    userId: 'user2'
   },
   {
     id: '5',
@@ -66,7 +73,9 @@ const mockStockMovements: StockMovement[] = [
     type: 'in',
     reason: 'Supplier delivery',
     performedBy: 'John Doe',
-    date: '2023-08-11T11:10:00Z'
+    date: '2023-08-11T11:10:00Z',
+    createdAt: '2023-08-11T11:10:00Z',
+    userId: 'user1'
   }
 ];
 
@@ -151,7 +160,9 @@ const StockMovements = () => {
       type: formData.type,
       reason: formData.reason,
       performedBy: 'John Doe', // Would come from auth context in a real app
-      date: formData.date.toISOString()
+      date: formData.date.toISOString(),
+      createdAt: formData.date.toISOString(),
+      userId: 'user1'
     };
     
     setStockMovements(prev => [newMovement, ...prev]);
