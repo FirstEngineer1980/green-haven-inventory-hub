@@ -1,4 +1,3 @@
-
 <?php
 
 namespace Database\Seeders;
@@ -51,7 +50,7 @@ class PromotionSeeder extends Seeder
 
         foreach ($promotions as $promotionData) {
             $promotion = Promotion::create($promotionData);
-            
+
             // Attach some random products to each promotion
             $categoryNames = $promotionData['categories'];
             $products = Product::whereHas('category', function ($query) use ($categoryNames) {
@@ -60,7 +59,7 @@ class PromotionSeeder extends Seeder
             ->inRandomOrder()
             ->limit(rand(3, 8))
             ->get();
-            
+
             $promotion->products()->attach($products->pluck('id'));
         }
     }
