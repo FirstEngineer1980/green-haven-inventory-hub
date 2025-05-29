@@ -102,12 +102,12 @@ const AddSellerDialog: React.FC<AddSellerDialogProps> = ({ open, onOpenChange, o
 
           <div>
             <Label htmlFor="leader_id">Leader</Label>
-            <Select onValueChange={(value) => setValue('leader_id', value)}>
+            <Select onValueChange={(value) => setValue('leader_id', value === "none" ? undefined : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a leader" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No leader</SelectItem>
+                <SelectItem value="none">No leader</SelectItem>
                 {users.map((user) => (
                   <SelectItem key={user.id} value={user.id.toString()}>
                     {user.name}
