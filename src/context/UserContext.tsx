@@ -33,10 +33,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setError(null);
     try {
       const response = await apiInstance.get('/users');
-      setUsers(response.data);
+      // Ensure we always set an array, even if response is malformed
+      const data = Array.isArray(response.data) ? response.data : [];
+      setUsers(data);
     } catch (err: any) {
       console.error('Error fetching users:', err);
       setError('Failed to fetch users');
+      // Set empty array on error to prevent map errors
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -69,7 +73,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     try {
       const response = await apiInstance.post('/users', userData);
-      setUsers(prev => [...prev, response.data]);
+      setUsers(prev => Array.isArray(prev) ? [...prev, response.data] : [response.data]);
     } catch (err: any) {
       console.error('Error adding user:', err);
       setError('Failed to add user');
@@ -86,7 +90,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await apiInstance.put(`/users/${id}`, userData);
       setUsers(prev =>
-        prev.map(user => (user.id.toString() === id ? response.data : user))
+        Array.isArray(prev) ? prev.map(user => (user.id.toString() === id ? response.data : user)) : [response.data]
       );
     } catch (err: any) {
       console.error('Error updating user:', err);
@@ -102,7 +106,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     try {
       await apiInstance.delete(`/users/${id}`);
-      setUsers(prev => prev.filter(user => user.id.toString() !== id));
+      setUsers(prev => Array.isArray(prev) ? prev.filter(user => user.id.toString() !== id) : []);
     } catch (err: any) {
       console.error('Error deleting user:', err);
       setError('Failed to delete user');
@@ -111,11 +115,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const getUserById = (id: string) => {
-    return users.find(user => user.id.toString() === id);
+    return Array.isArray(users) ? users.find(user => user.id.toString() === id) : undefined;
   };
 
-  // Filter users based on current user's role
-  const filteredUsers = users.filter(user => {
+  // Filter users based on current user's role with safety checks
+  const filteredUsers = Array.isArray(users) ? users.filter(user => {
     if (!currentUser) return false;
     
     // Admin can see all users
@@ -128,7 +132,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     // Employee can only see themselves
     return user.id === currentUser.id;
-  });
+  }) : [];
 
   const value: UserContextType = {
     users: filteredUsers,

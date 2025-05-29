@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +17,7 @@ import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 import { User, Role } from '@/types';
 
 const Users = () => {
-  const { users, addUser } = useUsers();
+  const { users = [], addUser, loading, error } = useUsers();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -52,8 +53,8 @@ const Users = () => {
     }
   };
 
-  // Filter users by search term and role
-  const filteredUsers = users.filter(user => {
+  // Filter users by search term and role with proper null checks
+  const filteredUsers = Array.isArray(users) ? users.filter(user => {
     const matchesSearch = 
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -61,7 +62,34 @@ const Users = () => {
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     
     return matchesSearch && matchesRole;
-  });
+  }) : [];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-64">
+          <div className="text-center">
+            <p className="text-muted-foreground">Loading users...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-64">
+          <div className="text-center">
+            <p className="text-destructive mb-4">Error loading users: {error}</p>
+            <p className="text-muted-foreground">Please check the backend connection and try again.</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -74,7 +102,7 @@ const Users = () => {
             validationFn={(data) => validateTemplate(data, 'users')}
           />
           <ExportButton 
-            data={users} 
+            data={users || []} 
             filename="users" 
             fields={['id', 'name', 'email', 'role', 'permissions', 'avatar', 'createdAt', 'lastActive']}
           />
