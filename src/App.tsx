@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { NotificationProvider } from '@/context/NotificationContext';
+import { FavoritesProvider } from '@/context/FavoritesContext';
+import { ComparisonProvider } from '@/context/ComparisonContext';
+import { CartProvider } from '@/context/CartContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import AppRoutes from '@/routes/AppRoutes';
@@ -47,8 +50,14 @@ function App() {
         <Router>
           <AuthProvider>
             <NotificationProvider>
-              <AppContent />
-              <Toaster />
+              <FavoritesProvider>
+                <ComparisonProvider>
+                  <CartProvider>
+                    <AppContent />
+                    <Toaster />
+                  </CartProvider>
+                </ComparisonProvider>
+              </FavoritesProvider>
             </NotificationProvider>
           </AuthProvider>
         </Router>
