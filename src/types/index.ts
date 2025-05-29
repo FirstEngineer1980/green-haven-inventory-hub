@@ -1,8 +1,9 @@
+
 export interface User {
   id: number; // Changed from string to number to match backend
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
+  role?: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer'; // Made optional to match authTypes
   avatar?: string;
   phone?: string;
   position?: string;
