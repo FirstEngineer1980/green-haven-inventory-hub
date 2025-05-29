@@ -1,10 +1,15 @@
-
 import { apiInstance } from './api';
 import { User, AuthResponse } from '../types/authTypes';
 
 export const login = async (email: string, password: string): Promise<AuthResponse> => {
   try {
     const response = await apiInstance.post('/login', { email, password });
+    
+    // Store the token in localStorage for Passport
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    
     return response.data;
   } catch (error) {
     console.error('Login error:', error);
@@ -14,13 +19,18 @@ export const login = async (email: string, password: string): Promise<AuthRespon
 
 export const register = async (name: string, email: string, password: string, passwordConfirmation: string): Promise<AuthResponse> => {
   try {
-    await apiInstance.get('/sanctum/csrf-cookie');
     const response = await apiInstance.post('/register', { 
       name, 
       email, 
       password, 
       password_confirmation: passwordConfirmation 
     });
+    
+    // Store the token in localStorage for Passport
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    
     return response.data;
   } catch (error) {
     console.error('Register error:', error);
@@ -33,7 +43,10 @@ export const logout = async (): Promise<void> => {
     await apiInstance.post('/logout');
   } catch (error) {
     console.error('Logout error:', error);
-    throw error;
+  } finally {
+    // Always clear local storage on logout
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
 };
 
@@ -67,12 +80,8 @@ export const checkAuthStatus = async (): Promise<User | null> => {
 };
 
 export const getCsrfCookie = async (): Promise<void> => {
-  try {
-    await apiInstance.get('/sanctum/csrf-cookie');
-  } catch (error) {
-    console.error('CSRF cookie error:', error);
-    throw error;
-  }
+  // Not needed for Passport, but keeping for compatibility
+  return Promise.resolve();
 };
 
 export const getAuthHeaders = () => {

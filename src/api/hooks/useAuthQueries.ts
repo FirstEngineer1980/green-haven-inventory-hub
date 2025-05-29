@@ -15,16 +15,17 @@ export const useRegisterMutation = () => {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['user'], data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
       toast.success(data.message || 'Registration successful');
-      navigate('/forms');
+      navigate('/dashboard');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Registration failed');
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      toast.error(errorMessage);
     }
   });
 };
 
-// Export the login mutation hook with two names for backward compatibility
 export const useLoginMutation = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -35,13 +36,14 @@ export const useLoginMutation = () => {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['user'], data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
       toast.success(data.message || 'Login successful');
-      // Navigate after successful login
-      navigate('/forms');
+      navigate('/dashboard');
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
       console.error("Login error:", error);
-      toast.error(error.message || 'Login failed');
+      toast.error(errorMessage);
     }
   });
 };
@@ -57,13 +59,18 @@ export const useLogoutMutation = () => {
     mutationFn: logout,
     onSuccess: () => {
       queryClient.setQueryData(['user'], null);
-      queryClient.invalidateQueries({ queryKey: ['forms'] });
+      queryClient.clear();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
       toast.success('Logout successful');
       navigate('/login');
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       // Even if server logout fails, clear local user data
       queryClient.setQueryData(['user'], null);
+      queryClient.clear();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
       toast.error(error.message || 'Logout failed');
       navigate('/login');
     }
@@ -77,14 +84,16 @@ export const useCurrentUser = () => {
       try {
         const result = await getCurrentUser();
         return result ?? null;
-      } catch (error: unknown) {
+      } catch (error: any) {
         if (
-          error instanceof Error &&
-          (error.message.includes('401') ||
-           error.message.includes('Unauthorized') ||
-           error.message.includes('not authenticated'))
+          error.response?.status === 401 ||
+          error.message.includes('401') ||
+          error.message.includes('Unauthorized') ||
+          error.message.includes('not authenticated')
         ) {
           console.info('User not logged in yet');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
           return null;
         }
         console.error('Error fetching current user:', error);
