@@ -35,10 +35,14 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       const response = await apiInstance.get('/rooms');
-      setRooms(response.data);
+      // Ensure we always set an array, even if response is malformed
+      const data = Array.isArray(response.data) ? response.data : [];
+      setRooms(data);
     } catch (err: any) {
       console.error('Error fetching rooms:', err);
       setError('Failed to fetch rooms');
+      // Set empty array on error to prevent map errors
+      setRooms([]);
     } finally {
       setLoading(false);
     }
@@ -51,7 +55,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   const getRoomById = (id: string): Room | undefined => {
-    return rooms.find(room => room.id === id);
+    return Array.isArray(rooms) ? rooms.find(room => room.id === id) : undefined;
   };
 
   const addRoom = async (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => {
@@ -60,7 +64,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const response = await apiInstance.post('/rooms', room);
-      setRooms(prev => [...prev, response.data]);
+      setRooms(prev => Array.isArray(prev) ? [...prev, response.data] : [response.data]);
       
       addNotification({
         title: 'New Room Added',
@@ -84,9 +88,9 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await apiInstance.put(`/rooms/${id}`, updates);
       setRooms(prev => 
-        prev.map(room => 
+        Array.isArray(prev) ? prev.map(room => 
           room.id === id ? response.data : room
-        )
+        ) : [response.data]
       );
     } catch (err: any) {
       console.error('Error updating room:', err);
@@ -100,11 +104,11 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const deleteRoom = async (id: string) => {
     if (!user) return;
     
-    const roomToDelete = rooms.find(room => room.id === id);
+    const roomToDelete = Array.isArray(rooms) ? rooms.find(room => room.id === id) : null;
     
     try {
       await apiInstance.delete(`/rooms/${id}`);
-      setRooms(prev => prev.filter(room => room.id !== id));
+      setRooms(prev => Array.isArray(prev) ? prev.filter(room => room.id !== id) : []);
       
       if (roomToDelete) {
         addNotification({
@@ -122,12 +126,12 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getRoomsByCustomerId = (customerId: string): Room[] => {
-    return rooms.filter(room => room.customerId === customerId);
+    return Array.isArray(rooms) ? rooms.filter(room => room.customerId === customerId) : [];
   };
 
   return (
     <RoomContext.Provider value={{ 
-      rooms, 
+      rooms: Array.isArray(rooms) ? rooms : [], 
       loading,
       error,
       addRoom, 

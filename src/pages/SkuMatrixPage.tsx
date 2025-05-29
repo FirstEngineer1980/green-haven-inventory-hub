@@ -16,8 +16,8 @@ import { SkuMatrix } from '@/context/SkuMatrixContext';
 import { UnitMatrix } from '@/types';
 
 const SkuMatrixPage = () => {
-  const { skuMatrices = [], deleteSkuMatrix } = useSkuMatrix();
-  const { rooms } = useRooms();
+  const { skuMatrices = [], deleteSkuMatrix, error } = useSkuMatrix();
+  const { rooms = [] } = useRooms();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedSkuMatrix, setSelectedSkuMatrix] = useState<SkuMatrix | null>(null);
@@ -33,30 +33,30 @@ const SkuMatrixPage = () => {
       description: skuMatrix.description || '', // Ensure description is always a string
       roomId: skuMatrix.roomId,
       roomName: skuMatrix.roomName,
-      rows: skuMatrix.rows.map(row => ({
+      rows: Array.isArray(skuMatrix.rows) ? skuMatrix.rows.map(row => ({
         id: row.id,
         name: row.label, // Map label to name
         label: row.label,
         color: row.color,
-        cells: row.cells.map(cell => ({
+        cells: Array.isArray(row.cells) ? row.cells.map(cell => ({
           id: cell.id,
           value: cell.value || '',
           content: cell.value,
           columnId: cell.columnId,
           productId: undefined,
           quantity: undefined
-        }))
-      })),
+        })) : []
+      })) : [],
       createdAt: skuMatrix.createdAt,
       updatedAt: skuMatrix.updatedAt
     };
   };
 
-  // Filter SKU matrices based on search and filters
-  const filteredSkuMatrices = skuMatrices.filter(skuMatrix => 
+  // Filter SKU matrices based on search and filters - with safety checks
+  const filteredSkuMatrices = Array.isArray(skuMatrices) ? skuMatrices.filter(skuMatrix => 
     (selectedRoom === 'all' || skuMatrix.roomId === selectedRoom) &&
     skuMatrix.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) : [];
 
   const handleEditClick = (skuMatrix: SkuMatrix) => {
     setSelectedSkuMatrix(skuMatrix);
@@ -72,6 +72,28 @@ const SkuMatrixPage = () => {
       variant: "default"
     });
   };
+
+  // Show error message if there's an API error
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold tracking-tight">SKU Matrix</h1>
+          </div>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center py-8">
+                <p className="text-destructive mb-4">Error loading SKU matrices: {error}</p>
+                <p className="text-muted-foreground">Please check the backend connection and try again.</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -101,7 +123,7 @@ const SkuMatrixPage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Rooms</SelectItem>
-                {rooms.map(room => (
+                {Array.isArray(rooms) && rooms.map(room => (
                   <SelectItem key={room.id} value={room.id}>{room.name}</SelectItem>
                 ))}
               </SelectContent>

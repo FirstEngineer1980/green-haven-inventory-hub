@@ -60,10 +60,14 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setError(null);
     try {
       const response = await apiInstance.get('/sku-matrices');
-      setSkuMatrices(response.data);
+      // Ensure we always set an array, even if response is malformed
+      const data = Array.isArray(response.data) ? response.data : [];
+      setSkuMatrices(data);
     } catch (err: any) {
       console.error('Error fetching SKU matrices:', err);
       setError('Failed to fetch SKU matrices');
+      // Set empty array on error to prevent map errors
+      setSkuMatrices([]);
     } finally {
       setLoading(false);
     }
@@ -76,11 +80,11 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [user]);
 
   const getSkuMatrixById = (id: string): SkuMatrix | undefined => {
-    return skuMatrices.find(matrix => matrix.id === id);
+    return Array.isArray(skuMatrices) ? skuMatrices.find(matrix => matrix.id === id) : undefined;
   };
 
   const getSkuMatricesByRoomId = (roomId: string): SkuMatrix[] => {
-    return skuMatrices.filter(matrix => matrix.roomId === roomId);
+    return Array.isArray(skuMatrices) ? skuMatrices.filter(matrix => matrix.roomId === roomId) : [];
   };
 
   const addSkuMatrix = async (skuMatrix: Omit<SkuMatrix, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -89,7 +93,7 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setLoading(true);
     try {
       const response = await apiInstance.post('/sku-matrices', skuMatrix);
-      setSkuMatrices(prev => [...prev, response.data]);
+      setSkuMatrices(prev => Array.isArray(prev) ? [...prev, response.data] : [response.data]);
       
       addNotification({
         title: 'New SKU Matrix Added',
@@ -113,9 +117,9 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       const response = await apiInstance.put(`/sku-matrices/${id}`, updates);
       setSkuMatrices(prev => 
-        prev.map(matrix => 
+        Array.isArray(prev) ? prev.map(matrix => 
           matrix.id === id ? response.data : matrix
-        )
+        ) : [response.data]
       );
     } catch (err: any) {
       console.error('Error updating SKU matrix:', err);
@@ -129,11 +133,11 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const deleteSkuMatrix = async (id: string) => {
     if (!user) return;
     
-    const matrixToDelete = skuMatrices.find(matrix => matrix.id === id);
+    const matrixToDelete = Array.isArray(skuMatrices) ? skuMatrices.find(matrix => matrix.id === id) : null;
     
     try {
       await apiInstance.delete(`/sku-matrices/${id}`);
-      setSkuMatrices(prev => prev.filter(matrix => matrix.id !== id));
+      setSkuMatrices(prev => Array.isArray(prev) ? prev.filter(matrix => matrix.id !== id) : []);
       
       if (matrixToDelete) {
         addNotification({
@@ -152,7 +156,7 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <SkuMatrixContext.Provider value={{ 
-      skuMatrices, 
+      skuMatrices: Array.isArray(skuMatrices) ? skuMatrices : [], 
       loading,
       error,
       addSkuMatrix, 
