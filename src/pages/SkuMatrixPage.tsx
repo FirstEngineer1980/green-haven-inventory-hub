@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { useUnitMatrix } from '@/context/UnitMatrixContext';
+import { useSkuMatrix } from '@/context/SkuMatrixContext';
 import { useRooms } from '@/context/RoomContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,31 +12,31 @@ import { Input } from '@/components/ui/input';
 import SkuMatrixTable from '@/components/sku-matrix/SkuMatrixTable';
 import AddSkuMatrixDialog from '@/components/sku-matrix/AddSkuMatrixDialog';
 import EditSkuMatrixDialog from '@/components/sku-matrix/EditSkuMatrixDialog';
-import { UnitMatrix } from '@/types';
+import { SkuMatrix } from '@/context/SkuMatrixContext';
 
 const SkuMatrixPage = () => {
-  const { unitMatrices, deleteUnitMatrix } = useUnitMatrix();
+  const { skuMatrices = [], deleteSkuMatrix } = useSkuMatrix();
   const { rooms } = useRooms();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [selectedUnitMatrix, setSelectedUnitMatrix] = useState<UnitMatrix | null>(null);
+  const [selectedSkuMatrix, setSelectedSkuMatrix] = useState<SkuMatrix | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  // Filter unit matrices based on search and filters
-  const filteredUnitMatrices = unitMatrices.filter(unitMatrix => 
-    (selectedRoom === 'all' || unitMatrix.roomId === selectedRoom) &&
-    unitMatrix.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter SKU matrices based on search and filters
+  const filteredSkuMatrices = skuMatrices.filter(skuMatrix => 
+    (selectedRoom === 'all' || skuMatrix.roomId === selectedRoom) &&
+    skuMatrix.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleEditClick = (unitMatrix: UnitMatrix) => {
-    setSelectedUnitMatrix(unitMatrix);
+  const handleEditClick = (skuMatrix: SkuMatrix) => {
+    setSelectedSkuMatrix(skuMatrix);
     setShowEditDialog(true);
   };
 
-  const handleDeleteUnitMatrix = (id: string) => {
-    deleteUnitMatrix(id);
+  const handleDeleteSkuMatrix = (id: string) => {
+    deleteSkuMatrix(id);
     
     toast({
       title: "SKU Matrix Deleted",
@@ -83,27 +83,27 @@ const SkuMatrixPage = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>SKU Matrices ({filteredUnitMatrices.length})</CardTitle>
+            <CardTitle>SKU Matrices ({filteredSkuMatrices.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {filteredUnitMatrices.map(unitMatrix => (
-              <div key={unitMatrix.id} className="mb-8">
+            {filteredSkuMatrices.map(skuMatrix => (
+              <div key={skuMatrix.id} className="mb-8">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">{unitMatrix.name} - {unitMatrix.roomName}</h3>
+                  <h3 className="text-lg font-semibold">{skuMatrix.name} - {skuMatrix.roomName}</h3>
                   <div className="space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditClick(unitMatrix)}>
+                    <Button variant="outline" size="sm" onClick={() => handleEditClick(skuMatrix)}>
                       Edit
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteUnitMatrix(unitMatrix.id)}>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteSkuMatrix(skuMatrix.id)}>
                       Delete
                     </Button>
                   </div>
                 </div>
-                <SkuMatrixTable unitMatrix={unitMatrix} />
+                <SkuMatrixTable skuMatrix={skuMatrix} />
               </div>
             ))}
             
-            {filteredUnitMatrices.length === 0 && (
+            {filteredSkuMatrices.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 No SKU matrices found
               </div>
@@ -116,11 +116,11 @@ const SkuMatrixPage = () => {
           onOpenChange={setShowAddDialog} 
         />
         
-        {selectedUnitMatrix && (
+        {selectedSkuMatrix && (
           <EditSkuMatrixDialog 
             open={showEditDialog} 
             onOpenChange={setShowEditDialog}
-            unitMatrix={selectedUnitMatrix}
+            skuMatrix={selectedSkuMatrix}
           />
         )}
       </div>
