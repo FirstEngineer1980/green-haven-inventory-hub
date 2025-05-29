@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { NotificationProvider } from '@/context/NotificationContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import AppRoutes from '@/routes/AppRoutes';
@@ -45,8 +46,10 @@ function App() {
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <Router>
           <AuthProvider>
-            <AppContent />
-            <Toaster />
+            <NotificationProvider>
+              <AppContent />
+              <Toaster />
+            </NotificationProvider>
           </AuthProvider>
         </Router>
       </ThemeProvider>
