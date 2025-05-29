@@ -8,6 +8,10 @@ import { FavoritesProvider } from '@/context/FavoritesContext';
 import { ComparisonProvider } from '@/context/ComparisonContext';
 import { CartProvider } from '@/context/CartContext';
 import { RoomProvider } from '@/context/RoomContext';
+import { CustomerProvider } from '@/context/CustomerContext';
+import { ProductProvider } from '@/context/ProductContext';
+import { CategoryProvider } from '@/context/CategoryContext';
+import { SkuMatrixProvider } from '@/context/SkuMatrixContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import AppRoutes from '@/routes/AppRoutes';
@@ -58,10 +62,18 @@ function App() {
               <FavoritesProvider>
                 <ComparisonProvider>
                   <CartProvider>
-                    <RoomProvider>
-                      <AppContent />
-                      <Toaster />
-                    </RoomProvider>
+                    <CustomerProvider>
+                      <RoomProvider>
+                        <ProductProvider>
+                          <CategoryProvider>
+                            <SkuMatrixProvider>
+                              <AppContent />
+                              <Toaster />
+                            </SkuMatrixProvider>
+                          </CategoryProvider>
+                        </ProductProvider>
+                      </RoomProvider>
+                    </CustomerProvider>
                   </CartProvider>
                 </ComparisonProvider>
               </FavoritesProvider>
