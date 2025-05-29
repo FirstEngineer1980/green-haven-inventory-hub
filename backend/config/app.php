@@ -166,6 +166,7 @@ return [
         Spatie\QueryBuilder\QueryBuilderServiceProvider::class,
         Spatie\Activitylog\ActivitylogServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Fruitcake\Cors\HandleCors::class,
 
         /*
          * Application Service Providers...
