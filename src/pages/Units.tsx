@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,6 +72,16 @@ const Units = () => {
   };
 
   const handleAddUnit = () => {
+    // Ensure roomId is not empty string
+    if (!formData.roomId) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a room for the unit",
+        variant: "destructive",
+      });
+      return;
+    }
+
     addUnit({
       name: formData.name,
       roomId: formData.roomId,
@@ -86,6 +97,16 @@ const Units = () => {
   };
 
   const handleEditUnit = () => {
+    // Ensure roomId is not empty string
+    if (!formData.roomId) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a room for the unit",
+        variant: "destructive",
+      });
+      return;
+    }
+
     updateUnit(selectedUnit!.id, {
       name: formData.name,
       roomId: formData.roomId,
@@ -176,6 +197,15 @@ const Units = () => {
             totalPages={totalPages}
             onEdit={(unit) => {
               setSelectedUnit(unit);
+              setFormData({
+                name: unit.name,
+                roomId: unit.roomId || '',
+                number: unit.number,
+                size: unit.size || 0,
+                sizeUnit: (unit.sizeUnit || 'sqft') as 'sqft' | 'sqm' | 'm²',
+                status: (unit.status || 'available') as 'available' | 'occupied' | 'maintenance',
+                description: unit.description || ''
+              });
               setOpenEditDialog(true);
             }}
             onView={(unit) => {
@@ -202,15 +232,7 @@ const Units = () => {
           <EditUnitDialog 
             showEditDialog={openEditDialog} 
             setShowEditDialog={setOpenEditDialog} 
-            formData={{
-              name: selectedUnit.name,
-              roomId: selectedUnit.roomId,
-              number: selectedUnit.number,
-              size: selectedUnit.size || 0,
-              sizeUnit: (selectedUnit.sizeUnit || 'sqft') as 'sqft' | 'sqm' | 'm²',
-              status: (selectedUnit.status || 'available') as 'available' | 'occupied' | 'maintenance',
-              description: selectedUnit.description || ''
-            }}
+            formData={formData}
             rooms={rooms}
             handleInputChange={handleInputChange}
             handleSelectChange={handleSelectChange}
@@ -223,6 +245,15 @@ const Units = () => {
             onClose={() => setOpenDetailsDialog(false)}
             onEdit={(unit) => {
               setSelectedUnit(unit);
+              setFormData({
+                name: unit.name,
+                roomId: unit.roomId || '',
+                number: unit.number,
+                size: unit.size || 0,
+                sizeUnit: (unit.sizeUnit || 'sqft') as 'sqft' | 'sqm' | 'm²',
+                status: (unit.status || 'available') as 'available' | 'occupied' | 'maintenance',
+                description: unit.description || ''
+              });
               setOpenDetailsDialog(false);
               setOpenEditDialog(true);
             }}

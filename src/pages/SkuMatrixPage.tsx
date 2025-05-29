@@ -100,9 +100,7 @@ const SkuMatrixPage = () => {
                   </div>
                 </div>
                 <SkuMatrixTable 
-                  matrix={skuMatrix}
-                  onEdit={() => handleEditClick(skuMatrix)}
-                  onDelete={() => handleDeleteSkuMatrix(skuMatrix.id)}
+                  skuMatrix={skuMatrix}
                 />
               </div>
             ))}
@@ -124,11 +122,7 @@ const SkuMatrixPage = () => {
           <EditSkuMatrixDialog 
             open={showEditDialog} 
             onOpenChange={setShowEditDialog}
-            matrix={selectedSkuMatrix}
-            onSave={() => {
-              setShowEditDialog(false);
-              setSelectedSkuMatrix(null);
-            }}
+            skuMatrix={selectedSkuMatrix}
           />
         )}
       </div>
