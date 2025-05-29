@@ -38,7 +38,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
   const handleSubmit = async (data: UserFormData) => {
     try {
       setIsSubmitting(true);
-      updateUser(user.id, {
+      updateUser(user.id.toString(), {
         name: data.name,
         email: data.email,
         role: data.role,

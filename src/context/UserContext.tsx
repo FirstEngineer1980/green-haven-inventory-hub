@@ -86,7 +86,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await apiInstance.put(`/users/${id}`, userData);
       setUsers(prev =>
-        prev.map(user => (user.id === id ? response.data : user))
+        prev.map(user => (user.id.toString() === id ? response.data : user))
       );
     } catch (err: any) {
       console.error('Error updating user:', err);
@@ -102,7 +102,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     try {
       await apiInstance.delete(`/users/${id}`);
-      setUsers(prev => prev.filter(user => user.id !== id));
+      setUsers(prev => prev.filter(user => user.id.toString() !== id));
     } catch (err: any) {
       console.error('Error deleting user:', err);
       setError('Failed to delete user');
@@ -111,7 +111,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const getUserById = (id: string) => {
-    return users.find(user => user.id === id);
+    return users.find(user => user.id.toString() === id);
   };
 
   // Filter users based on current user's role

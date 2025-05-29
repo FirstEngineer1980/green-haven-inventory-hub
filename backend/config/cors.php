@@ -25,10 +25,15 @@ return [
         'http://127.0.0.1:3000',
         'http://192.168.1.2:8080',
         'https://preview--green-haven-inventory-hub.lovable.app',
+        'https://145b2e48-5bdc-472c-911a-bf04de9cdccc.lovableproject.com',
+        '*',
         '*.lovable.app',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '*://preview--*.lovable.app',
+        '*://*.lovableproject.com',
+    ],
 
     'allowed_headers' => ['*'],
 
@@ -36,5 +41,5 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 ];

@@ -123,7 +123,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   // Filter notifications based on user roles
   const filteredNotifications = notifications.filter(notification => {
     if (!user) return false;
-    return notification.for?.includes(user.role) || notification.for?.includes(user.id);
+    return notification.for?.includes(user.role || '') || notification.for?.includes(user.id.toString());
   });
 
   const value: NotificationContextType = {
