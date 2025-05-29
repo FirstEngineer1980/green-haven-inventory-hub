@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -14,7 +13,7 @@ class SellerController extends Controller
     public function index(Request $request)
     {
         $sellers = Seller::with('leader', 'clients')->get();
-        
+
         return response()->json($sellers);
     }
 

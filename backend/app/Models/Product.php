@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -92,11 +91,11 @@ class Product extends Model
             ->where('end_date', '>=', now())
             ->orderBy('discount', 'desc')
             ->first();
-        
+
         if ($activePromotion) {
             return round($this->price * (1 - $activePromotion->discount), 2);
         }
-        
+
         return $this->price;
     }
 }

@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -65,9 +64,9 @@ class Invoice extends Model
             ->whereMonth('created_at', $month)
             ->orderBy('id', 'desc')
             ->first();
-        
+
         $number = $lastInvoice ? (int) substr($lastInvoice->invoice_number, -4) + 1 : 1;
-        
+
         return sprintf('INV-%s%s-%04d', $year, $month, $number);
     }
 }

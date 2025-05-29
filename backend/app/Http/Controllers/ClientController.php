@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -14,7 +13,7 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         $clients = Client::with('seller')->get();
-        
+
         return response()->json($clients);
     }
 

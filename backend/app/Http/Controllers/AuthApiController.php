@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -91,7 +90,7 @@ class AuthApiController extends Controller
             'user' => $userData,
         ], 201);
     }
-    
+
     /**
      * Handle user logout request
      *
@@ -134,7 +133,7 @@ class AuthApiController extends Controller
     public function updateProfile(Request $request)
     {
         $user = $request->user();
-        
+
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,

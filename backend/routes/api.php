@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Http\Request;
@@ -129,7 +128,7 @@ Route::middleware('auth:api')->group(function () {
     // CRM Routes
     Route::apiResource('sellers', SellerController::class);
     Route::apiResource('clients', ClientController::class);
-    
+
     // Seller Commission Routes
     Route::apiResource('seller-commissions', SellerCommissionController::class);
     Route::post('seller-commissions/{sellerCommission}/calculate', [SellerCommissionController::class, 'calculateCommission']);

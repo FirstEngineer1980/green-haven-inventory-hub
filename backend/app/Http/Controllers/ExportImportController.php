@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -34,7 +33,7 @@ class ExportImportController extends Controller
 
         try {
             $data = $this->getDataByType($type, $fields);
-            
+
             // Log the export
             ExportLog::create([
                 'type' => $type,
@@ -74,9 +73,9 @@ class ExportImportController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             $result = $this->importDataByType($type, $data, $overwrite);
-            
+
             DB::commit();
 
             return response()->json([
@@ -204,7 +203,7 @@ class ExportImportController extends Controller
     private function importProduct($item, $overwrite)
     {
         $existing = Product::where('sku', $item['sku'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Product with SKU {$item['sku']} already exists");
         }
@@ -221,7 +220,7 @@ class ExportImportController extends Controller
     private function importCategory($item, $overwrite)
     {
         $existing = Category::where('name', $item['name'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Category {$item['name']} already exists");
         }
@@ -238,7 +237,7 @@ class ExportImportController extends Controller
     private function importCustomer($item, $overwrite)
     {
         $existing = Customer::where('email', $item['email'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Customer with email {$item['email']} already exists");
         }
@@ -255,7 +254,7 @@ class ExportImportController extends Controller
     private function importRoom($item, $overwrite)
     {
         $existing = Room::where('name', $item['name'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Room {$item['name']} already exists");
         }
@@ -272,7 +271,7 @@ class ExportImportController extends Controller
     private function importUnit($item, $overwrite)
     {
         $existing = Unit::where('number', $item['number'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Unit {$item['number']} already exists");
         }
@@ -289,7 +288,7 @@ class ExportImportController extends Controller
     private function importSeller($item, $overwrite)
     {
         $existing = Seller::where('email', $item['email'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Seller with email {$item['email']} already exists");
         }
@@ -306,7 +305,7 @@ class ExportImportController extends Controller
     private function importClient($item, $overwrite)
     {
         $existing = Client::where('email', $item['email'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Client with email {$item['email']} already exists");
         }
@@ -325,7 +324,7 @@ class ExportImportController extends Controller
         $existing = SellerCommission::where('seller_id', $item['seller_id'])
             ->where('client_id', $item['client_id'])
             ->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("Commission structure for this seller-client combination already exists");
         }
@@ -342,7 +341,7 @@ class ExportImportController extends Controller
     private function importUser($item, $overwrite)
     {
         $existing = User::where('email', $item['email'])->first();
-        
+
         if ($existing && !$overwrite) {
             throw new \Exception("User with email {$item['email']} already exists");
         }
@@ -371,7 +370,7 @@ class ExportImportController extends Controller
         }
 
         $filename = "{$type}_export_" . now()->format('Y-m-d_H-i-s') . ".csv";
-        
+
         return response()->streamDownload(function () use ($csvData) {
             $handle = fopen('php://output', 'w');
             foreach ($csvData as $row) {
