@@ -28,13 +28,9 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
   const handleSubmit = async (data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       setIsSubmitting(true);
-      // Transform the data to match the expected type
-      const productData = {
-        ...data,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      await addProduct(productData);
+      console.log('Submitting product data:', data);
+      
+      await addProduct(data);
       
       toast({
         title: "Product added",
@@ -43,11 +39,17 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({
       });
       
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding product:', error);
+      
+      let errorMessage = "An error occurred while adding the product";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: "An error occurred while adding the product",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

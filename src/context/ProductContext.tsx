@@ -27,11 +27,14 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching products from API...');
       const response = await apiInstance.get('/products');
+      console.log('Products response:', response.data);
       setProducts(response.data);
     } catch (err: any) {
       console.error('Error fetching products:', err);
-      setError(err.message || 'Failed to fetch products');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch products';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -43,12 +46,53 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const response = await apiInstance.post('/products', product);
-      setProducts(prev => [...prev, response.data]);
+      console.log('Adding product with frontend data:', product);
+      
+      // Map frontend field names to backend field names
+      const backendData = {
+        name: product.name,
+        sku: product.sku,
+        description: product.description || '',
+        category_id: null, // Will need to be mapped properly if categories are used
+        price: product.price,
+        cost_price: product.costPrice, // Map costPrice to cost_price
+        quantity: product.quantity,
+        threshold: product.threshold,
+        location: product.location || '',
+        image: product.image || '',
+        status: 'active',
+        barcode: '',
+        weight: '',
+        dimensions: '',
+      };
+
+      console.log('Sending to backend:', backendData);
+      const response = await apiInstance.post('/products', backendData);
+      console.log('Add product response:', response.data);
+      
+      // Transform response back to frontend format
+      const newProduct: Product = {
+        id: response.data.id,
+        name: response.data.name,
+        sku: response.data.sku,
+        description: response.data.description || '',
+        category: response.data.category?.name || '',
+        price: parseFloat(response.data.price),
+        costPrice: parseFloat(response.data.cost_price),
+        quantity: response.data.quantity,
+        threshold: response.data.threshold,
+        location: response.data.location || '',
+        image: response.data.image || '',
+        createdAt: response.data.created_at || new Date().toISOString(),
+        updatedAt: response.data.updated_at || new Date().toISOString(),
+      };
+
+      setProducts(prev => [...prev, newProduct]);
     } catch (err: any) {
       console.error('Error adding product:', err);
-      setError(err.message || 'Failed to add product');
-      throw err;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to add product';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
