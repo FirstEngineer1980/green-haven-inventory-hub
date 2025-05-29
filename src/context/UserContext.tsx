@@ -16,9 +16,15 @@ interface UserContextType {
   fetchUsers: () => Promise<void>;
 }
 
-const UserContext = createContext<UserContextType>({} as UserContextType);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const useUsers = () => useContext(UserContext);
+export const useUsers = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUsers must be used within a UserProvider');
+  }
+  return context;
+};
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>([]);
@@ -27,12 +33,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { user: currentUser } = useAuth();
 
   const fetchUsers = async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log('No current user, skipping fetch users');
+      return;
+    }
     
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching users...');
       const response = await apiInstance.get('/users');
+      console.log('Users response:', response.data);
       // Ensure we always set an array, even if response is malformed
       const data = Array.isArray(response.data) ? response.data : [];
       setUsers(data);
@@ -48,7 +59,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     if (currentUser) {
+      console.log('Current user changed, fetching users:', currentUser);
       fetchUsers();
+    } else {
+      console.log('No current user, setting empty users array');
+      setUsers([]);
     }
   }, [currentUser]);
 
@@ -68,10 +83,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const addUser = async (userData: Omit<User, 'id'> & { password?: string }) => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.error('No current user, cannot add user');
+      throw new Error('Not authenticated');
+    }
     
     setLoading(true);
+    setError(null);
     try {
+      console.log('Adding user with data:', userData);
+      
       // Prepare data for backend - include password and map role if needed
       const backendData = {
         name: userData.name,
@@ -80,7 +101,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         role: userData.role === 'staff' ? 'user' : userData.role, // Map staff to user for backend
       };
 
+      console.log('Sending to backend:', backendData);
       const response = await apiInstance.post('/users', backendData);
+      console.log('Add user response:', response.data);
       
       // Transform response to match frontend User type
       const newUser: User = {
@@ -90,11 +113,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         avatar: userData.avatar,
       };
 
-      setUsers(prev => Array.isArray(prev) ? [...prev, newUser] : [newUser]);
+      setUsers(prev => {
+        const currentUsers = Array.isArray(prev) ? prev : [];
+        return [...currentUsers, newUser];
+      });
+      
+      console.log('User added successfully');
     } catch (err: any) {
       console.error('Error adding user:', err);
-      setError('Failed to add user');
-      throw err;
+      const errorMessage = err.response?.data?.message || 'Failed to add user';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }

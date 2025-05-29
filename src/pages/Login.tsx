@@ -23,18 +23,28 @@ const Login = () => {
 
   // Handle form submission
   const onSubmit = async (data: LoginFormData) => {
+    console.log('Login attempt with:', { email: data.email, password: '***' });
     try {
       await login(data.email, data.password);
+      console.log('Login successful, navigating to dashboard');
       toast({
         title: "Success",
         description: "Successfully logged in!",
       });
       navigate('/dashboard', { replace: true });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error in component:', error);
+      
+      let errorMessage = "Login failed. Please check your credentials.";
+      if (error.code === 'ERR_NETWORK') {
+        errorMessage = "Network error. Please check if the backend server is running.";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
       toast({
         title: "Error",
-        description: "Login failed. Please check your credentials.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
