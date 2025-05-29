@@ -8,7 +8,7 @@ interface UserContextType {
   users: User[];
   loading: boolean;
   error: string | null;
-  addUser: (user: Omit<User, 'id'>) => Promise<void>;
+  addUser: (user: Omit<User, 'id'> & { password?: string }) => Promise<void>;
   updateUser: (id: string, user: Partial<User>) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
   getUserById: (id: string) => User | undefined;
@@ -67,13 +67,30 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const addUser = async (userData: Omit<User, 'id'>) => {
+  const addUser = async (userData: Omit<User, 'id'> & { password?: string }) => {
     if (!currentUser) return;
     
     setLoading(true);
     try {
-      const response = await apiInstance.post('/users', userData);
-      setUsers(prev => Array.isArray(prev) ? [...prev, response.data] : [response.data]);
+      // Prepare data for backend - include password and map role if needed
+      const backendData = {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password || 'defaultPassword123', // Backend requires password
+        role: userData.role === 'staff' ? 'user' : userData.role, // Map staff to user for backend
+      };
+
+      const response = await apiInstance.post('/users', backendData);
+      
+      // Transform response to match frontend User type
+      const newUser: User = {
+        ...response.data,
+        role: userData.role, // Keep original role from frontend
+        permissions: userData.permissions || [],
+        avatar: userData.avatar,
+      };
+
+      setUsers(prev => Array.isArray(prev) ? [...prev, newUser] : [newUser]);
     } catch (err: any) {
       console.error('Error adding user:', err);
       setError('Failed to add user');

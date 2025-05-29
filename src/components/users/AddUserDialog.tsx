@@ -19,6 +19,7 @@ interface AddUserDialogProps {
 type UserFormData = {
   name: string;
   email: string;
+  password?: string;
   role: "admin" | "manager" | "staff" | "viewer";
   avatar?: string;
   permissions?: string[];
@@ -35,9 +36,10 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
   const handleSubmit = async (data: UserFormData) => {
     try {
       setIsSubmitting(true);
-      addUser({
+      await addUser({
         name: data.name,
         email: data.email,
+        password: data.password,
         role: data.role,
         permissions: data.permissions || [],
         avatar: data.avatar
@@ -76,6 +78,7 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
           <UserForm 
             onSubmit={handleSubmit} 
             isSubmitting={isSubmitting} 
+            isEdit={false}
           />
         </div>
       </DialogContent>

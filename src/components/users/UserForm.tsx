@@ -26,6 +26,7 @@ import { User } from '@/types';
 const userFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters." }).optional(),
   role: z.enum(['admin', 'manager', 'staff', 'viewer'] as const),
   permissions: z.array(z.string()).optional(),
   avatar: z.string().optional(),
@@ -37,18 +38,21 @@ interface UserFormProps {
   onSubmit: (data: UserFormValues) => void;
   defaultValues?: Partial<User>;
   isSubmitting: boolean;
+  isEdit?: boolean;
 }
 
 const UserForm: React.FC<UserFormProps> = ({ 
   onSubmit, 
   defaultValues, 
-  isSubmitting 
+  isSubmitting,
+  isEdit = false
 }) => {
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       name: defaultValues?.name || '',
       email: defaultValues?.email || '',
+      password: '',
       role: (defaultValues?.role === 'employee' ? 'staff' : defaultValues?.role) || 'viewer',
       permissions: defaultValues?.permissions || [],
       avatar: defaultValues?.avatar || '',
@@ -108,6 +112,22 @@ const UserForm: React.FC<UserFormProps> = ({
             </FormItem>
           )}
         />
+
+        {!isEdit && (
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Enter password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
