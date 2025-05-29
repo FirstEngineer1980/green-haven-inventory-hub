@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'backend/api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
@@ -26,7 +26,6 @@ return [
         'http://192.168.1.2:8080',
         'https://preview--green-haven-inventory-hub.lovable.app',
         'https://145b2e48-5bdc-472c-911a-bf04de9cdccc.lovableproject.com',
-        '*',
         '*.lovable.app',
     ],
 
