@@ -36,9 +36,9 @@ const COLORS = ['#74c696', '#6bacde', '#F4C430', '#FF6B6B', '#9775fa', '#5D5FEF'
 
 const Reports = () => {
   const { hasPermission } = useAuth();
-  const { reports, loading: reportsLoading, runReport } = useReports();
-  const { inventoryItems } = useInventory();
-  const { customers } = useCustomers();
+  const { reports = [], loading: reportsLoading, runReport } = useReports();
+  const { inventoryItems = [] } = useInventory();
+  const { customers = [] } = useCustomers();
   
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reportType, setReportType] = useState("inventory");
@@ -57,8 +57,8 @@ const Reports = () => {
     );
   }
 
-  // Transform inventory data for charts
-  const stockLevelData = inventoryItems.map(item => ({
+  // Transform inventory data for charts - with safety check
+  const stockLevelData = (inventoryItems || []).map(item => ({
     name: item.productName || `Product ${item.productId}`,
     value: item.quantity,
     category: 'General'
@@ -88,8 +88,8 @@ const Reports = () => {
     { name: 'Tools', value: 10 }
   ];
 
-  // Transform customer data for charts
-  const customerRevenueData = customers.slice(0, 5).map((customer, index) => ({
+  // Transform customer data for charts - with safety check
+  const customerRevenueData = (customers || []).slice(0, 5).map((customer, index) => ({
     name: customer.name,
     revenue: Math.floor(Math.random() * 10000) + 1000,
     orders: Math.floor(Math.random() * 20) + 5
@@ -261,7 +261,7 @@ const Reports = () => {
                       {stockLevelData.slice(0, 8).map((item, index) => (
                         <tr key={index} className="border-b">
                           <td className="py-3 px-4">{item.name}</td>
-                          <td className="py-3 px-4">{inventoryItems[index]?.status || 'Available'}</td>
+                          <td className="py-3 px-4">{(inventoryItems[index] && inventoryItems[index].status) || 'Available'}</td>
                           <td className="py-3 px-4 text-right">{item.value}</td>
                           <td className="py-3 px-4 text-right">$10.00</td>
                           <td className="py-3 px-4 text-right">${(item.value * 10).toLocaleString()}</td>
@@ -585,7 +585,7 @@ const Reports = () => {
           <CardContent>
             {reportsLoading ? (
               <div className="text-center py-4">Loading reports...</div>
-            ) : reports.length > 0 ? (
+            ) : (reports && reports.length > 0) ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {reports.map((report) => (
                   <Card key={report.id} className="p-4">
