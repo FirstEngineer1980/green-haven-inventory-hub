@@ -33,7 +33,20 @@ const SkuMatrixPage = () => {
       description: skuMatrix.description || '', // Ensure description is always a string
       roomId: skuMatrix.roomId,
       roomName: skuMatrix.roomName,
-      rows: skuMatrix.rows,
+      rows: skuMatrix.rows.map(row => ({
+        id: row.id,
+        name: row.label, // Map label to name
+        label: row.label,
+        color: row.color,
+        cells: row.cells.map(cell => ({
+          id: cell.id,
+          value: cell.value || '',
+          content: cell.value,
+          columnId: cell.columnId,
+          productId: undefined,
+          quantity: undefined
+        }))
+      })),
       createdAt: skuMatrix.createdAt,
       updatedAt: skuMatrix.updatedAt
     };
