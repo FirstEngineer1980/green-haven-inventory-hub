@@ -13,6 +13,7 @@ import SkuMatrixTable from '@/components/sku-matrix/SkuMatrixTable';
 import AddSkuMatrixDialog from '@/components/sku-matrix/AddSkuMatrixDialog';
 import EditSkuMatrixDialog from '@/components/sku-matrix/EditSkuMatrixDialog';
 import { SkuMatrix } from '@/context/SkuMatrixContext';
+import { UnitMatrix } from '@/types';
 
 const SkuMatrixPage = () => {
   const { skuMatrices = [], deleteSkuMatrix } = useSkuMatrix();
@@ -23,6 +24,20 @@ const SkuMatrixPage = () => {
   const [selectedRoom, setSelectedRoom] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
+
+  // Helper function to convert SkuMatrix to UnitMatrix
+  const convertSkuMatrixToUnitMatrix = (skuMatrix: SkuMatrix): UnitMatrix => {
+    return {
+      id: skuMatrix.id,
+      name: skuMatrix.name,
+      description: skuMatrix.description || '', // Ensure description is always a string
+      roomId: skuMatrix.roomId,
+      roomName: skuMatrix.roomName,
+      rows: skuMatrix.rows,
+      createdAt: skuMatrix.createdAt,
+      updatedAt: skuMatrix.updatedAt
+    };
+  };
 
   // Filter SKU matrices based on search and filters
   const filteredSkuMatrices = skuMatrices.filter(skuMatrix => 
@@ -100,7 +115,7 @@ const SkuMatrixPage = () => {
                   </div>
                 </div>
                 <SkuMatrixTable 
-                  unitMatrix={skuMatrix}
+                  unitMatrix={convertSkuMatrixToUnitMatrix(skuMatrix)}
                 />
               </div>
             ))}
@@ -122,7 +137,7 @@ const SkuMatrixPage = () => {
           <EditSkuMatrixDialog 
             open={showEditDialog} 
             onOpenChange={setShowEditDialog}
-            unitMatrix={selectedSkuMatrix}
+            unitMatrix={convertSkuMatrixToUnitMatrix(selectedSkuMatrix)}
           />
         )}
       </div>
