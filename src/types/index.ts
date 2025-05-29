@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  id: number; // Changed from string to number to match backend
   name: string;
   email: string;
   role: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
