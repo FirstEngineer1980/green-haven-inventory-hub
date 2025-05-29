@@ -1,6 +1,6 @@
 
 // Base API URL - adjust based on your environment
-export const API_URL = import.meta.env.VITE_API_URL || 'https://backend.myphr.io/backend/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'https://backend.myphr.io/api';
 
 // Export a function to check if backend is available
 export const checkBackendConnection = async (): Promise<boolean> => {
