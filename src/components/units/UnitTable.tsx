@@ -17,6 +17,19 @@ interface UnitTableProps {
   onDelete: (id: string) => void;
 }
 
+const formatDate = (dateValue: string | Date | undefined): string => {
+  if (!dateValue) return 'N/A';
+  
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return 'N/A';
+    return format(date, 'MMM d, yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'N/A';
+  }
+};
+
 const UnitTable = ({
   units,
   currentPage,
@@ -68,7 +81,7 @@ const UnitTable = ({
                   <TableCell>{unit.roomName}</TableCell>
                   <TableCell>{unit.size} {unit.sizeUnit}</TableCell>
                   <TableCell>{getStatusBadge(unit.status)}</TableCell>
-                  <TableCell>{format(new Date(unit.updatedAt), 'MMM d, yyyy')}</TableCell>
+                  <TableCell>{formatDate(unit.updatedAt)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" onClick={() => onView(unit)}>
