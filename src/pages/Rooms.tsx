@@ -17,8 +17,8 @@ import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const Rooms = () => {
-  const { rooms, addRoom, updateRoom, deleteRoom } = useRooms();
-  const { customers } = useCustomers();
+  const { rooms = [], addRoom, updateRoom, deleteRoom } = useRooms();
+  const { customers = [] } = useCustomers();
   const [searchTerm, setSearchTerm] = useState('');
   const [customerFilter, setCustomerFilter] = useState<string>('all');
   const [openAddDialog, setOpenAddDialog] = useState(false);

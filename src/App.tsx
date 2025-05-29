@@ -7,6 +7,7 @@ import { NotificationProvider } from '@/context/NotificationContext';
 import { FavoritesProvider } from '@/context/FavoritesContext';
 import { ComparisonProvider } from '@/context/ComparisonContext';
 import { CartProvider } from '@/context/CartContext';
+import { RoomProvider } from '@/context/RoomContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import AppRoutes from '@/routes/AppRoutes';
@@ -57,8 +58,10 @@ function App() {
               <FavoritesProvider>
                 <ComparisonProvider>
                   <CartProvider>
-                    <AppContent />
-                    <Toaster />
+                    <RoomProvider>
+                      <AppContent />
+                      <Toaster />
+                    </RoomProvider>
                   </CartProvider>
                 </ComparisonProvider>
               </FavoritesProvider>
