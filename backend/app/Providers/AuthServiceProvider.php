@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Providers;
@@ -24,8 +25,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Register Passport routes
-        Passport::routes();
+        // In Laravel 11, Passport routes are automatically registered
+        // No need to call Passport::routes()
 
         // Define token scopes if needed
         Passport::tokensCan([
