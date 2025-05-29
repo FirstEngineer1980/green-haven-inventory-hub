@@ -40,6 +40,10 @@ const AddClientDialog: React.FC<AddClientDialogProps> = ({ open, onOpenChange, o
   });
 
   const onSubmit = (data: Omit<Client, 'id' | 'created_at' | 'updated_at'>) => {
+    // Convert "no-seller" back to undefined/null for the API
+    if (data.seller_id === 'no-seller') {
+      data.seller_id = undefined;
+    }
     createMutation.mutate(data);
   };
 
@@ -104,7 +108,7 @@ const AddClientDialog: React.FC<AddClientDialogProps> = ({ open, onOpenChange, o
                 <SelectValue placeholder="Select a seller" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No seller</SelectItem>
+                <SelectItem value="no-seller">No seller</SelectItem>
                 {sellers.map((seller) => (
                   <SelectItem key={seller.id} value={seller.id}>
                     {seller.name}

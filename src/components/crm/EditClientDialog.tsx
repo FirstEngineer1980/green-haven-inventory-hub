@@ -37,14 +37,20 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({ client, open, onOpe
         company: client.company,
         address: client.address,
         notes: client.notes,
-        seller_id: client.seller_id,
+        seller_id: client.seller_id || 'no-seller',
         status: client.status,
       });
     }
   }, [client, reset]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: Partial<Client>) => crmService.updateClient(client.id, data),
+    mutationFn: (data: Partial<Client>) => {
+      // Convert "no-seller" back to undefined/null for the API
+      if (data.seller_id === 'no-seller') {
+        data.seller_id = undefined;
+      }
+      return crmService.updateClient(client.id, data);
+    },
     onSuccess: () => {
       toast.success('Client updated successfully');
       onSuccess();
@@ -131,12 +137,12 @@ const EditClientDialog: React.FC<EditClientDialogProps> = ({ client, open, onOpe
 
           <div>
             <Label htmlFor="seller_id">Seller</Label>
-            <Select onValueChange={(value) => setValue('seller_id', value)} defaultValue={client.seller_id}>
+            <Select onValueChange={(value) => setValue('seller_id', value)} defaultValue={client.seller_id || 'no-seller'}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a seller" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No seller</SelectItem>
+                <SelectItem value="no-seller">No seller</SelectItem>
                 {sellers.map((seller) => (
                   <SelectItem key={seller.id} value={seller.id}>
                     {seller.name}
