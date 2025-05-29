@@ -6,6 +6,7 @@ import SellersPage from '@/pages/crm/SellersPage';
 import SellerCommissionPage from '@/pages/crm/SellerCommissionPage';
 import ExportImportManager from '@/pages/ExportImportManager';
 import InvoicesPage from '@/pages/InvoicesPage';
+import Unauthorized from '@/pages/Unauthorized';
 import { useAuth } from '@/context/AuthContext';
 
 const AppRoutes: React.FC = () => {
@@ -23,7 +24,8 @@ const AppRoutes: React.FC = () => {
       <Route path="/crm/seller-commission" element={<SellerCommissionPage />} />
       <Route path="/data-management" element={<ExportImportManager />} />
       <Route path="/invoices" element={<InvoicesPage />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      {/* Remove the wildcard redirect to dashboard */}
     </Routes>
   );
 };

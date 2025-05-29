@@ -38,7 +38,11 @@ const AppContent = () => {
   return (
     <Routes>
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/*" element={isAuthenticated ? <AppRoutes /> : <Navigate to="/login" replace />} />
+      {isAuthenticated ? (
+        <Route path="/*" element={<AppRoutes />} />
+      ) : (
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      )}
     </Routes>
   );
 };
