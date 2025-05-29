@@ -20,7 +20,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/crm/sellers" element={<SellersPage />} />
-      <Route path="/crm/commission" element={<SellerCommissionPage />} />
+      <Route path="/crm/seller-commission" element={<SellerCommissionPage />} />
       <Route path="/data-management" element={<ExportImportManager />} />
       <Route path="/invoices" element={<InvoicesPage />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -24,10 +25,18 @@ const Login = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      // Navigation is handled inside the login function in AuthContext
+      toast({
+        title: "Success",
+        description: "Successfully logged in!",
+      });
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Login error in component:', error);
-      // Error is already handled in the login function
+      toast({
+        title: "Error",
+        description: "Login failed. Please check your credentials.",
+        variant: "destructive",
+      });
     }
   };
 

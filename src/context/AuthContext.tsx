@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
 import { authService } from '../api/services/authService';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -53,6 +54,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const response = await authService.login(email, password);
       setUser(response.user);
       localStorage.setItem('user', JSON.stringify(response.user));
+      console.log('Login successful, user set:', response.user);
+      // Navigation will be handled by the component
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
