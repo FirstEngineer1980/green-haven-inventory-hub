@@ -7,6 +7,7 @@ import { FavoritesProvider } from '@/context/FavoritesContext';
 import { ComparisonProvider } from '@/context/ComparisonContext';
 import { CartProvider } from '@/context/CartContext';
 import { RoomProvider } from '@/context/RoomContext';
+import { UnitProvider } from '@/context/UnitContext';
 import { CustomerProvider } from '@/context/CustomerContext';
 import { ProductProvider } from '@/context/ProductContext';
 import { CategoryProvider } from '@/context/CategoryContext';
@@ -64,16 +65,18 @@ function App() {
                   <CartProvider>
                     <CustomerProvider>
                       <RoomProvider>
-                        <ProductProvider>
-                          <CategoryProvider>
-                            <SkuMatrixProvider>
-                              <CustomerProductProvider>
-                                <AppContent />
-                                <Toaster />
-                              </CustomerProductProvider>
-                            </SkuMatrixProvider>
-                          </CategoryProvider>
-                        </ProductProvider>
+                        <UnitProvider>
+                          <ProductProvider>
+                            <CategoryProvider>
+                              <SkuMatrixProvider>
+                                <CustomerProductProvider>
+                                  <AppContent />
+                                  <Toaster />
+                                </CustomerProductProvider>
+                              </SkuMatrixProvider>
+                            </CategoryProvider>
+                          </ProductProvider>
+                        </UnitProvider>
                       </RoomProvider>
                     </CustomerProvider>
                   </CartProvider>
