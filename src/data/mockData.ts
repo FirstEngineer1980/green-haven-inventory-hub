@@ -1,10 +1,11 @@
+
 import { Product, StockMovement, User, Notification, Category } from '../types';
 import { Warehouse } from '../types/warehouse';
 
 // Mock user data
 export const mockUsers: User[] = [
   {
-    id: '1',
+    id: 1,
     name: 'Admin User',
     email: 'admin@example.com',
     role: 'admin',
@@ -14,7 +15,7 @@ export const mockUsers: User[] = [
     lastActive: '2024-04-14T14:00:00.000Z'
   },
   {
-    id: '2',
+    id: 2,
     name: 'Manager User',
     email: 'manager@example.com',
     role: 'manager',
@@ -24,7 +25,7 @@ export const mockUsers: User[] = [
     lastActive: '2024-04-13T09:30:00.000Z'
   },
   {
-    id: '3',
+    id: 3,
     name: 'Staff User',
     email: 'staff@example.com',
     role: 'staff',
@@ -34,7 +35,7 @@ export const mockUsers: User[] = [
     lastActive: '2024-04-14T11:45:00.000Z'
   },
   {
-    id: '4',
+    id: 4,
     name: 'Viewer User',
     email: 'viewer@example.com',
     role: 'viewer',
