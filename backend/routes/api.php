@@ -47,13 +47,13 @@ use App\Http\Controllers\InvoiceController;
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/register', [AuthApiController::class, 'register']);
 
-// CSRF cookie route
+// CSRF cookie route for SPA
 Route::get('/sanctum/csrf-cookie', function () {
     return response()->json(['message' => 'CSRF cookie set']);
 });
 
-// Protected routes
-Route::middleware('auth:sanctum')->group(function () {
+// Protected routes using Passport
+Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthApiController::class, 'logout']);
     Route::get('/user', [AuthApiController::class, 'user']);
     Route::get('/user/current', [AuthApiController::class, 'user']);

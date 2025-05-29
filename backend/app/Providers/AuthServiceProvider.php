@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Providers;
@@ -25,7 +26,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Register Passport routes
-//        Passport::routes();
+        Passport::routes();
 
         // Define token scopes if needed
         Passport::tokensCan([
