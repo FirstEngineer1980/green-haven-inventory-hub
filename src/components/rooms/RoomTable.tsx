@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import { Room } from '@/types';
@@ -16,6 +17,19 @@ interface RoomTableProps {
   onView: (room: Room) => void;
   onDelete: (id: string) => void;
 }
+
+const formatDate = (dateValue: string | Date | undefined): string => {
+  if (!dateValue) return 'N/A';
+  
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) return 'N/A';
+    return format(date, 'MMM d, yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'N/A';
+  }
+};
 
 const RoomTable = ({
   rooms,
@@ -52,8 +66,8 @@ const RoomTable = ({
                 <TableCell className="font-medium">{room.name}</TableCell>
                 <TableCell>{room.unit || 'N/A'}</TableCell>
                 <TableCell>{room.customerName || 'N/A'}</TableCell>
-                <TableCell>{format(new Date(room.createdAt), 'MMM d, yyyy')}</TableCell>
-                <TableCell>{format(new Date(room.updatedAt), 'MMM d, yyyy')}</TableCell>
+                <TableCell>{formatDate(room.createdAt)}</TableCell>
+                <TableCell>{formatDate(room.updatedAt)}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="icon" onClick={() => onView(room)}>
