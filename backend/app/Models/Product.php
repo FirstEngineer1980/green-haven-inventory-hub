@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -77,7 +78,7 @@ class Product extends Model
      */
     public function promotions()
     {
-        return $this->belongsToMany(Promotion::class);
+        return $this->belongsToMany(Promotion::class, 'promotion_product');
     }
 
     /**
