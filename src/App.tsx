@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -14,6 +15,7 @@ import { CategoryProvider } from '@/context/CategoryContext';
 import { SkuMatrixProvider } from '@/context/SkuMatrixContext';
 import { CustomerProductProvider } from '@/context/CustomerProductContext';
 import { POProvider } from '@/context/POContext';
+import { BinProvider } from '@/context/BinContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import AppRoutes from '@/routes/AppRoutes';
@@ -72,8 +74,10 @@ function App() {
                               <SkuMatrixProvider>
                                 <CustomerProductProvider>
                                   <POProvider>
-                                    <AppContent />
-                                    <Toaster />
+                                    <BinProvider>
+                                      <AppContent />
+                                      <Toaster />
+                                    </BinProvider>
                                   </POProvider>
                                 </CustomerProductProvider>
                               </SkuMatrixProvider>
