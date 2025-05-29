@@ -13,6 +13,7 @@ import { ProductProvider } from '@/context/ProductContext';
 import { CategoryProvider } from '@/context/CategoryContext';
 import { SkuMatrixProvider } from '@/context/SkuMatrixContext';
 import { CustomerProductProvider } from '@/context/CustomerProductContext';
+import { POProvider } from '@/context/POContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import AppRoutes from '@/routes/AppRoutes';
@@ -70,8 +71,10 @@ function App() {
                             <CategoryProvider>
                               <SkuMatrixProvider>
                                 <CustomerProductProvider>
-                                  <AppContent />
-                                  <Toaster />
+                                  <POProvider>
+                                    <AppContent />
+                                    <Toaster />
+                                  </POProvider>
                                 </CustomerProductProvider>
                               </SkuMatrixProvider>
                             </CategoryProvider>
