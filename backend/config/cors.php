@@ -25,6 +25,7 @@ return [
         'http://127.0.0.1:3000',
         'http://192.168.1.2:8080',
         'https://preview--green-haven-inventory-hub.lovable.app',
+        '*.lovable.app',
     ],
 
     'allowed_origins_patterns' => [],
