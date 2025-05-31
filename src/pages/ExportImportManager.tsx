@@ -132,7 +132,6 @@ const ExportImportManager = () => {
                     <BackendExportButton
                       type={exportType.type}
                       availableFields={exportType.fields}
-                      label={`Export ${exportType.title}`}
                     />
                   </CardContent>
                 </Card>
@@ -157,7 +156,6 @@ const ExportImportManager = () => {
                     <BackendImportButton
                       type={exportType.type}
                       onSuccess={handleImportSuccess}
-                      label={`Import ${exportType.title}`}
                     />
                   </CardContent>
                 </Card>

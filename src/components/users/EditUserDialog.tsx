@@ -88,7 +88,8 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
           <UserForm 
             onSubmit={handleSubmit} 
             defaultValues={formDefaultValues}
-            isSubmitting={isSubmitting} 
+            isSubmitting={isSubmitting}
+            isEdit={true}
           />
         </div>
       </DialogContent>
