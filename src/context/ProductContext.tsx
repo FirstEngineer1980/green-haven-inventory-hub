@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from '../types';
 import { useAuth } from './AuthContext';
@@ -21,6 +22,24 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
+  const transformBackendProduct = (backendProduct: any): Product => {
+    return {
+      id: backendProduct.id.toString(),
+      name: backendProduct.name || '',
+      sku: backendProduct.sku || '',
+      description: backendProduct.description || '',
+      category: backendProduct.category?.name || backendProduct.category || '',
+      price: parseFloat(backendProduct.price) || 0,
+      costPrice: parseFloat(backendProduct.cost_price) || 0,
+      quantity: parseInt(backendProduct.quantity) || 0,
+      threshold: parseInt(backendProduct.threshold) || 0,
+      location: backendProduct.location || '',
+      image: backendProduct.image || '',
+      createdAt: backendProduct.created_at || new Date().toISOString(),
+      updatedAt: backendProduct.updated_at || new Date().toISOString(),
+    };
+  };
+
   const fetchProducts = async () => {
     if (!user) return;
 
@@ -29,8 +48,13 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     try {
       console.log('Fetching products from API...');
       const response = await apiInstance.get('/products');
-      console.log('Products response:', response.data);
-      setProducts(response.data);
+      console.log('Raw products response:', response.data);
+      
+      // Transform the backend data to frontend format
+      const transformedProducts = response.data.map(transformBackendProduct);
+      console.log('Transformed products:', transformedProducts);
+      
+      setProducts(transformedProducts);
     } catch (err: any) {
       console.error('Error fetching products:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch products';
@@ -71,22 +95,8 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
       console.log('Add product response:', response.data);
       
       // Transform response back to frontend format
-      const newProduct: Product = {
-        id: response.data.id,
-        name: response.data.name,
-        sku: response.data.sku,
-        description: response.data.description || '',
-        category: response.data.category?.name || '',
-        price: parseFloat(response.data.price),
-        costPrice: parseFloat(response.data.cost_price),
-        quantity: response.data.quantity,
-        threshold: response.data.threshold,
-        location: response.data.location || '',
-        image: response.data.image || '',
-        createdAt: response.data.created_at || new Date().toISOString(),
-        updatedAt: response.data.updated_at || new Date().toISOString(),
-      };
-
+      const newProduct = transformBackendProduct(response.data);
+      
       setProducts(prev => [...prev, newProduct]);
     } catch (err: any) {
       console.error('Error adding product:', err);
@@ -123,21 +133,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
       console.log('Update product response:', response.data);
       
       // Transform response back to frontend format
-      const updatedProduct: Product = {
-        id: response.data.id,
-        name: response.data.name,
-        sku: response.data.sku,
-        description: response.data.description || '',
-        category: response.data.category?.name || '',
-        price: parseFloat(response.data.price),
-        costPrice: parseFloat(response.data.cost_price),
-        quantity: response.data.quantity,
-        threshold: response.data.threshold,
-        location: response.data.location || '',
-        image: response.data.image || '',
-        createdAt: response.data.created_at || new Date().toISOString(),
-        updatedAt: response.data.updated_at || new Date().toISOString(),
-      };
+      const updatedProduct = transformBackendProduct(response.data);
 
       setProducts(prev =>
         prev.map(p => p.id === id ? updatedProduct : p)

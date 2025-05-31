@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,8 +19,8 @@ import BackendImportButton from '@/components/shared/BackendImportButton';
 import { useAuth } from '@/context/AuthContext';
 
 const Products = () => {
-  const { products, addProduct, loading, error } = useProducts();
-  const { categories } = useCategories();
+  const { products, addProduct, loading, error, fetchProducts } = useProducts();
+  const { categories, fetchCategories } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -30,9 +30,23 @@ const Products = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  // Fetch data when component mounts
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('Fetching products and categories...');
+      fetchProducts();
+      fetchCategories();
+    }
+  }, [isAuthenticated, fetchProducts, fetchCategories]);
+
   const handleImportSuccess = () => {
-    // Refresh the products context or refetch data
-    window.location.reload(); // Simple refresh for now
+    // Refresh the products after import
+    fetchProducts();
+    toast({
+      title: "Import successful",
+      description: "Products have been imported and the list has been refreshed",
+      variant: "default",
+    });
   };
 
   // Filter products by search term, category, and status
@@ -54,7 +68,7 @@ const Products = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-500 mb-4">Error Loading Products</h1>
             <p className="text-muted-foreground mb-6">{typeof error === 'string' ? error : 'Failed to fetch product data. Please try again later.'}</p>
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <Button onClick={() => fetchProducts()}>Retry</Button>
           </div>
         </div>
       </DashboardLayout>
