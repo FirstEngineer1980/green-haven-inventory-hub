@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,10 +26,11 @@ import { Grid2X2, List, Search, SlidersHorizontal } from 'lucide-react';
 import ProductCard from '@/components/products/ProductCard';
 import ProductPreviewDialog from '@/components/products/ProductPreviewDialog';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const ProductsPage = () => {
-  const { products } = useProducts();
-  const { categories } = useCategories();
+  const { products, fetchProducts } = useProducts();
+  const { categories, fetchCategories } = useCategories();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -40,10 +40,22 @@ const ProductsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [hasInitiallyFetched, setHasInitiallyFetched] = useState(false);
   
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+
+  // Fetch data when component mounts, but only once
+  useEffect(() => {
+    if (isAuthenticated && !hasInitiallyFetched) {
+      console.log('Initial fetch for ProductsPage...');
+      fetchProducts();
+      fetchCategories();
+      setHasInitiallyFetched(true);
+    }
+  }, [isAuthenticated, hasInitiallyFetched]);
 
   // Handle category from URL params
   useEffect(() => {

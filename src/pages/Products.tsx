@@ -26,18 +26,20 @@ const Products = () => {
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [hasInitiallyFetched, setHasInitiallyFetched] = useState(false);
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch data when component mounts
+  // Fetch data when component mounts, but only once
   useEffect(() => {
-    if (isAuthenticated) {
-      console.log('Fetching products and categories...');
+    if (isAuthenticated && !hasInitiallyFetched) {
+      console.log('Initial fetch of products and categories...');
       fetchProducts();
       fetchCategories();
+      setHasInitiallyFetched(true);
     }
-  }, [isAuthenticated, fetchProducts, fetchCategories]);
+  }, [isAuthenticated, hasInitiallyFetched]);
 
   const handleImportSuccess = () => {
     // Refresh the products after import

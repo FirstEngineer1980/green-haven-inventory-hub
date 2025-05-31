@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { Product } from '../types';
 import { useAuth } from './AuthContext';
 import { apiInstance } from '../api/services/api';
@@ -40,8 +40,8 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     };
   };
 
-  const fetchProducts = async () => {
-    if (!user) return;
+  const fetchProducts = useCallback(async () => {
+    if (!user || loading) return;
 
     setLoading(true);
     setError(null);
@@ -62,7 +62,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, loading]);
 
   const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!user) return;
