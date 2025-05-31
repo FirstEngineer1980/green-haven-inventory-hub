@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -115,6 +116,11 @@ const ProductsPage = () => {
   const handleQuickView = (product: Product) => {
     setSelectedProduct(product);
     setShowPreview(true);
+  };
+
+  const handleProductClick = (product: Product) => {
+    // Use navigate instead of causing a page refresh
+    navigate(`/products/${product.id}`);
   };
 
   const clearFilters = () => {
@@ -273,7 +279,7 @@ const ProductsPage = () => {
                     product={product}
                     viewMode={viewMode}
                     onQuickView={handleQuickView}
-                    onProductClick={() => navigate(`/products/${product.id}`)}
+                    onProductClick={() => handleProductClick(product)}
                   />
                 ))}
               </div>

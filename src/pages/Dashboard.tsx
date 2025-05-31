@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { CONFIG } from 'src/config-global';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -12,9 +13,69 @@ import StockTrendChart from '@/components/dashboard/StockTrendChart';
 import RecentMovements from '@/components/dashboard/RecentMovements';
 import LowStockAlert from '@/components/dashboard/LowStockAlert';
 import { Product, StockMovement } from '@/types';
+import { apiInstance } from '@/api/services/api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
+  // Fetch dashboard stats from backend
+  const { data: dashboardStats } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: async () => {
+      const response = await apiInstance.get('/dashboard/stats');
+      return response.data;
+    },
+  });
+
+  // Fetch low stock products from backend
+  const { data: lowStockData } = useQuery({
+    queryKey: ['dashboard-low-stock'],
+    queryFn: async () => {
+      const response = await apiInstance.get('/dashboard/low-stock');
+      return response.data.data || [];
+    },
+  });
+
+  // Fetch recent movements from backend
+  const { data: recentMovementsData } = useQuery({
+    queryKey: ['dashboard-recent-movements'],
+    queryFn: async () => {
+      const response = await apiInstance.get('/dashboard/recent-movements');
+      return response.data.data || [];
+    },
+  });
+
+  // Transform low stock data to match frontend Product type
+  const lowStockProducts: Product[] = (lowStockData || []).map((item: any) => ({
+    id: item.id.toString(),
+    name: item.name,
+    sku: item.sku || '',
+    description: item.description || '',
+    category: item.category?.name || '',
+    price: 0,
+    costPrice: 0,
+    quantity: item.quantity,
+    threshold: item.threshold,
+    location: '',
+    image: '',
+    createdAt: item.created_at || new Date().toISOString(),
+    updatedAt: item.updated_at || new Date().toISOString(),
+  }));
+
+  // Transform recent movements data
+  const recentMovements: StockMovement[] = (recentMovementsData || []).map((item: any) => ({
+    id: item.id.toString(),
+    productId: item.product_id?.toString() || '',
+    productName: item.productName || '',
+    type: item.type as 'in' | 'out',
+    quantity: item.quantity,
+    date: item.date,
+    reason: 'movement',
+    performedBy: item.performedBy || '',
+    createdAt: item.date,
+    userId: item.performed_by?.toString() || '',
+  }));
+
   const [productCategories] = useState([
     { category: 'Electronics', count: 24 },
     { category: 'Furniture', count: 18 },
@@ -23,7 +84,6 @@ const Dashboard = () => {
     { category: 'Bathroom', count: 6 }
   ]);
 
-  // Updated stockTrends to match the expected format for StockTrendChart
   const [stockTrends] = useState([
     { date: '2023-01-15T00:00:00Z', inStock: 65 },
     { date: '2023-02-15T00:00:00Z', inStock: 78 },
@@ -31,128 +91,6 @@ const Dashboard = () => {
     { date: '2023-04-15T00:00:00Z', inStock: 70 },
     { date: '2023-05-15T00:00:00Z', inStock: 85 },
     { date: '2023-06-15T00:00:00Z', inStock: 90 },
-  ]);
-
-  // Define lowStockProducts with correct Product type
-  const [lowStockProducts] = useState<Product[]>([
-    { 
-      id: '1', 
-      name: 'MacBook Pro', 
-      quantity: 2, 
-      threshold: 5,
-      sku: 'MBP-2023',
-      description: 'Apple MacBook Pro',
-      category: 'Electronics',
-      price: 1999.99,
-      costPrice: 1799.99,
-      location: 'Warehouse A',
-      createdAt: '2023-06-01T10:00:00Z',
-      updatedAt: '2023-06-10T15:30:00Z'
-    },
-    { 
-      id: '2', 
-      name: 'Samsung Monitor', 
-      quantity: 3, 
-      threshold: 10,
-      sku: 'SM-2023',
-      description: 'Samsung Ultra-wide Monitor',
-      category: 'Electronics',
-      price: 599.99,
-      costPrice: 499.99,
-      location: 'Warehouse B',
-      createdAt: '2023-06-02T11:00:00Z',
-      updatedAt: '2023-06-11T16:30:00Z'
-    },
-    { 
-      id: '3', 
-      name: 'Desk Chair', 
-      quantity: 4, 
-      threshold: 8,
-      sku: 'DC-2023',
-      description: 'Ergonomic Desk Chair',
-      category: 'Furniture',
-      price: 299.99,
-      costPrice: 249.99,
-      location: 'Warehouse A',
-      createdAt: '2023-06-03T12:00:00Z',
-      updatedAt: '2023-06-12T17:30:00Z'
-    },
-  ]);
-
-  // Define recentMovements with correct StockMovement type
-  const [recentMovements] = useState<StockMovement[]>([
-    { 
-      id: '1', 
-      productId: 'p1', 
-      productName: 'Desk Chair', 
-      type: 'in', 
-      quantity: 10, 
-      date: '2023-06-12T15:30:00Z', 
-      reason: 'restock', 
-      performedBy: 'user1',
-      createdAt: '2023-06-12T15:30:00Z',
-      userId: 'user1'
-    },
-    { 
-      id: '2', 
-      productId: 'p2', 
-      productName: 'Desk Lamp', 
-      type: 'out', 
-      quantity: 5, 
-      date: '2023-06-11T13:45:00Z', 
-      reason: 'sale', 
-      performedBy: 'user2',
-      createdAt: '2023-06-11T13:45:00Z',
-      userId: 'user2'
-    },
-    { 
-      id: '3', 
-      productId: 'p3', 
-      productName: 'Notebook', 
-      type: 'in', 
-      quantity: 50, 
-      date: '2023-06-10T09:20:00Z', 
-      reason: 'restock', 
-      performedBy: 'user1',
-      createdAt: '2023-06-10T09:20:00Z',
-      userId: 'user1'
-    },
-    { 
-      id: '4', 
-      productId: 'p4', 
-      productName: 'Monitor', 
-      type: 'out', 
-      quantity: 8, 
-      date: '2023-06-09T14:15:00Z', 
-      reason: 'sale', 
-      performedBy: 'user3',
-      createdAt: '2023-06-09T14:15:00Z',
-      userId: 'user3'
-    },
-    { 
-      id: '5', 
-      productId: 'p5', 
-      productName: 'Keyboard', 
-      type: 'out', 
-      quantity: 12, 
-      date: '2023-06-08T11:30:00Z', 
-      reason: 'sale', 
-      performedBy: 'user2',
-      createdAt: '2023-06-08T11:30:00Z',
-      userId: 'user2'
-    },
-    { 
-      id: '6', 
-      productId: 'p6', 
-      productName: 'Mouse', 
-      type: 'in', 
-      quantity: 25, 
-      date: '2023-06-07T10:00:00Z', 
-      reason: 'restock', 
-      performedBy: 'user1',
-      createdAt: '2023-06-07T10:00:00Z',
-      userId: 'user1'
-    },
   ]);
 
   return (
@@ -171,28 +109,28 @@ const Dashboard = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard 
-          title="Total Inventory"
-          value="1,234"
+          title="Total Products"
+          value={dashboardStats?.totalProducts?.toString() || "0"}
           icon={<Package className="h-4 w-4" />}
           change={{ value: "12%", positive: true }}
         />
         <StatCard 
-          title="New Customers"
-          value="24"
+          title="Low Stock Items"
+          value={dashboardStats?.lowStockCount?.toString() || "0"}
           icon={<UserPlus className="h-4 w-4" />}
-          change={{ value: "4", positive: true }}
+          change={{ value: "Items below threshold", positive: false }}
         />
         <StatCard 
-          title="Stock In"
-          value="528"
+          title="Total Value"
+          value={`$${dashboardStats?.totalValue?.toFixed(2) || "0.00"}`}
           icon={<ArrowDown className="h-4 w-4" />}
-          change={{ value: "Items received this month", positive: true }}
+          change={{ value: "Inventory value", positive: true }}
         />
         <StatCard 
-          title="Stock Out"
-          value="432"
+          title="Monthly Movements"
+          value={dashboardStats?.monthlyMovements?.toString() || "0"}
           icon={<ArrowUp className="h-4 w-4" />}
-          change={{ value: "Items dispatched this month", positive: false }}
+          change={{ value: "This month", positive: false }}
         />
       </div>
 

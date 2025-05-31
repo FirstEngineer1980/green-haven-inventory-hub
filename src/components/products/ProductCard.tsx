@@ -1,168 +1,123 @@
+
 import React from 'react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Eye, Package } from 'lucide-react';
 import { Product } from '@/types';
-import { Eye, Heart, BarChart2, ShoppingCart } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useFavorites } from '@/context/FavoritesContext';
-import { useComparison } from '@/context/ComparisonContext';
-import { useCart } from '@/context/CartContext';
-import { formatCurrency } from '@/utils/formatters';
 
 interface ProductCardProps {
   product: Product;
-  viewMode: 'grid' | 'list';
-  onQuickView: (product: Product) => void;
-  onProductClick: () => void;
+  viewMode?: 'grid' | 'list';
+  onQuickView?: (product: Product) => void;
+  onProductClick?: () => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
-  viewMode, 
+  viewMode = 'grid', 
   onQuickView,
   onProductClick
 }) => {
-  const { toast } = useToast();
-  const { addToFavorites, isFavorite } = useFavorites();
-  const { addToComparison, isInComparison } = useComparison();
-  const { addToCart } = useCart();
-  
-  // Safely format the price
-  const displayPrice = formatCurrency(typeof product.price === 'number' ? product.price : 0);
-  
-  const handleAddToFavorites = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToFavorites(product);
-    toast({
-      description: `${product.name} added to favorites`,
-    });
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent event bubbling from buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    onProductClick?.();
   };
-  
-  const handleAddToComparison = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToComparison(product);
-    toast({
-      description: `${product.name} added to comparison`,
-    });
-  };
-  
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToCart(product);
-    toast({
-      description: `${product.name} added to cart`,
-    });
-  };
-  
+
   const handleQuickView = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onQuickView(product);
+    onQuickView?.(product);
   };
 
   if (viewMode === 'list') {
     return (
-      <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={onProductClick}>
-        <div className="flex flex-col sm:flex-row">
-          <div className="sm:w-48 h-48 relative">
-            <img 
-              src={product.image || 'https://placehold.co/200x200?text=No+Image'} 
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-1 p-6">
-            <div className="mb-2">
-              <span className="text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary">
-                {product.category}
-              </span>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-            <p className="text-muted-foreground line-clamp-2 mb-3">{product.description}</p>
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-bold">{displayPrice}</span>
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className={isFavorite(product.id) ? "text-red-500" : ""}
-                  onClick={handleAddToFavorites}
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  className={isInComparison(product.id) ? "bg-muted" : ""}
-                  onClick={handleAddToComparison}
-                >
-                  <BarChart2 className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" onClick={handleQuickView}>
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button onClick={handleAddToCart}>
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
-                </Button>
+      <Card 
+        className="cursor-pointer hover:shadow-md transition-shadow"
+        onClick={handleCardClick}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                {product.image ? (
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <Package className="h-8 w-8 text-gray-400" />
+                )}
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">{product.name}</h3>
+                <p className="text-sm text-muted-foreground">{product.sku}</p>
+                <p className="text-sm text-muted-foreground line-clamp-1">{product.description}</p>
               </div>
             </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="font-semibold text-lg">${product.price}</p>
+                <Badge variant={product.quantity > product.threshold ? 'default' : 'destructive'}>
+                  Stock: {product.quantity}
+                </Badge>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleQuickView}>
+                <Eye className="h-4 w-4 mr-2" />
+                Quick View
+              </Button>
+            </div>
           </div>
-        </div>
+        </CardContent>
       </Card>
     );
   }
-  
+
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={onProductClick}>
-      <div className="relative h-48">
-        <img 
-          src={product.image || 'https://placehold.co/300x200?text=No+Image'} 
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute top-2 right-2 flex flex-col gap-2">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className={`bg-white/80 ${isFavorite(product.id) ? "text-red-500" : ""}`}
-            onClick={handleAddToFavorites}
-          >
-            <Heart className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className={`bg-white/80 ${isInComparison(product.id) ? "bg-muted" : ""}`}
-            onClick={handleAddToComparison}
-          >
-            <BarChart2 className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="bg-white/80"
-            onClick={handleQuickView}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
+    <Card 
+      className="cursor-pointer hover:shadow-md transition-shadow"
+      onClick={handleCardClick}
+    >
+      <CardHeader className="p-0">
+        <div className="aspect-square bg-gray-100 rounded-t-lg flex items-center justify-center">
+          {product.image ? (
+            <img 
+              src={product.image} 
+              alt={product.name}
+              className="w-full h-full object-cover rounded-t-lg"
+            />
+          ) : (
+            <Package className="h-16 w-16 text-gray-400" />
+          )}
         </div>
-      </div>
+      </CardHeader>
       <CardContent className="p-4">
-        <div className="mb-2">
-          <span className="text-xs font-medium px-2 py-1 rounded-full bg-primary/10 text-primary">
-            {product.category}
-          </span>
+        <div className="space-y-2">
+          <div>
+            <h3 className="font-semibold text-lg line-clamp-1">{product.name}</h3>
+            <p className="text-sm text-muted-foreground">{product.sku}</p>
+          </div>
+          
+          <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
+          
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-lg">${product.price}</span>
+            <Badge variant={product.quantity > product.threshold ? 'default' : 'destructive'}>
+              Stock: {product.quantity}
+            </Badge>
+          </div>
+          
+          <div className="flex space-x-2 pt-2">
+            <Button variant="outline" size="sm" className="flex-1" onClick={handleQuickView}>
+              <Eye className="h-4 w-4 mr-2" />
+              Quick View
+            </Button>
+          </div>
         </div>
-        <h3 className="font-semibold">{product.name}</h3>
-        <p className="text-muted-foreground text-sm line-clamp-2 h-10">{product.description}</p>
       </CardContent>
-      <CardFooter className="flex items-center justify-between p-4 pt-0">
-        <span className="text-lg font-bold">{displayPrice}</span>
-        <Button size="sm" onClick={handleAddToCart}>
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          Add
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
