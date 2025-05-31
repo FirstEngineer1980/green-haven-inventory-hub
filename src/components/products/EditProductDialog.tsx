@@ -20,7 +20,7 @@ interface EditProductDialogProps {
 
 const EditProductDialog: React.FC<EditProductDialogProps> = ({ 
   open, 
-  onOpenChange, 
+  onOpenChange,
   product 
 }) => {
   const { updateProduct } = useProducts();
@@ -30,7 +30,9 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
   const handleSubmit = async (data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       setIsSubmitting(true);
-      updateProduct(product.id, data);
+      console.log('Updating product data:', data);
+      
+      await updateProduct(product.id, data);
       
       toast({
         title: "Product updated",
@@ -39,11 +41,17 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
       });
       
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating product:', error);
+      
+      let errorMessage = "An error occurred while updating the product";
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: "An error occurred while updating the product",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -57,15 +65,15 @@ const EditProductDialog: React.FC<EditProductDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Edit Product</DialogTitle>
           <DialogDescription>
-            Update the product details.
+            Update the product details below.
           </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">
           <ProductForm 
             onSubmit={handleSubmit} 
+            isSubmitting={isSubmitting}
             defaultValues={product}
-            isSubmitting={isSubmitting} 
           />
         </div>
       </DialogContent>

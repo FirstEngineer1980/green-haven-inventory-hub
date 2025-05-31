@@ -104,14 +104,49 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const response = await apiInstance.put(`/products/${id}`, product);
+      console.log('Updating product with frontend data:', product);
+      
+      // Map frontend field names to backend field names
+      const backendData: any = {};
+      if (product.name !== undefined) backendData.name = product.name;
+      if (product.sku !== undefined) backendData.sku = product.sku;
+      if (product.description !== undefined) backendData.description = product.description;
+      if (product.price !== undefined) backendData.price = product.price;
+      if (product.costPrice !== undefined) backendData.cost_price = product.costPrice;
+      if (product.quantity !== undefined) backendData.quantity = product.quantity;
+      if (product.threshold !== undefined) backendData.threshold = product.threshold;
+      if (product.location !== undefined) backendData.location = product.location;
+      if (product.image !== undefined) backendData.image = product.image;
+
+      console.log('Sending update to backend:', backendData);
+      const response = await apiInstance.put(`/products/${id}`, backendData);
+      console.log('Update product response:', response.data);
+      
+      // Transform response back to frontend format
+      const updatedProduct: Product = {
+        id: response.data.id,
+        name: response.data.name,
+        sku: response.data.sku,
+        description: response.data.description || '',
+        category: response.data.category?.name || '',
+        price: parseFloat(response.data.price),
+        costPrice: parseFloat(response.data.cost_price),
+        quantity: response.data.quantity,
+        threshold: response.data.threshold,
+        location: response.data.location || '',
+        image: response.data.image || '',
+        createdAt: response.data.created_at || new Date().toISOString(),
+        updatedAt: response.data.updated_at || new Date().toISOString(),
+      };
+
       setProducts(prev =>
-        prev.map(p => p.id === id ? response.data : p)
+        prev.map(p => p.id === id ? updatedProduct : p)
       );
     } catch (err: any) {
       console.error('Error updating product:', err);
-      setError(err.message || 'Failed to update product');
-      throw err;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to update product';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
