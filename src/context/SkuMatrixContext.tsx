@@ -1,5 +1,5 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useNotifications } from './NotificationContext';
 import { useAuth } from './AuthContext';
 import { apiInstance } from '../api/services/api';
@@ -28,6 +28,7 @@ export interface SkuMatrixCell {
   skuMatrixRowId: string;
   columnId: string;
   value?: string;
+  binId?: string;
 }
 
 interface SkuMatrixContextType {
@@ -53,31 +54,57 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { addNotification } = useNotifications();
   const { user } = useAuth();
 
-  const fetchSkuMatrices = async () => {
-    if (!user) return;
+  const transformBackendSkuMatrix = (backendData: any): SkuMatrix => {
+    return {
+      id: backendData.id?.toString() || '',
+      name: backendData.name || '',
+      description: backendData.description || '',
+      roomId: backendData.room_id?.toString() || backendData.roomId || '',
+      roomName: backendData.room?.name || backendData.roomName || '',
+      rows: Array.isArray(backendData.rows) ? backendData.rows.map((row: any) => ({
+        id: row.id?.toString() || '',
+        skuMatrixId: row.sku_matrix_id?.toString() || row.skuMatrixId || '',
+        label: row.label || '',
+        color: row.color || '#FFFFFF',
+        cells: Array.isArray(row.cells) ? row.cells.map((cell: any) => ({
+          id: cell.id?.toString() || '',
+          skuMatrixRowId: cell.sku_matrix_row_id?.toString() || cell.skuMatrixRowId || '',
+          columnId: cell.column_id || cell.columnId || '',
+          value: cell.value || '',
+          binId: cell.bin_id || cell.binId || ''
+        })) : []
+      })) : [],
+      createdAt: backendData.created_at || backendData.createdAt || new Date().toISOString(),
+      updatedAt: backendData.updated_at || backendData.updatedAt || new Date().toISOString()
+    };
+  };
+
+  const fetchSkuMatrices = useCallback(async () => {
+    if (!user || loading) return;
     
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching SKU matrices from API...');
       const response = await apiInstance.get('/sku-matrices');
+      console.log('Raw SKU matrices response:', response.data);
+      
       // Ensure we always set an array, even if response is malformed
       const data = Array.isArray(response.data) ? response.data : [];
-      setSkuMatrices(data);
+      const transformedData = data.map(transformBackendSkuMatrix);
+      console.log('Transformed SKU matrices:', transformedData);
+      
+      setSkuMatrices(transformedData);
     } catch (err: any) {
       console.error('Error fetching SKU matrices:', err);
-      setError('Failed to fetch SKU matrices');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch SKU matrices';
+      setError(errorMessage);
       // Set empty array on error to prevent map errors
       setSkuMatrices([]);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchSkuMatrices();
-    }
-  }, [user]);
+  }, [user, loading]);
 
   const getSkuMatrixById = (id: string): SkuMatrix | undefined => {
     return Array.isArray(skuMatrices) ? skuMatrices.find(matrix => matrix.id === id) : undefined;
@@ -91,20 +118,32 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!user) return;
     
     setLoading(true);
+    setError(null);
     try {
-      const response = await apiInstance.post('/sku-matrices', skuMatrix);
-      setSkuMatrices(prev => Array.isArray(prev) ? [...prev, response.data] : [response.data]);
+      console.log('Adding SKU matrix:', skuMatrix);
+      
+      const backendData = {
+        name: skuMatrix.name,
+        description: skuMatrix.description || '',
+        room_id: skuMatrix.roomId
+      };
+      
+      const response = await apiInstance.post('/sku-matrices', backendData);
+      const transformedMatrix = transformBackendSkuMatrix(response.data);
+      
+      setSkuMatrices(prev => Array.isArray(prev) ? [...prev, transformedMatrix] : [transformedMatrix]);
       
       addNotification({
         title: 'New SKU Matrix Added',
-        message: `SKU Matrix "${response.data.name}" has been created`,
+        message: `SKU Matrix "${transformedMatrix.name}" has been created`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
     } catch (err: any) {
       console.error('Error adding SKU matrix:', err);
-      setError('Failed to add SKU matrix');
-      throw err;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to add SKU matrix';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -114,17 +153,28 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!user) return;
     
     setLoading(true);
+    setError(null);
     try {
-      const response = await apiInstance.put(`/sku-matrices/${id}`, updates);
+      console.log('Updating SKU matrix:', id, updates);
+      
+      const backendData: any = {};
+      if (updates.name !== undefined) backendData.name = updates.name;
+      if (updates.description !== undefined) backendData.description = updates.description;
+      if (updates.roomId !== undefined) backendData.room_id = updates.roomId;
+      
+      const response = await apiInstance.put(`/sku-matrices/${id}`, backendData);
+      const transformedMatrix = transformBackendSkuMatrix(response.data);
+      
       setSkuMatrices(prev => 
         Array.isArray(prev) ? prev.map(matrix => 
-          matrix.id === id ? response.data : matrix
-        ) : [response.data]
+          matrix.id === id ? transformedMatrix : matrix
+        ) : [transformedMatrix]
       );
     } catch (err: any) {
       console.error('Error updating SKU matrix:', err);
-      setError('Failed to update SKU matrix');
-      throw err;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to update SKU matrix';
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -135,6 +185,8 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     
     const matrixToDelete = Array.isArray(skuMatrices) ? skuMatrices.find(matrix => matrix.id === id) : null;
     
+    setLoading(true);
+    setError(null);
     try {
       await apiInstance.delete(`/sku-matrices/${id}`);
       setSkuMatrices(prev => Array.isArray(prev) ? prev.filter(matrix => matrix.id !== id) : []);
@@ -149,8 +201,11 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     } catch (err: any) {
       console.error('Error deleting SKU matrix:', err);
-      setError('Failed to delete SKU matrix');
-      throw err;
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete SKU matrix';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 

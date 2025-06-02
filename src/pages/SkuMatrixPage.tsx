@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useSkuMatrix } from '@/context/SkuMatrixContext';
 import { useRooms } from '@/context/RoomContext';
@@ -9,33 +9,45 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import SkuMatrixTable from '@/components/sku-matrix/SkuMatrixTable';
+import EnhancedSkuMatrixTable from '@/components/sku-matrix/EnhancedSkuMatrixTable';
 import AddSkuMatrixDialog from '@/components/sku-matrix/AddSkuMatrixDialog';
 import EditSkuMatrixDialog from '@/components/sku-matrix/EditSkuMatrixDialog';
 import { SkuMatrix } from '@/context/SkuMatrixContext';
 import { UnitMatrix } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 const SkuMatrixPage = () => {
-  const { skuMatrices = [], deleteSkuMatrix, error } = useSkuMatrix();
+  const { skuMatrices = [], deleteSkuMatrix, error, fetchSkuMatrices, loading } = useSkuMatrix();
   const { rooms = [] } = useRooms();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedSkuMatrix, setSelectedSkuMatrix] = useState<SkuMatrix | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [hasInitiallyFetched, setHasInitiallyFetched] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
-  // Helper function to convert SkuMatrix to UnitMatrix
+  // Fetch data when component mounts, but only once
+  useEffect(() => {
+    if (isAuthenticated && !hasInitiallyFetched) {
+      console.log('Initial fetch of SKU matrices...');
+      fetchSkuMatrices();
+      setHasInitiallyFetched(true);
+    }
+  }, [isAuthenticated, hasInitiallyFetched]);
+
+  // Helper function to convert SkuMatrix to UnitMatrix (for legacy components)
   const convertSkuMatrixToUnitMatrix = (skuMatrix: SkuMatrix): UnitMatrix => {
     return {
       id: skuMatrix.id,
       name: skuMatrix.name,
-      description: skuMatrix.description || '', // Ensure description is always a string
+      description: skuMatrix.description || '',
       roomId: skuMatrix.roomId,
       roomName: skuMatrix.roomName,
       rows: Array.isArray(skuMatrix.rows) ? skuMatrix.rows.map(row => ({
         id: row.id,
-        name: row.label, // Map label to name
+        name: row.label,
         label: row.label,
         color: row.color,
         cells: Array.isArray(row.cells) ? row.cells.map(cell => ({
@@ -63,14 +75,21 @@ const SkuMatrixPage = () => {
     setShowEditDialog(true);
   };
 
-  const handleDeleteSkuMatrix = (id: string) => {
-    deleteSkuMatrix(id);
-    
-    toast({
-      title: "SKU Matrix Deleted",
-      description: "The SKU matrix has been removed from the system",
-      variant: "default"
-    });
+  const handleDeleteSkuMatrix = async (id: string) => {
+    try {
+      await deleteSkuMatrix(id);
+      toast({
+        title: "SKU Matrix Deleted",
+        description: "The SKU matrix has been removed from the system",
+        variant: "default"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete SKU matrix",
+        variant: "destructive"
+      });
+    }
   };
 
   // Show error message if there's an API error
@@ -86,7 +105,12 @@ const SkuMatrixPage = () => {
             <CardContent className="pt-6">
               <div className="text-center py-8">
                 <p className="text-destructive mb-4">Error loading SKU matrices: {error}</p>
-                <p className="text-muted-foreground">Please check the backend connection and try again.</p>
+                <p className="text-muted-foreground mb-4">
+                  This might be because the SKU matrix feature is not yet implemented in the backend.
+                </p>
+                <Button onClick={() => fetchSkuMatrices()} disabled={loading}>
+                  {loading ? 'Retrying...' : 'Retry'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -136,29 +160,43 @@ const SkuMatrixPage = () => {
             <CardTitle>SKU Matrices ({filteredSkuMatrices.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {filteredSkuMatrices.map(skuMatrix => (
-              <div key={skuMatrix.id} className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">{skuMatrix.name} - {skuMatrix.roomName}</h3>
-                  <div className="space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditClick(skuMatrix)}>
-                      Edit
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteSkuMatrix(skuMatrix.id)}>
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-                <SkuMatrixTable 
-                  unitMatrix={convertSkuMatrixToUnitMatrix(skuMatrix)}
-                />
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+                <p className="mt-4 text-muted-foreground">Loading SKU matrices...</p>
               </div>
-            ))}
-            
-            {filteredSkuMatrices.length === 0 && (
+            ) : filteredSkuMatrices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No SKU matrices found
+                <p className="mb-4">No SKU matrices found</p>
+                <Button onClick={() => setShowAddDialog(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Your First SKU Matrix
+                </Button>
               </div>
+            ) : (
+              <>
+                {filteredSkuMatrices.map(skuMatrix => (
+                  <div key={skuMatrix.id} className="mb-8">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold">{skuMatrix.name} - {skuMatrix.roomName}</h3>
+                      <div className="space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEditClick(skuMatrix)}>
+                          Edit
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteSkuMatrix(skuMatrix.id)}>
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                    <EnhancedSkuMatrixTable 
+                      skuMatrix={skuMatrix}
+                      onUpdate={(updatedMatrix) => {
+                        console.log('Matrix updated:', updatedMatrix);
+                      }}
+                    />
+                  </div>
+                ))}
+              </>
             )}
           </CardContent>
         </Card>
