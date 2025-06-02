@@ -72,6 +72,12 @@ const EditUnitMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditUnitMatrix
       variant: "default"
     });
   };
+
+  // Filter rooms to ensure they have valid IDs (not empty strings or null/undefined)
+  const validRooms = rooms.filter(room => room.id && room.id.trim() !== '');
+  
+  // Ensure the current roomId is valid, if not set to empty string for placeholder
+  const currentRoomId = formData.roomId && formData.roomId.trim() !== '' ? formData.roomId : '';
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -98,18 +104,24 @@ const EditUnitMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditUnitMatrix
           <div className="space-y-2">
             <Label htmlFor="edit-roomId">Room</Label>
             <Select
-              value={formData.roomId}
+              value={currentRoomId}
               onValueChange={(value) => handleSelectChange('roomId', value)}
             >
               <SelectTrigger id="edit-roomId">
                 <SelectValue placeholder="Select a room" />
               </SelectTrigger>
               <SelectContent>
-                {rooms.map((room) => (
-                  <SelectItem key={room.id} value={room.id}>
-                    {room.name}
+                {validRooms.length > 0 ? (
+                  validRooms.map((room) => (
+                    <SelectItem key={room.id} value={room.id}>
+                      {room.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="no-rooms-available" disabled>
+                    No rooms available
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
           </div>

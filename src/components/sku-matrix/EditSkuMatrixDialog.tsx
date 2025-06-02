@@ -110,6 +110,9 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
   // Filter rooms to ensure they have valid IDs (not empty strings or null/undefined)
   const validRooms = rooms.filter(room => room.id && room.id.trim() !== '');
   
+  // Ensure the current roomId is valid, if not set to empty string for placeholder
+  const currentRoomId = formData.roomId && formData.roomId.trim() !== '' ? formData.roomId : '';
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -135,7 +138,7 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
           <div className="space-y-2">
             <Label htmlFor="roomId">Room</Label>
             <Select
-              value={formData.roomId}
+              value={currentRoomId}
               onValueChange={(value) => handleSelectChange('roomId', value)}
             >
               <SelectTrigger id="roomId">
