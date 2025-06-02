@@ -31,6 +31,11 @@ import {
   Calculator,
   Briefcase,
   UserPlus,
+  Receipt,
+  Grid3X3,
+  Warehouse,
+  TrendingUp,
+  DollarSign,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -44,21 +49,28 @@ const AppSidebar = () => {
     { title: 'Products', url: '/products', icon: Package },
     { title: 'Categories', url: '/categories', icon: Layers },
     { title: 'Customers', url: '/customers', icon: Users },
-    { title: 'Customer Products', url: '/customer-products', icon: Package },
-    { title: 'Rooms', url: '/rooms', icon: Building },
-    { title: 'Units', url: '/units', icon: Boxes },
+    { title: 'Customer Products', url: '/customer-products', icon: Grid3X3 },
     { title: 'Purchase Orders', url: '/purchase-orders', icon: ShoppingCart },
     { title: 'Vendors', url: '/vendors', icon: Truck },
+    { title: 'Inventory', url: '/inventory', icon: Warehouse },
+    { title: 'Invoices', url: '/invoices', icon: Receipt },
+  ];
+
+  const warehouseNavItems = [
+    { title: 'Rooms', url: '/rooms', icon: Building },
+    { title: 'Units', url: '/units', icon: Boxes },
     { title: 'Bins', url: '/bins', icon: Package },
     { title: 'SKU Matrix', url: '/sku-matrix', icon: Calculator },
+    { title: 'Unit Matrix', url: '/unit-matrix', icon: Grid3X3 },
     { title: 'Stock Movements', url: '/stock-movements', icon: BarChart3 },
-    { title: 'Inventory', url: '/inventory', icon: Package },
   ];
 
   const crmNavItems = [
     { title: 'CRM Dashboard', url: '/crm', icon: BarChart3 },
-    { title: 'Sellers', url: '/crm/sellers', icon: UserCheck },
     { title: 'Clients', url: '/crm/clients', icon: UserPlus },
+    { title: 'Sellers', url: '/crm/sellers', icon: UserCheck },
+    { title: 'Seller Commissions', url: '/crm/seller-commissions', icon: TrendingUp },
+    { title: 'Commission Management', url: '/crm/commission-dashboard', icon: DollarSign },
   ];
 
   const systemNavItems = [
@@ -106,7 +118,29 @@ const AppSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>CRM</SidebarGroupLabel>
+          <SidebarGroupLabel>Warehouse</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {warehouseNavItems.map((item) => (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton
+                    onClick={() => handleNavigation(item.url)}
+                    className={cn(
+                      "w-full justify-start",
+                      isActive(item.url) && "bg-accent text-accent-foreground"
+                    )}
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>CRM & Sales</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {crmNavItems.map((item) => (
