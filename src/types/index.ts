@@ -179,7 +179,9 @@ export interface Vendor {
   phone?: string;
   address?: string;
   contactPerson?: string;
+  notes?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface UnitMatrix {
