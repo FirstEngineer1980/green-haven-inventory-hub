@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 
-interface InvoiceItem {
+interface LocalInvoiceItem {
   description: string;
   quantity: number;
   unit_price: number;
@@ -19,8 +19,8 @@ interface InvoiceTypeFormProps {
   type: string;
   formData: any;
   onChange: (data: any) => void;
-  items: InvoiceItem[];
-  onItemsChange: (items: InvoiceItem[]) => void;
+  items: LocalInvoiceItem[];
+  onItemsChange: (items: LocalInvoiceItem[]) => void;
 }
 
 const InvoiceTypeForm = ({ type, formData, onChange, items, onItemsChange }: InvoiceTypeFormProps) => {

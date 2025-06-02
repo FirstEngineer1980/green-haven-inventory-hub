@@ -16,6 +16,13 @@ interface AddInvoiceDialogProps {
   onSuccess: () => void;
 }
 
+interface LocalInvoiceItem {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  notes?: string;
+}
+
 const AddInvoiceDialog = ({ open, onOpenChange, onSuccess }: AddInvoiceDialogProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -34,7 +41,7 @@ const AddInvoiceDialog = ({ open, onOpenChange, onSuccess }: AddInvoiceDialogPro
   });
   
   const [typeSpecificData, setTypeSpecificData] = useState({});
-  const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0, notes: '' }]);
+  const [items, setItems] = useState<LocalInvoiceItem[]>([{ description: '', quantity: 1, unit_price: 0, notes: '' }]);
 
   const handleSubmit = async () => {
     if (!formData.type || !formData.client_name || !formData.due_date || items.length === 0) {

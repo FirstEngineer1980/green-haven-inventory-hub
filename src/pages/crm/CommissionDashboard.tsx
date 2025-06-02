@@ -251,6 +251,8 @@ const CommissionDashboard = () => {
       <AddCommissionDialog 
         open={openAddDialog} 
         onOpenChange={setOpenAddDialog}
+        sellers={sellers || []}
+        clients={clients || []}
         onSuccess={refetchCommissions}
       />
       
@@ -259,6 +261,8 @@ const CommissionDashboard = () => {
           open={openEditDialog} 
           onOpenChange={setOpenEditDialog}
           commission={selectedCommission}
+          sellers={sellers || []}
+          clients={clients || []}
           onSuccess={refetchCommissions}
         />
       )}
