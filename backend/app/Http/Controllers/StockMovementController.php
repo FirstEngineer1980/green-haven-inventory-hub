@@ -1,5 +1,3 @@
-
-
 <?php
 
 namespace App\Http\Controllers;
@@ -26,10 +24,10 @@ class StockMovementController extends Controller
         if (!isset($requestData['reference_id'])) {
             $requestData['reference_id'] = 1;
         }
-        
+
         // Create a new request instance with the modified data
         $request->merge($requestData);
-        
+
         $data = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
