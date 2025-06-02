@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -28,6 +29,14 @@ class StockMovementController extends Controller
 
         // Add the current user as performer
         $data['performed_by'] = Auth::id();
+
+        // Set default values for reference fields if not provided
+        if (!isset($data['reference_type'])) {
+            $data['reference_type'] = 'manual';
+        }
+        if (!isset($data['reference_id'])) {
+            $data['reference_id'] = 1; // Default reference ID for manual entries
+        }
 
         $stockMovement = StockMovement::create($data);
 
