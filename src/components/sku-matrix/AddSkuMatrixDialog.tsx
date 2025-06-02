@@ -36,6 +36,10 @@ const AddSkuMatrixDialog = ({ open, onOpenChange }: AddSkuMatrixDialogProps) => 
   };
   
   const handleSelectChange = (name: string, value: string) => {
+    // Don't allow empty string values
+    if (value === 'no-room-selected') {
+      value = '';
+    }
     setFormData(prev => ({
       ...prev,
       [name]: value
