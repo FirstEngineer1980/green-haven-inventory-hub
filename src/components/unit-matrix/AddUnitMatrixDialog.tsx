@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
 import { useRooms } from '@/context/RoomContext';
@@ -15,7 +16,7 @@ interface AddUnitMatrixDialogProps {
 }
 
 const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) => {
-  const { addUnitMatrix } = useUnitMatrix();
+  const { addUnitMatrix, columns } = useUnitMatrix();
   const { rooms } = useRooms();
   const { toast } = useToast();
   
@@ -27,8 +28,6 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
   const [rows, setRows] = useState<{ label: string; color: string; }[]>([]);
   const [newRowLabel, setNewRowLabel] = useState('');
   const [newRowColor, setNewRowColor] = useState('#FFFFFF');
-  
-  const [columns, setColumns] = useState<{ id: string; name: string; }[]>([]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -83,13 +82,16 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
       return;
     }
     
-    // Add IDs to rows and create cells for each row
+    // Use the actual columns from the context
+    const actualColumns = columns || [];
+    
+    // Add IDs to rows and create cells for each row using actual columns
     const timestamp = Date.now();
     const rowsWithIds = rows.map((row, index) => {
       const rowId = `row-${timestamp}-${index}`;
       
-      // Create cells for each column in this row
-      const cellsForRow = columns.map(column => ({
+      // Create cells for each column in this row using actual columns from context
+      const cellsForRow = actualColumns.map(column => ({
         id: `${rowId}-${column.id}`,
         columnId: column.id,
         value: '',
@@ -98,30 +100,39 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
       
       return {
         id: rowId,
-        name: row.label, // Add the missing name property
+        name: row.label,
         label: row.label,
         color: row.color,
         cells: cellsForRow
       };
     });
     
-    addUnitMatrix({
-      name: formData.name,
-      roomId: formData.roomId,
-      description: '',
-      rows: rowsWithIds,
-    });
-    
-    // Reset form
-    setFormData({ name: '', roomId: '' });
-    setRows([]);
-    onOpenChange(false);
-    
-    toast({
-      title: "Unit Matrix Added",
-      description: "The new unit matrix has been created successfully",
-      variant: "default"
-    });
+    try {
+      addUnitMatrix({
+        name: formData.name,
+        roomId: formData.roomId,
+        description: '',
+        rows: rowsWithIds,
+      });
+      
+      // Reset form
+      setFormData({ name: '', roomId: '' });
+      setRows([]);
+      onOpenChange(false);
+      
+      toast({
+        title: "Unit Matrix Added",
+        description: "The new unit matrix has been created successfully",
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('Error adding unit matrix:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add unit matrix. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   
   return (
