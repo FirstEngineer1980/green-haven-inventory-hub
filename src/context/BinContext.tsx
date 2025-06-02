@@ -12,7 +12,7 @@ interface BinContextProps {
   addBin: (bin: Omit<Bin, 'id' | 'createdAt' | 'updatedAt' | 'volumeCapacity'>) => Promise<void>;
   updateBin: (id: string, bin: Partial<Bin>) => Promise<void>;
   deleteBin: (id: string) => Promise<void>;
-  getBinsByUnitMatrix: (unitMatrixId: string) => Bin[];
+  getBinsBySkuMatrix: (skuMatrixId: string) => Bin[];
 }
 
 const BinContext = createContext<BinContextProps | undefined>(undefined);
@@ -41,10 +41,16 @@ export const BinProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!user) return;
     setLoading(true);
     try {
-      const volumeCapacity = binData.length * binData.width * binData.height;
+      const volumeCapacity = (binData.length || 0) * (binData.width || 0) * (binData.height || 0);
       const response = await apiInstance.post('/bins', {
-        ...binData,
-        volumeCapacity,
+        name: binData.name,
+        length: binData.length,
+        width: binData.width,
+        height: binData.height,
+        volume_capacity: volumeCapacity,
+        location: binData.location,
+        sku_matrix_id: binData.skuMatrixId,
+        status: binData.status || 'active',
       });
       setBins([...bins, response.data]);
     } catch (error: any) {
@@ -59,7 +65,20 @@ export const BinProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!user) return;
     setLoading(true);
     try {
-      const response = await apiInstance.put(`/bins/${id}`, binData);
+      const updateData: any = {};
+      if (binData.name) updateData.name = binData.name;
+      if (binData.length !== undefined) updateData.length = binData.length;
+      if (binData.width !== undefined) updateData.width = binData.width;
+      if (binData.height !== undefined) updateData.height = binData.height;
+      if (binData.location) updateData.location = binData.location;
+      if (binData.skuMatrixId) updateData.sku_matrix_id = binData.skuMatrixId;
+      if (binData.status) updateData.status = binData.status;
+      
+      if (binData.length !== undefined && binData.width !== undefined && binData.height !== undefined) {
+        updateData.volume_capacity = binData.length * binData.width * binData.height;
+      }
+
+      const response = await apiInstance.put(`/bins/${id}`, updateData);
       setBins(bins.map(bin => bin.id === id ? response.data : bin));
     } catch (error: any) {
       console.error('Error updating bin:', error);
@@ -80,8 +99,8 @@ export const BinProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  const getBinsByUnitMatrix = (unitMatrixId: string) => {
-    return bins.filter(bin => bin.unitMatrixId === unitMatrixId);
+  const getBinsBySkuMatrix = (skuMatrixId: string) => {
+    return bins.filter(bin => bin.skuMatrixId === skuMatrixId);
   };
 
   const value: BinContextProps = {
@@ -92,7 +111,7 @@ export const BinProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     addBin,
     updateBin,
     deleteBin,
-    getBinsByUnitMatrix,
+    getBinsBySkuMatrix,
   };
 
   return (

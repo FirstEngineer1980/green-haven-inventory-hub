@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -9,7 +10,7 @@ class BinController extends Controller
 {
     public function index()
     {
-        return Bin::with('unitMatrix')->get();
+        return Bin::with('skuMatrix')->get();
     }
 
     public function store(Request $request)
@@ -21,16 +22,16 @@ class BinController extends Controller
             'height' => 'nullable|numeric|min:0',
             'volume_capacity' => 'nullable|numeric|min:0',
             'location' => 'nullable|string',
-            'unit_matrix_id' => 'nullable|exists:unit_matrices,id',
+            'sku_matrix_id' => 'nullable|exists:sku_matrices,id',
             'status' => 'string|in:active,inactive',
         ]));
 
-        return $bin->load('unitMatrix');
+        return $bin->load('skuMatrix');
     }
 
     public function show(Bin $bin)
     {
-        return $bin->load(['unitMatrix', 'inventoryItems']);
+        return $bin->load(['skuMatrix', 'inventoryItems']);
     }
 
     public function update(Request $request, Bin $bin)
@@ -42,11 +43,11 @@ class BinController extends Controller
             'height' => 'nullable|numeric|min:0',
             'volume_capacity' => 'nullable|numeric|min:0',
             'location' => 'nullable|string',
-            'unit_matrix_id' => 'nullable|exists:unit_matrices,id',
+            'sku_matrix_id' => 'nullable|exists:sku_matrices,id',
             'status' => 'string|in:active,inactive',
         ]));
 
-        return $bin->load('unitMatrix');
+        return $bin->load('skuMatrix');
     }
 
     public function destroy(Bin $bin)

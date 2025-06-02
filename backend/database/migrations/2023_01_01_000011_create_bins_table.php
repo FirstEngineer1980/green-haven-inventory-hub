@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('height', 8, 2)->nullable();
             $table->decimal('volume_capacity', 10, 2)->nullable();
             $table->string('location')->nullable();
-            $table->foreignId('unit_matrix_id')->nullable();
+            $table->foreignId('sku_matrix_id')->nullable()->constrained('sku_matrices')->nullOnDelete();
             $table->string('status')->default('active');
             $table->timestamps();
             $table->softDeletes();

@@ -1,4 +1,3 @@
-
 export interface User {
   id: number; // Changed from string to number to match backend
   name: string;
@@ -78,7 +77,7 @@ export interface Bin {
   height: number;
   volumeCapacity: number;
   location: string;
-  unitMatrixId?: string;
+  skuMatrixId?: string;
   roomId?: string;
   status?: string;
   currentStock: number;

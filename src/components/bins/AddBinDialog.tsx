@@ -14,20 +14,20 @@ import { Bin } from '@/types';
 interface AddBinDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  unitMatrixId?: string;
+  skuMatrixId?: string;
 }
 
 export const AddBinDialog: React.FC<AddBinDialogProps> = ({
   open,
   onOpenChange,
-  unitMatrixId
+  skuMatrixId
 }) => {
   const { addBin } = useBins();
 
   const handleSubmit = (data: Partial<Bin>) => {
-    // If unitMatrixId is provided as a prop, use it as the default
-    const binData = unitMatrixId 
-      ? { ...data, unitMatrixId } 
+    // If skuMatrixId is provided as a prop, use it as the default
+    const binData = skuMatrixId 
+      ? { ...data, skuMatrixId } 
       : data;
       
     addBin(binData as any);
@@ -46,7 +46,7 @@ export const AddBinDialog: React.FC<AddBinDialogProps> = ({
         
         <BinForm 
           onSubmit={handleSubmit} 
-          defaultValues={unitMatrixId ? { unitMatrixId } : {}}
+          defaultValues={skuMatrixId ? { skuMatrixId } : {}}
         />
       </DialogContent>
     </Dialog>

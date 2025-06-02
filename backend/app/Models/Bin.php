@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -22,16 +23,16 @@ class Bin extends Model
         'height',
         'volume_capacity',
         'location',
-        'unit_matrix_id',
+        'sku_matrix_id',
         'status',
     ];
 
     /**
-     * Get the unit matrix associated with this bin.
+     * Get the SKU matrix associated with this bin.
      */
-    public function unitMatrix()
+    public function skuMatrix()
     {
-        return $this->belongsTo(UnitMatrix::class);
+        return $this->belongsTo(SkuMatrix::class);
     }
 
     /**

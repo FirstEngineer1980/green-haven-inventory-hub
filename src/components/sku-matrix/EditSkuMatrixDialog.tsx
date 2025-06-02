@@ -24,7 +24,7 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
   
   const [formData, setFormData] = useState({
     name: unitMatrix.name,
-    roomId: unitMatrix.roomId,
+    roomId: unitMatrix.roomId || '',
   });
   
   const [newRows, setNewRows] = useState<{ label: string; color: string; }[]>([]);
@@ -35,7 +35,7 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
   useEffect(() => {
     setFormData({
       name: unitMatrix.name,
-      roomId: unitMatrix.roomId,
+      roomId: unitMatrix.roomId || '',
     });
     setNewRows([]);
   }, [unitMatrix]);
@@ -106,6 +106,9 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
       variant: "default"
     });
   };
+
+  // Filter rooms to ensure they have valid IDs
+  const validRooms = rooms.filter(room => room.id && room.id.trim() !== '');
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,11 +142,17 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
                 <SelectValue placeholder="Select a room" />
               </SelectTrigger>
               <SelectContent>
-                {rooms.map((room) => (
-                  <SelectItem key={room.id} value={room.id}>
-                    {room.name}
+                {validRooms.length > 0 ? (
+                  validRooms.map((room) => (
+                    <SelectItem key={room.id} value={room.id}>
+                      {room.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="no-rooms" disabled>
+                    No rooms available
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
           </div>
