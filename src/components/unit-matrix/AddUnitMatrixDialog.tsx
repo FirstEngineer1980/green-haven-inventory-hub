@@ -64,6 +64,10 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
   };
   
   const handleSubmit = () => {
+    console.log('Submit clicked - Form data:', formData);
+    console.log('Submit clicked - Rows:', rows);
+    console.log('Submit clicked - Columns:', columns);
+    
     if (!formData.name || !formData.roomId) {
       toast({
         title: "Validation Error",
@@ -82,32 +86,19 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
       return;
     }
     
-    // Use the actual columns from the context
-    const actualColumns = columns || [];
-    
-    // Add IDs to rows and create cells for each row using actual columns
-    const timestamp = Date.now();
-    const rowsWithIds = rows.map((row, index) => {
-      const rowId = `row-${timestamp}-${index}`;
-      
-      // Create cells for each column in this row using actual columns from context
-      const cellsForRow = actualColumns.map(column => ({
-        id: `${rowId}-${column.id}`,
-        columnId: column.id,
-        value: '',
-        content: ''
-      }));
-      
-      return {
-        id: rowId,
+    try {
+      // Create rows with IDs first, without cells
+      const timestamp = Date.now();
+      const rowsWithIds = rows.map((row, index) => ({
+        id: `row-${timestamp}-${index}`,
         name: row.label,
         label: row.label,
         color: row.color,
-        cells: cellsForRow
-      };
-    });
-    
-    try {
+        cells: [] // Will be populated by the context
+      }));
+      
+      console.log('Rows with IDs:', rowsWithIds);
+      
       addUnitMatrix({
         name: formData.name,
         roomId: formData.roomId,

@@ -135,25 +135,59 @@ export const UnitMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const { addNotification } = useNotifications();
 
   const addUnitMatrix = (matrix: Omit<UnitMatrix, 'id' | 'createdAt' | 'updatedAt' | 'roomName'>) => {
-    const now = new Date().toISOString();
-    const room = getRoomById(matrix.roomId || '');
+    console.log('Adding unit matrix:', matrix);
+    console.log('Current columns:', columns);
     
-    const newUnitMatrix: UnitMatrix = {
-      ...matrix,
-      id: Date.now().toString(),
-      roomName: room ? room.name : 'Unknown Room',
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    setUnitMatrices(prev => [...prev, newUnitMatrix]);
-    
-    addNotification({
-      title: 'New Unit Matrix Created',
-      message: `Unit matrix "${newUnitMatrix.name}" has been created`,
-      type: 'success',
-      for: ['1', '2'], // Admin, Manager IDs
-    });
+    try {
+      const now = new Date().toISOString();
+      const room = getRoomById(matrix.roomId || '');
+      
+      // Ensure we have columns to work with
+      const availableColumns = columns && columns.length > 0 ? columns : mockColumns;
+      console.log('Available columns:', availableColumns);
+      
+      // Process rows to ensure they have proper cells
+      const processedRows = (matrix.rows || []).map(row => {
+        const cells = availableColumns.map(column => ({
+          id: `${row.id}-${column.id}`,
+          columnId: column.id,
+          value: '',
+          content: ''
+        }));
+        
+        return {
+          ...row,
+          cells
+        };
+      });
+      
+      const newUnitMatrix: UnitMatrix = {
+        ...matrix,
+        id: Date.now().toString(),
+        roomName: room ? room.name : 'Unknown Room',
+        rows: processedRows,
+        createdAt: now,
+        updatedAt: now
+      };
+      
+      console.log('New unit matrix created:', newUnitMatrix);
+      
+      setUnitMatrices(prev => {
+        const updated = [...prev, newUnitMatrix];
+        console.log('Updated unit matrices:', updated);
+        return updated;
+      });
+      
+      addNotification({
+        title: 'New Unit Matrix Created',
+        message: `Unit matrix "${newUnitMatrix.name}" has been created`,
+        type: 'success',
+        for: ['1', '2'], // Admin, Manager IDs
+      });
+    } catch (error) {
+      console.error('Error in addUnitMatrix:', error);
+      throw error;
+    }
   };
 
   const updateUnitMatrix = (id: string, updates: Partial<UnitMatrix>) => {
