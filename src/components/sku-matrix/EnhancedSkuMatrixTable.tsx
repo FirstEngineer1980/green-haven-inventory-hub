@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface EnhancedSkuMatrixTableProps {
   skuMatrix: SkuMatrix;
@@ -15,15 +16,19 @@ interface EnhancedSkuMatrixTableProps {
 const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableProps) => {
   const [editingCell, setEditingCell] = useState<string | null>(null);
   const [cellValue, setCellValue] = useState('');
+  const [newRowLabel, setNewRowLabel] = useState('');
+  const [newRowColor, setNewRowColor] = useState('#3B82F6');
+  const [newColumnLabel, setNewColumnLabel] = useState('');
+  const { toast } = useToast();
 
   // Mock columns for now - in a real app this would come from context
-  const columns = [
+  const [columns, setColumns] = useState([
     { id: 'col-1', label: 'Column 1' },
     { id: 'col-2', label: 'Column 2' },
     { id: 'col-3', label: 'Column 3' },
     { id: 'col-4', label: 'Column 4' },
     { id: 'col-5', label: 'Column 5' },
-  ];
+  ]);
 
   // Mock bin options - in a real app this would come from an API
   const binOptions = [
@@ -52,6 +57,116 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
   const handleSelectChange = (cellId: string, value: string) => {
     console.log('Select changed for cell:', cellId, 'new value:', value);
     // Here you would update the actual matrix data
+  };
+
+  const handleAddRow = () => {
+    if (!newRowLabel.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Row label is required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newRowId = `row-${Date.now()}`;
+    const newCells = columns.map(column => ({
+      id: `${newRowId}-${column.id}`,
+      columnId: column.id,
+      value: '',
+      content: ''
+    }));
+
+    const newRow = {
+      id: newRowId,
+      skuMatrixId: skuMatrix.id,
+      label: newRowLabel,
+      color: newRowColor,
+      cells: newCells
+    };
+
+    const updatedMatrix = {
+      ...skuMatrix,
+      rows: [...(skuMatrix.rows || []), newRow]
+    };
+
+    if (onUpdate) {
+      onUpdate(updatedMatrix);
+    }
+
+    setNewRowLabel('');
+    setNewRowColor('#3B82F6');
+
+    toast({
+      title: "Row Added",
+      description: `Row "${newRowLabel}" has been added successfully`,
+      variant: "default"
+    });
+  };
+
+  const handleAddColumn = () => {
+    if (!newColumnLabel.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Column label is required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newColumnId = `col-${Date.now()}`;
+    const newColumn = {
+      id: newColumnId,
+      label: newColumnLabel
+    };
+
+    setColumns(prev => [...prev, newColumn]);
+
+    // Add cells for this new column to all existing rows
+    const updatedMatrix = {
+      ...skuMatrix,
+      rows: (skuMatrix.rows || []).map(row => ({
+        ...row,
+        cells: [
+          ...(row.cells || []),
+          {
+            id: `${row.id}-${newColumnId}`,
+            columnId: newColumnId,
+            value: '',
+            content: ''
+          }
+        ]
+      }))
+    };
+
+    if (onUpdate) {
+      onUpdate(updatedMatrix);
+    }
+
+    setNewColumnLabel('');
+
+    toast({
+      title: "Column Added",
+      description: `Column "${newColumnLabel}" has been added successfully`,
+      variant: "default"
+    });
+  };
+
+  const handleDeleteRow = (rowId: string) => {
+    const updatedMatrix = {
+      ...skuMatrix,
+      rows: (skuMatrix.rows || []).filter(row => row.id !== rowId)
+    };
+
+    if (onUpdate) {
+      onUpdate(updatedMatrix);
+    }
+
+    toast({
+      title: "Row Deleted",
+      description: "Row has been deleted successfully",
+      variant: "default"
+    });
   };
 
   return (
@@ -129,7 +244,7 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => console.log('Delete row:', row.id)}
+                    onClick={() => handleDeleteRow(row.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -140,15 +255,42 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
         </Table>
       </div>
       
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => console.log('Add row')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Row
-        </Button>
-        <Button variant="outline" onClick={() => console.log('Add column')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Column
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Add Row</h4>
+          <div className="flex space-x-2">
+            <Input
+              placeholder="Row Label"
+              value={newRowLabel}
+              onChange={(e) => setNewRowLabel(e.target.value)}
+              className="flex-1"
+            />
+            <Input
+              type="color"
+              value={newRowColor}
+              onChange={(e) => setNewRowColor(e.target.value)}
+              className="w-16"
+            />
+            <Button onClick={handleAddRow} size="sm">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Add Column</h4>
+          <div className="flex space-x-2">
+            <Input
+              placeholder="Column Label"
+              value={newColumnLabel}
+              onChange={(e) => setNewColumnLabel(e.target.value)}
+              className="flex-1"
+            />
+            <Button onClick={handleAddColumn} size="sm">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
