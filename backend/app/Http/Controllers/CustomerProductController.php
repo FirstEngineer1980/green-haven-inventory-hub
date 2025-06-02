@@ -1,9 +1,11 @@
+
 <?php
 
 namespace App\Http\Controllers;
 
 use App\Models\CustomerProduct;
 use App\Models\Customer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CustomerProductController extends Controller
@@ -23,6 +25,33 @@ class CustomerProductController extends Controller
         $products = $query->get();
 
         return response()->json($products);
+    }
+
+    /**
+     * Get all products for SKU selection.
+     */
+    public function getProducts()
+    {
+        $products = Product::select('id', 'name', 'sku', 'description', 'price', 'cost_price', 'image')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($products);
+    }
+
+    /**
+     * Get product details by SKU.
+     */
+    public function getProductBySku($sku)
+    {
+        $product = Product::where('sku', $sku)->first();
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        return response()->json($product);
     }
 
     /**

@@ -5,6 +5,7 @@ import CustomerProductTable from '@/components/customer-products/CustomerProduct
 import CustomerProductForm from '@/components/customer-products/CustomerProductForm';
 import { useCustomerProducts, CustomerProduct } from '@/context/CustomerProductContext';
 import { useCustomers } from '@/context/CustomerContext';
+import { ProductSelectionProvider } from '@/context/ProductSelectionContext';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { useNotifications } from '@/context/NotificationContext';
@@ -66,70 +67,72 @@ const CustomerProducts = () => {
   };
   
   return (
-    <DashboardLayout>
-      <div className="space-y-4 md:space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Customer Products</h1>
-          <Button onClick={handleAddNew} className="w-full md:w-auto">
-            <Plus className="mr-2 h-4 w-4" /> Add New Product
-          </Button>
+    <ProductSelectionProvider>
+      <DashboardLayout>
+        <div className="space-y-4 md:space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Customer Products</h1>
+            <Button onClick={handleAddNew} className="w-full md:w-auto">
+              <Plus className="mr-2 h-4 w-4" /> Add New Product
+            </Button>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Filters</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div className="grid w-full">
+                  <Input
+                    placeholder="Search by name or SKU"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="grid w-full">
+                  <Select
+                    value={selectedCustomerId}
+                    onValueChange={setSelectedCustomerId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Customers" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Customers</SelectItem>
+                      {customers.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id}>
+                          {customer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Button variant="outline" onClick={resetFilters} className="w-full md:w-auto">
+                  <RefreshCw className="mr-2 h-4 w-4" /> Reset
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <CustomerProductTable 
+            customerIdFilter={selectedCustomerId === 'all' ? '' : selectedCustomerId} 
+            onEdit={handleEdit} 
+          />
+          
+          <CustomerProductForm
+            open={formOpen}
+            onOpenChange={setFormOpen}
+            product={editingProduct}
+            onSubmit={handleFormSubmit}
+            title={editingProduct ? 'Edit Customer Product' : 'Add Customer Product'}
+          />
         </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-              <div className="grid w-full">
-                <Input
-                  placeholder="Search by name or SKU"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              
-              <div className="grid w-full">
-                <Select
-                  value={selectedCustomerId}
-                  onValueChange={setSelectedCustomerId}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Customers" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Customers</SelectItem>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <Button variant="outline" onClick={resetFilters} className="w-full md:w-auto">
-                <RefreshCw className="mr-2 h-4 w-4" /> Reset
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <CustomerProductTable 
-          customerIdFilter={selectedCustomerId === 'all' ? '' : selectedCustomerId} 
-          onEdit={handleEdit} 
-        />
-        
-        <CustomerProductForm
-          open={formOpen}
-          onOpenChange={setFormOpen}
-          product={editingProduct}
-          onSubmit={handleFormSubmit}
-          title={editingProduct ? 'Edit Customer Product' : 'Add Customer Product'}
-        />
-      </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </ProductSelectionProvider>
   );
 };
 

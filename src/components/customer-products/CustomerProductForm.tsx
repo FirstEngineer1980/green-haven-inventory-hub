@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -24,6 +24,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import SkuSelector from './SkuSelector';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const formSchema = z.object({
   sku: z.string().min(1, "SKU is required"),
@@ -52,6 +54,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
   title,
 }) => {
   const { customers } = useCustomers();
+  const [selectedProductInfo, setSelectedProductInfo] = useState<any>(null);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -78,6 +81,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
           description: product.description || '',
           customerId: product.customerId,
         });
+        setSelectedProductInfo(null);
       } else {
         // Add mode - reset to defaults
         form.reset({
@@ -88,9 +92,18 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
           description: '',
           customerId: customers.length > 0 ? customers[0].id : '',
         });
+        setSelectedProductInfo(null);
       }
     }
   }, [open, product, form, customers]);
+
+  const handleProductSelect = (productInfo: any) => {
+    setSelectedProductInfo(productInfo);
+    // Auto-populate fields with product information
+    form.setValue('name', productInfo.name);
+    form.setValue('description', productInfo.description || '');
+    form.setValue('picture', productInfo.image || '');
+  };
   
   const handleSubmit = (values: FormValues) => {
     onSubmit(values);
@@ -99,27 +112,50 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="sku"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SKU</FormLabel>
+                  <SkuSelector
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onProductSelect={handleProductSelect}
+                    placeholder="Select or enter SKU"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {selectedProductInfo && (
+              <Card className="bg-muted/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium">Product Information</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="font-medium">Price:</span> ${selectedProductInfo.price}
+                    </div>
+                    {selectedProductInfo.costPrice && (
+                      <div>
+                        <span className="font-medium">Cost:</span> ${selectedProductInfo.costPrice}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
             <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="sku"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>SKU</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter SKU" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
               <FormField
                 control={form.control}
                 name="qty"
@@ -129,6 +165,31 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="customerId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Customer</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || (customers.length > 0 ? customers[0].id : undefined)}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a customer" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {customers.map((customer) => (
+                          <SelectItem key={customer.id} value={customer.id}>
+                            {customer.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -177,31 +238,6 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
                       rows={3}
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="customerId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Customer</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value || (customers.length > 0 ? customers[0].id : undefined)}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a customer" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {customers.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id}>
-                          {customer.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
