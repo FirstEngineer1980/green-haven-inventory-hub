@@ -107,7 +107,7 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
     });
   };
 
-  // Filter rooms to ensure they have valid IDs
+  // Filter rooms to ensure they have valid IDs (not empty strings or null/undefined)
   const validRooms = rooms.filter(room => room.id && room.id.trim() !== '');
   
   return (
@@ -149,7 +149,7 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="no-rooms" disabled>
+                  <SelectItem value="no-rooms-available" disabled>
                     No rooms available
                   </SelectItem>
                 )}
