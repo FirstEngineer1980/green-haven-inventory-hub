@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +38,7 @@ const Bins = () => {
       length: parseFloat(formData.length),
       width: parseFloat(formData.width),
       height: parseFloat(formData.height),
-      unitMatrixId: formData.unitMatrixId,
+      skuMatrixId: formData.skuMatrixId,
       roomId: formData.roomId || '',
       location: formData.location || 'Warehouse A',
       currentStock: 0,
@@ -60,7 +61,7 @@ const Bins = () => {
       length: parseFloat(formData.length),
       width: parseFloat(formData.width),
       height: parseFloat(formData.height),
-      unitMatrixId: formData.unitMatrixId,
+      skuMatrixId: formData.skuMatrixId,
       roomId: formData.roomId || '',
       location: formData.location || 'Warehouse A',
       currentStock: formData.currentStock,
@@ -124,7 +125,7 @@ const Bins = () => {
                   <TableHead>Width</TableHead>
                   <TableHead>Height</TableHead>
                   <TableHead>Volume Capacity</TableHead>
-                  <TableHead>Unit Matrix ID</TableHead>
+                  <TableHead>SKU Matrix ID</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -136,7 +137,7 @@ const Bins = () => {
                     <TableCell>{bin.width}</TableCell>
                     <TableCell>{bin.height}</TableCell>
                     <TableCell>{bin.volumeCapacity}</TableCell>
-                    <TableCell>{bin.unitMatrixId}</TableCell>
+                    <TableCell>{bin.skuMatrixId}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"

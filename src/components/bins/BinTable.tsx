@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -17,19 +18,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 
 interface BinTableProps {
   bins?: Bin[]; // Made optional with default from context
-  unitMatrixId?: string;
+  skuMatrixId?: string;
   onEdit?: (bin: Bin) => void; // Made optional to fix the TypeScript error
 }
 
-export const BinTable: React.FC<BinTableProps> = ({ bins: propBins, unitMatrixId, onEdit }) => {
-  const { bins: contextBins, deleteBin, getBinsByUnitMatrix } = useBins();
+export const BinTable: React.FC<BinTableProps> = ({ bins: propBins, skuMatrixId, onEdit }) => {
+  const { bins: contextBins, deleteBin, getBinsBySkuMatrix } = useBins();
   const [editBin, setEditBin] = useState<Bin | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [binToDelete, setBinToDelete] = useState<Bin | null>(null);
 
   // Use bins from props if provided, otherwise use filtered bins from context
-  const bins = propBins ?? (unitMatrixId 
-    ? getBinsByUnitMatrix(unitMatrixId) 
+  const bins = propBins ?? (skuMatrixId 
+    ? getBinsBySkuMatrix(skuMatrixId) 
     : contextBins);
 
   const handleEdit = (bin: Bin) => {

@@ -129,7 +129,7 @@ export const UnitMatrixTable = ({ unitMatrices, onEdit, onDelete }: UnitMatrixTa
                 Add Bin
               </Button>
             </div>
-            <BinTable unitMatrixId={viewingBins.matrix.id} />
+            <BinTable skuMatrixId={viewingBins.matrix.id} />
           </div>
         </SheetContent>
       </Sheet>
@@ -138,7 +138,7 @@ export const UnitMatrixTable = ({ unitMatrices, onEdit, onDelete }: UnitMatrixTa
         <AddBinDialog
           open={addBinOpen}
           onOpenChange={setAddBinOpen}
-          unitMatrixId={viewingBins.matrix.id}
+          skuMatrixId={viewingBins.matrix.id}
         />
       )}
     </>

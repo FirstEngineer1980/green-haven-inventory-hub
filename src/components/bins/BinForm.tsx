@@ -47,7 +47,7 @@ export const BinForm: React.FC<BinFormProps> = ({
       width: Number(values.width),
       height: Number(values.height),
       location: values.location,
-      unitMatrixId: defaultValues.unitMatrixId,
+      skuMatrixId: defaultValues.skuMatrixId,
       roomId: defaultValues.roomId,
       status: defaultValues.status || 'active',
       currentStock: 0,
