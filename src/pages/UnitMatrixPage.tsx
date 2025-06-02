@@ -64,8 +64,8 @@ const UnitMatrixPage = () => {
     setShowAddDialog(false);
   };
 
-  // Filter unit matrices based on search and filters
-  const filteredUnitMatrices = unitMatrices.filter(unitMatrix => 
+  // Filter unit matrices based on search and filters - handle undefined case
+  const filteredUnitMatrices = (unitMatrices || []).filter(unitMatrix => 
     (selectedRoom === 'all' || unitMatrix.roomId === selectedRoom) &&
     unitMatrix.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -97,7 +97,7 @@ const UnitMatrixPage = () => {
               validationFn={(data) => validateTemplate(data, 'unitMatrices')}
             />
             <ExportButton 
-              data={unitMatrices} 
+              data={unitMatrices || []} 
               filename="unit_matrices" 
               fields={['id', 'roomId', 'roomName', 'name', 'rows', 'createdAt', 'updatedAt']}
             />
