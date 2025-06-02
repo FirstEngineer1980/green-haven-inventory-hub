@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/customer-products/{customerProduct}', [CustomerProductController::class, 'destroy']);
     Route::get('/customer-products/customer/{customer}', [CustomerProductController::class, 'getByCustomer']);
     
-    // Product selection routes for customer products
+    // Product selection routes for customer products and purchase orders
     Route::get('/products/for-selection', [CustomerProductController::class, 'getProducts']);
     Route::get('/products/sku/{sku}', [CustomerProductController::class, 'getProductBySku']);
     

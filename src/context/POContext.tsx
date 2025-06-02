@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { PurchaseOrder, Vendor } from '../types';
 import { useAuth } from './AuthContext';
 import apiInstance from '../api/services/api';
@@ -49,7 +49,19 @@ export const POProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setLoading(true);
     try {
       const response = await apiInstance.get('/vendors');
-      setVendors(response.data);
+      // Transform backend data to match frontend Vendor type
+      const transformedVendors = response.data.map((vendor: any) => ({
+        id: vendor.id.toString(),
+        name: vendor.name,
+        email: vendor.email || '',
+        phone: vendor.phone || '',
+        address: vendor.address || '',
+        contactPerson: vendor.contact_name || '',
+        notes: vendor.notes || '',
+        createdAt: vendor.created_at,
+        updatedAt: vendor.updated_at
+      }));
+      setVendors(transformedVendors);
     } catch (error: any) {
       console.error('Error fetching vendors:', error);
       setError('Failed to fetch vendors');
@@ -57,6 +69,13 @@ export const POProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setLoading(false);
     }
   };
+
+  // Fetch vendors when component mounts and user is available
+  useEffect(() => {
+    if (user) {
+      fetchVendors();
+    }
+  }, [user]);
 
   const addPurchaseOrder = async (poData: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!user) return;
@@ -112,11 +131,32 @@ export const POProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     if (!user) return;
     setLoading(true);
     try {
-      const response = await apiInstance.post('/vendors', vendorData);
-      setVendors([...vendors, response.data]);
+      const response = await apiInstance.post('/vendors', {
+        name: vendorData.name,
+        email: vendorData.email,
+        phone: vendorData.phone,
+        address: vendorData.address,
+        contact_name: vendorData.contactPerson,
+        notes: vendorData.notes
+      });
+      
+      const newVendor = {
+        id: response.data.id.toString(),
+        name: response.data.name,
+        email: response.data.email || '',
+        phone: response.data.phone || '',
+        address: response.data.address || '',
+        contactPerson: response.data.contact_name || '',
+        notes: response.data.notes || '',
+        createdAt: response.data.created_at,
+        updatedAt: response.data.updated_at
+      };
+      
+      setVendors([...vendors, newVendor]);
     } catch (error: any) {
       console.error('Error adding vendor:', error);
       setError('Failed to add vendor');
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -126,11 +166,32 @@ export const POProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     if (!user) return;
     setLoading(true);
     try {
-      const response = await apiInstance.put(`/vendors/${id}`, vendorData);
-      setVendors(vendors.map(vendor => vendor.id === id ? response.data : vendor));
+      const response = await apiInstance.put(`/vendors/${id}`, {
+        name: vendorData.name,
+        email: vendorData.email,
+        phone: vendorData.phone,
+        address: vendorData.address,
+        contact_name: vendorData.contactPerson,
+        notes: vendorData.notes
+      });
+      
+      const updatedVendor = {
+        id: response.data.id.toString(),
+        name: response.data.name,
+        email: response.data.email || '',
+        phone: response.data.phone || '',
+        address: response.data.address || '',
+        contactPerson: response.data.contact_name || '',
+        notes: response.data.notes || '',
+        createdAt: response.data.created_at,
+        updatedAt: response.data.updated_at
+      };
+      
+      setVendors(vendors.map(vendor => vendor.id === id ? updatedVendor : vendor));
     } catch (error: any) {
       console.error('Error updating vendor:', error);
       setError('Failed to update vendor');
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -144,6 +205,7 @@ export const POProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     } catch (error: any) {
       console.error('Error deleting vendor:', error);
       setError('Failed to delete vendor');
+      throw error;
     }
   };
 

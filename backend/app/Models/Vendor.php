@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -21,8 +22,8 @@ class Vendor extends Model
         'email',
         'phone',
         'address',
-        'website',
         'notes',
+        'website',
         'status',
         'payment_terms',
         'tax_id',

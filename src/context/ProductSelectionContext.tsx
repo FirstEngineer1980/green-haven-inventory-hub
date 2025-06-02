@@ -49,12 +49,13 @@ export const ProductSelectionProvider: React.FC<{ children: React.ReactNode }> =
     setLoading(true);
     setError(null);
     try {
-      const response = await apiInstance.get('/customer-products/products');
+      const response = await apiInstance.get('/products/for-selection');
       const transformedProducts = response.data.map(transformProduct);
       setProducts(transformedProducts);
     } catch (err: any) {
       console.error('Error fetching products for selection:', err);
       setError('Failed to fetch products');
+      setProducts([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -64,7 +65,7 @@ export const ProductSelectionProvider: React.FC<{ children: React.ReactNode }> =
     if (!user) return null;
     
     try {
-      const response = await apiInstance.get(`/customer-products/product-by-sku/${sku}`);
+      const response = await apiInstance.get(`/products/sku/${sku}`);
       return transformProduct(response.data);
     } catch (err: any) {
       console.error('Error fetching product by SKU:', err);

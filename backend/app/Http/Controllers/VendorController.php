@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -28,6 +29,7 @@ class VendorController extends Controller
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         $vendor = Vendor::create($validated);
@@ -56,6 +58,7 @@ class VendorController extends Controller
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         $vendor->update($validated);
