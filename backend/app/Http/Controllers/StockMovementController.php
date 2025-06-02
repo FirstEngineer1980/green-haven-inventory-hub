@@ -1,4 +1,5 @@
 
+
 <?php
 
 namespace App\Http\Controllers;
@@ -17,6 +18,18 @@ class StockMovementController extends Controller
 
     public function store(Request $request)
     {
+        // Set default values before validation
+        $requestData = $request->all();
+        if (!isset($requestData['reference_type'])) {
+            $requestData['reference_type'] = 'manual';
+        }
+        if (!isset($requestData['reference_id'])) {
+            $requestData['reference_id'] = 1;
+        }
+        
+        // Create a new request instance with the modified data
+        $request->merge($requestData);
+        
         $data = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
@@ -29,14 +42,6 @@ class StockMovementController extends Controller
 
         // Add the current user as performer
         $data['performed_by'] = Auth::id();
-
-        // Set default values for reference fields if not provided
-        if (!isset($data['reference_type'])) {
-            $data['reference_type'] = 'manual';
-        }
-        if (!isset($data['reference_id'])) {
-            $data['reference_id'] = 1; // Default reference ID for manual entries
-        }
 
         $stockMovement = StockMovement::create($data);
 
@@ -61,3 +66,4 @@ class StockMovementController extends Controller
         return $product->stockMovements()->with('performer')->get();
     }
 }
+
