@@ -72,9 +72,10 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
     const newRowId = `row-${Date.now()}`;
     const newCells = columns.map(column => ({
       id: `${newRowId}-${column.id}`,
+      skuMatrixRowId: newRowId,
       columnId: column.id,
       value: '',
-      content: ''
+      binId: ''
     }));
 
     const newRow = {
@@ -131,9 +132,10 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
           ...(row.cells || []),
           {
             id: `${row.id}-${newColumnId}`,
+            skuMatrixRowId: row.id,
             columnId: newColumnId,
             value: '',
-            content: ''
+            binId: ''
           }
         ]
       }))
