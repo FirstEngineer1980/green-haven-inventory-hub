@@ -33,6 +33,7 @@ class CustomerProductController extends Controller
     {
         $products = Product::select('id', 'name', 'sku', 'description', 'price', 'cost_price', 'image')
             ->where('status', 'active')
+            ->whereNotNull('sku')
             ->orderBy('name')
             ->get();
 
@@ -44,13 +45,23 @@ class CustomerProductController extends Controller
      */
     public function getProductBySku($sku)
     {
-        $product = Product::where('sku', $sku)->first();
+        $product = Product::where('sku', $sku)
+            ->where('status', 'active')
+            ->first();
 
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        return response()->json($product);
+        return response()->json([
+            'id' => $product->id,
+            'name' => $product->name,
+            'sku' => $product->sku,
+            'description' => $product->description,
+            'price' => $product->price,
+            'cost_price' => $product->cost_price,
+            'image' => $product->image,
+        ]);
     }
 
     /**
