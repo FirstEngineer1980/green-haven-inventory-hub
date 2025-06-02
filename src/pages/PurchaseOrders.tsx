@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePO } from '@/context/POContext';
+import { ProductSelectionProvider } from '@/context/ProductSelectionContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Table,
@@ -92,106 +93,108 @@ const PurchaseOrders = () => {
   });
 
   return (
-    <DashboardLayout>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Purchase Orders</h1>
-        <Button onClick={() => setShowAddDialog(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Purchase Order
-        </Button>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex-1">
-          <Input
-            placeholder="Search purchase orders..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <ProductSelectionProvider>
+      <DashboardLayout>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold">Purchase Orders</h1>
+          <Button onClick={() => setShowAddDialog(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Purchase Order
+          </Button>
         </div>
-        <div className="md:w-64">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="received">Received</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Purchase Orders</CardTitle>
-          <CardDescription>
-            Manage purchase orders and track their status
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>PO Number</TableHead>
-                <TableHead>Vendor</TableHead>
-                <TableHead>Order Date</TableHead>
-                <TableHead>Expected Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPurchaseOrders.map((po) => (
-                <TableRow key={po.id}>
-                  <TableCell className="font-medium">{po.poNumber}</TableCell>
-                  <TableCell>{po.vendorName}</TableCell>
-                  <TableCell>{formatDate(po.orderDate)}</TableCell>
-                  <TableCell>{po.expectedDate ? formatDate(po.expectedDate) : 'N/A'}</TableCell>
-                  <TableCell>{po.status}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setSelectedPurchaseOrder(po);
-                        setShowEditDialog(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeletePurchaseOrder(po.id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex-1">
+            <Input
+              placeholder="Search purchase orders..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="md:w-64">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="received">Received</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Purchase Orders</CardTitle>
+            <CardDescription>
+              Manage purchase orders and track their status
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>PO Number</TableHead>
+                  <TableHead>Vendor</TableHead>
+                  <TableHead>Order Date</TableHead>
+                  <TableHead>Expected Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {filteredPurchaseOrders.map((po) => (
+                  <TableRow key={po.id}>
+                    <TableCell className="font-medium">{po.poNumber}</TableCell>
+                    <TableCell>{po.vendorName}</TableCell>
+                    <TableCell>{formatDate(po.orderDate)}</TableCell>
+                    <TableCell>{po.expectedDate ? formatDate(po.expectedDate) : 'N/A'}</TableCell>
+                    <TableCell>{po.status}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedPurchaseOrder(po);
+                          setShowEditDialog(true);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeletePurchaseOrder(po.id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
 
-      <AddPurchaseOrderDialog
-        open={showAddDialog}
-        onOpenChange={setShowAddDialog}
-      />
-
-      {selectedPurchaseOrder && (
-        <EditPurchaseOrderDialog
-          open={showEditDialog}
-          onOpenChange={setShowEditDialog}
-          purchaseOrder={selectedPurchaseOrder}
+        <AddPurchaseOrderDialog
+          open={showAddDialog}
+          onOpenChange={setShowAddDialog}
         />
-      )}
-    </DashboardLayout>
+
+        {selectedPurchaseOrder && (
+          <EditPurchaseOrderDialog
+            open={showEditDialog}
+            onOpenChange={setShowEditDialog}
+            purchaseOrder={selectedPurchaseOrder}
+          />
+        )}
+      </DashboardLayout>
+    </ProductSelectionProvider>
   );
 };
 

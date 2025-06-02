@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -33,11 +34,20 @@ class UnitController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'room_id' => 'required|exists:rooms,id',
+            'roomId' => 'sometimes|exists:rooms,id', // Accept both formats
             'number' => 'nullable|string|max:255',
             'size' => 'nullable|string',
             'size_unit' => 'nullable|string',
             'status' => 'nullable|string|max:255',
         ]);
+
+        // Handle both roomId and room_id field names
+        if (isset($validated['roomId']) && !isset($validated['room_id'])) {
+            $validated['room_id'] = $validated['roomId'];
+        }
+
+        // Remove roomId if it exists to avoid database issues
+        unset($validated['roomId']);
 
         $unit = Unit::create($validated);
 

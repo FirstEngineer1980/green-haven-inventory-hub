@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -33,7 +34,16 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'customer_id' => 'required|exists:customers,id',
+            'customerId' => 'sometimes|exists:customers,id', // Accept both formats
         ]);
+
+        // Handle both customerId and customer_id field names
+        if (isset($validated['customerId']) && !isset($validated['customer_id'])) {
+            $validated['customer_id'] = $validated['customerId'];
+        }
+
+        // Remove customerId if it exists to avoid database issues
+        unset($validated['customerId']);
 
         $room = Room::create($validated);
 

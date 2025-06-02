@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -58,5 +59,13 @@ class CustomerProduct extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    /**
+     * Get the related product from the products table by SKU.
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'sku', 'sku');
     }
 }

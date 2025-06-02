@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -18,7 +19,7 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function stats()
+    public function getStats()
     {
         $totalProducts = Product::count();
         $lowStockCount = Product::whereRaw('quantity <= threshold')->count();
@@ -41,7 +42,7 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function lowStock()
+    public function getLowStockProducts()
     {
         $products = Product::select('id', 'name', 'sku', 'quantity', 'threshold', 'category_id')
             ->with('category:id,name')
@@ -58,7 +59,7 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function recentMovements()
+    public function getRecentMovements()
     {
         $movements = StockMovement::select(
                 'stock_movements.id',
