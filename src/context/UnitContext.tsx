@@ -35,7 +35,23 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       const response = await apiInstance.get('/units');
-      setUnits(response.data);
+      // Map the backend response to match frontend Unit type
+      const unitsData = Array.isArray(response.data) ? response.data.map((unit: any) => ({
+        id: unit.id.toString(),
+        name: unit.name,
+        description: unit.description || '',
+        roomId: unit.room_id.toString(),
+        roomName: unit.room?.name || 'Unknown Room',
+        number: unit.number || '',
+        capacity: 0, // Default capacity
+        currentStock: 0, // Default current stock
+        size: parseInt(unit.size) || 0,
+        sizeUnit: unit.size_unit || 'sqft',
+        status: unit.status || 'available',
+        createdAt: unit.created_at,
+        updatedAt: unit.updated_at
+      })) : [];
+      setUnits(unitsData);
     } catch (err: any) {
       console.error('Error fetching units:', err);
       setError('Failed to fetch units');
@@ -59,12 +75,37 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setLoading(true);
     try {
-      const response = await apiInstance.post('/units', unit);
-      setUnits(prev => [...prev, response.data]);
+      const response = await apiInstance.post('/units', {
+        name: unit.name,
+        description: unit.description,
+        room_id: unit.roomId,
+        number: unit.number,
+        size: unit.size?.toString(),
+        size_unit: unit.sizeUnit,
+        status: unit.status
+      });
+      
+      const newUnit = {
+        id: response.data.id.toString(),
+        name: response.data.name,
+        description: response.data.description || '',
+        roomId: response.data.room_id.toString(),
+        roomName: response.data.room?.name || 'Unknown Room',
+        number: response.data.number || '',
+        capacity: unit.capacity || 0,
+        currentStock: unit.currentStock || 0,
+        size: parseInt(response.data.size) || 0,
+        sizeUnit: response.data.size_unit || 'sqft',
+        status: response.data.status || 'available',
+        createdAt: response.data.created_at,
+        updatedAt: response.data.updated_at
+      };
+      
+      setUnits(prev => [...prev, newUnit]);
       
       addNotification({
         title: 'New Unit Added',
-        message: `Unit "${response.data.number || response.data.name}" has been added`,
+        message: `Unit "${newUnit.number || newUnit.name}" has been added`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
@@ -82,10 +123,35 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setLoading(true);
     try {
-      const response = await apiInstance.put(`/units/${id}`, updates);
+      const response = await apiInstance.put(`/units/${id}`, {
+        name: updates.name,
+        description: updates.description,
+        room_id: updates.roomId,
+        number: updates.number,
+        size: updates.size?.toString(),
+        size_unit: updates.sizeUnit,
+        status: updates.status
+      });
+      
+      const updatedUnit = {
+        id: response.data.id.toString(),
+        name: response.data.name,
+        description: response.data.description || '',
+        roomId: response.data.room_id.toString(),
+        roomName: response.data.room?.name || 'Unknown Room',
+        number: response.data.number || '',
+        capacity: updates.capacity || 0,
+        currentStock: updates.currentStock || 0,
+        size: parseInt(response.data.size) || 0,
+        sizeUnit: response.data.size_unit || 'sqft',
+        status: response.data.status || 'available',
+        createdAt: response.data.created_at,
+        updatedAt: response.data.updated_at
+      };
+      
       setUnits(prev => 
         prev.map(unit => 
-          unit.id === id ? response.data : unit
+          unit.id === id ? updatedUnit : unit
         )
       );
     } catch (err: any) {

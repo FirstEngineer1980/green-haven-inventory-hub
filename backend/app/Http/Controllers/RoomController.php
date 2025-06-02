@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -45,6 +46,7 @@ class RoomController extends Controller
         unset($validated['customerId']);
 
         $room = Room::create($validated);
+        $room->load('customer');
 
         return response()->json($room, 201);
     }
@@ -71,6 +73,7 @@ class RoomController extends Controller
         ]);
 
         $room->update($validated);
+        $room->load('customer');
 
         return response()->json($room);
     }

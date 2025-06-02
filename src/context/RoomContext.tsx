@@ -35,13 +35,23 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       const response = await apiInstance.get('/rooms');
-      // Ensure we always set an array, even if response is malformed
-      const data = Array.isArray(response.data) ? response.data : [];
-      setRooms(data);
+      // Map the backend response to match frontend Room type
+      const roomsData = Array.isArray(response.data) ? response.data.map((room: any) => ({
+        id: room.id.toString(),
+        name: room.name,
+        description: room.description || '',
+        customerId: room.customer_id.toString(),
+        customerName: room.customer?.name || 'Unknown Customer',
+        capacity: 100, // Default capacity
+        unit: '', // Default unit
+        units: [], // Initialize empty units array
+        createdAt: room.created_at,
+        updatedAt: room.updated_at
+      })) : [];
+      setRooms(roomsData);
     } catch (err: any) {
       console.error('Error fetching rooms:', err);
       setError('Failed to fetch rooms');
-      // Set empty array on error to prevent map errors
       setRooms([]);
     } finally {
       setLoading(false);
@@ -63,12 +73,30 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setLoading(true);
     try {
-      const response = await apiInstance.post('/rooms', room);
-      setRooms(prev => Array.isArray(prev) ? [...prev, response.data] : [response.data]);
+      const response = await apiInstance.post('/rooms', {
+        name: room.name,
+        description: room.description,
+        customer_id: room.customerId
+      });
+      
+      const newRoom = {
+        id: response.data.id.toString(),
+        name: response.data.name,
+        description: response.data.description || '',
+        customerId: response.data.customer_id.toString(),
+        customerName: response.data.customer?.name || 'Unknown Customer',
+        capacity: room.capacity || 100,
+        unit: room.unit || '',
+        units: [],
+        createdAt: response.data.created_at,
+        updatedAt: response.data.updated_at
+      };
+      
+      setRooms(prev => Array.isArray(prev) ? [...prev, newRoom] : [newRoom]);
       
       addNotification({
         title: 'New Room Added',
-        message: `Room "${response.data.name}" has been added`,
+        message: `Room "${newRoom.name}" has been added`,
         type: 'info',
         for: ['1', '2'], // Admin, Manager
       });
@@ -86,11 +114,29 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setLoading(true);
     try {
-      const response = await apiInstance.put(`/rooms/${id}`, updates);
+      const response = await apiInstance.put(`/rooms/${id}`, {
+        name: updates.name,
+        description: updates.description,
+        customer_id: updates.customerId
+      });
+      
+      const updatedRoom = {
+        id: response.data.id.toString(),
+        name: response.data.name,
+        description: response.data.description || '',
+        customerId: response.data.customer_id.toString(),
+        customerName: response.data.customer?.name || 'Unknown Customer',
+        capacity: updates.capacity || 100,
+        unit: updates.unit || '',
+        units: updates.units || [],
+        createdAt: response.data.created_at,
+        updatedAt: response.data.updated_at
+      };
+      
       setRooms(prev => 
         Array.isArray(prev) ? prev.map(room => 
-          room.id === id ? response.data : room
-        ) : [response.data]
+          room.id === id ? updatedRoom : room
+        ) : [updatedRoom]
       );
     } catch (err: any) {
       console.error('Error updating room:', err);

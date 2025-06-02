@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -49,6 +50,7 @@ class UnitController extends Controller
         unset($validated['roomId']);
 
         $unit = Unit::create($validated);
+        $unit->load('room');
 
         return response()->json($unit, 201);
     }
@@ -79,6 +81,7 @@ class UnitController extends Controller
         ]);
 
         $unit->update($validated);
+        $unit->load('room');
 
         return response()->json($unit);
     }
