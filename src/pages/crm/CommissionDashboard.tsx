@@ -41,7 +41,7 @@ const CommissionDashboard = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await crmService.deleteSellerCommission(id);
+      await crmService.deleteSellerCommission(id.toString());
       toast({
         title: "Success",
         description: "Commission structure deleted successfully",
@@ -58,7 +58,7 @@ const CommissionDashboard = () => {
 
   const handleToggleStatus = async (id: number, isActive: boolean) => {
     try {
-      await crmService.updateSellerCommission(id, { is_active: !isActive });
+      await crmService.updateSellerCommission(id.toString(), { is_active: !isActive });
       toast({
         title: "Success",
         description: `Commission structure ${!isActive ? 'activated' : 'deactivated'} successfully`,
