@@ -130,7 +130,11 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('sellers', SellerController::class);
     Route::apiResource('seller-commissions', SellerCommissionController::class);
+    
+    // Invoice routes with status update
     Route::apiResource('invoices', InvoiceController::class);
+    Route::patch('invoices/{invoice}/status', [InvoiceController::class, 'updateStatus']);
+    
     Route::apiResource('client-order-templates', ClientOrderTemplateController::class);
 
     // Stripe payment routes

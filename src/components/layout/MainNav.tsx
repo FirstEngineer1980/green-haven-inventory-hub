@@ -1,90 +1,164 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Home, ShoppingBag, ShoppingCart, Info, Phone, BadgePercent, Menu } from 'lucide-react';
+import {
+  Home,
+  Package,
+  Users,
+  ShoppingCart,
+  Truck,
+  BarChart3,
+  Settings,
+  FileText,
+  Grid3X3,
+  Warehouse,
+  Bell,
+  UserPlus,
+  TrendingUp,
+  DollarSign,
+  Receipt,
+} from 'lucide-react';
 
 const MainNav = () => {
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = useState(false);
-
+  const location = useLocation();
+  
   const navItems = [
-    { label: 'Home', path: '/', icon: <Home className="h-4 w-4 mr-2" /> },
-    { label: 'Products', path: '/products', icon: <ShoppingBag className="h-4 w-4 mr-2" /> },
-    { label: 'Cart', path: '/cart', icon: <ShoppingCart className="h-4 w-4 mr-2" /> },
-    { label: 'About', path: '/about', icon: <Info className="h-4 w-4 mr-2" /> },
-    { label: 'Contact', path: '/contact', icon: <Phone className="h-4 w-4 mr-2" /> },
-    { label: 'Promotions', path: '/promotions', icon: <BadgePercent className="h-4 w-4 mr-2" /> },
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/products', label: 'Products', icon: Package },
+    { href: '/customers', label: 'Customers', icon: Users },
+    { href: '/customer-products', label: 'Customer Products', icon: Grid3X3 },
+    { href: '/purchase-orders', label: 'Purchase Orders', icon: ShoppingCart },
+    { href: '/vendors', label: 'Vendors', icon: Truck },
+    { href: '/inventory', label: 'Inventory', icon: Warehouse },
+    { href: '/invoices', label: 'Invoices', icon: Receipt },
   ];
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    setIsOpen(false);
-  };
+  const crmItems = [
+    { href: '/crm', label: 'CRM Dashboard', icon: BarChart3 },
+    { href: '/crm/clients', label: 'Clients', icon: Users },
+    { href: '/crm/sellers', label: 'Sellers', icon: UserPlus },
+    { href: '/crm/seller-commissions', label: 'Seller Commissions', icon: TrendingUp },
+    { href: '/crm/commission-dashboard', label: 'Commission Management', icon: DollarSign },
+  ];
 
-  // Mobile navigation using Sheet component
-  if (isMobile) {
-    return (
-      <div className="flex justify-between items-center w-full">
-        <Button 
-          variant="ghost" 
-          className="p-2 text-white"
-          onClick={() => navigate('/')}
-        >
-          <Home className="h-5 w-5" />
-        </Button>
-        
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" className="p-2 text-white">
-              <Menu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[250px] pt-12">
-            <nav className="flex flex-col space-y-4">
-              {navItems.map((item) => (
-                <Button
-                  key={item.path}
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => handleNavigation(item.path)}
-                >
-                  {item.icon}
-                  {item.label}
-                </Button>
-              ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
-      </div>
-    );
-  }
+  const warehouseItems = [
+    { href: '/rooms', label: 'Rooms', icon: Home },
+    { href: '/units', label: 'Units', icon: Grid3X3 },
+    { href: '/bins', label: 'Bins', icon: Package },
+    { href: '/sku-matrix', label: 'SKU Matrix', icon: Grid3X3 },
+    { href: '/unit-matrix', label: 'Unit Matrix', icon: Grid3X3 },
+  ];
 
-  // Desktop navigation
+  const systemItems = [
+    { href: '/users', label: 'Users', icon: Users },
+    { href: '/reports', label: 'Reports', icon: BarChart3 },
+    { href: '/notifications', label: 'Notifications', icon: Bell },
+    { href: '/settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
-    <NavigationMenu className="max-w-full w-full justify-start">
-      <NavigationMenuList className="space-x-2">
-        {navItems.map(({ label, path, icon }) => (
-          <NavigationMenuItem key={path}>
-            <NavigationMenuLink
+    <nav className="space-y-2">
+      {/* Main Navigation */}
+      <div className="space-y-1">
+        <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Main
+        </h3>
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
               className={cn(
-                navigationMenuTriggerStyle(),
-                "bg-transparent hover:bg-white/10 text-white cursor-pointer flex items-center"
+                'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                location.pathname === item.href
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               )}
-              onClick={() => navigate(path)}
             >
-              {icon}
-              {label}
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        ))}
-      </NavigationMenuList>
-    </NavigationMenu>
+              <Icon className="mr-3 h-4 w-4" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* CRM Section */}
+      <div className="space-y-1">
+        <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          CRM & Sales
+        </h3>
+        {crmItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={cn(
+                'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                location.pathname === item.href
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              )}
+            >
+              <Icon className="mr-3 h-4 w-4" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Warehouse Management */}
+      <div className="space-y-1">
+        <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Warehouse
+        </h3>
+        {warehouseItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={cn(
+                'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                location.pathname === item.href
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              )}
+            >
+              <Icon className="mr-3 h-4 w-4" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* System */}
+      <div className="space-y-1">
+        <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          System
+        </h3>
+        {systemItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={cn(
+                'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                location.pathname === item.href
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              )}
+            >
+              <Icon className="mr-3 h-4 w-4" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 };
 
