@@ -110,8 +110,8 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
   // Filter rooms to ensure they have valid IDs (not empty strings or null/undefined)
   const validRooms = rooms.filter(room => room.id && room.id.trim() !== '');
   
-  // Ensure the current roomId is valid, if not set to empty string for placeholder
-  const currentRoomId = formData.roomId && formData.roomId.trim() !== '' ? formData.roomId : '';
+  // Ensure the current roomId is valid, if not set to placeholder value
+  const currentRoomId = formData.roomId && formData.roomId.trim() !== '' ? formData.roomId : 'no-room-selected';
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,23 +139,20 @@ const EditSkuMatrixDialog = ({ open, onOpenChange, unitMatrix }: EditSkuMatrixDi
             <Label htmlFor="roomId">Room</Label>
             <Select
               value={currentRoomId}
-              onValueChange={(value) => handleSelectChange('roomId', value)}
+              onValueChange={(value) => handleSelectChange('roomId', value === 'no-room-selected' ? '' : value)}
             >
               <SelectTrigger id="roomId">
                 <SelectValue placeholder="Select a room" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="no-room-selected">No room selected</SelectItem>
                 {validRooms.length > 0 ? (
                   validRooms.map((room) => (
                     <SelectItem key={room.id} value={room.id}>
                       {room.name}
                     </SelectItem>
                   ))
-                ) : (
-                  <SelectItem value="no-rooms-available" disabled>
-                    No rooms available
-                  </SelectItem>
-                )}
+                ) : null}
               </SelectContent>
             </Select>
           </div>

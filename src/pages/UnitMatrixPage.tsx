@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
@@ -54,18 +53,8 @@ const UnitMatrixPage = () => {
     }
   };
 
-  const handleAddUnitMatrix = (formData: any) => {
-    addUnitMatrix({
-      roomId: formData.roomId,
-      name: formData.name,
-      description: formData.description || '',
-      rows: formData.rows || []
-    });
-    setShowAddDialog(false);
-  };
-
-  // Filter unit matrices based on search and filters
-  const filteredUnitMatrices = unitMatrices.filter(unitMatrix => 
+  // Filter unit matrices based on search and filters - handle undefined case
+  const filteredUnitMatrices = (unitMatrices || []).filter(unitMatrix => 
     (selectedRoom === 'all' || unitMatrix.roomId === selectedRoom) &&
     unitMatrix.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -97,7 +86,7 @@ const UnitMatrixPage = () => {
               validationFn={(data) => validateTemplate(data, 'unitMatrices')}
             />
             <ExportButton 
-              data={unitMatrices} 
+              data={unitMatrices || []} 
               filename="unit_matrices" 
               fields={['id', 'roomId', 'roomName', 'name', 'rows', 'createdAt', 'updatedAt']}
             />

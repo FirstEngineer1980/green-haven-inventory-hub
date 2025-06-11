@@ -24,6 +24,12 @@ const MatrixGeneralForm = ({
   onInputChange, 
   onSelectChange 
 }: MatrixGeneralFormProps) => {
+  // Filter rooms to ensure they have valid IDs
+  const validRooms = rooms.filter(room => room.id && room.id.trim() !== '');
+  
+  // Use a placeholder value for empty roomId to avoid empty string in Select
+  const selectValue = roomId && roomId.trim() !== '' ? roomId : 'no-room-selected';
+
   return (
     <>
       <div className="space-y-2">
@@ -40,14 +46,15 @@ const MatrixGeneralForm = ({
       <div className="space-y-2">
         <Label htmlFor="roomId">Room</Label>
         <Select
-          value={roomId}
+          value={selectValue}
           onValueChange={(value) => onSelectChange('roomId', value)}
         >
           <SelectTrigger id="roomId">
             <SelectValue placeholder="Select a room" />
           </SelectTrigger>
           <SelectContent>
-            {rooms.map((room) => (
+            <SelectItem value="no-room-selected">Select a room</SelectItem>
+            {validRooms.map((room) => (
               <SelectItem key={room.id} value={room.id}>
                 {room.name}
               </SelectItem>

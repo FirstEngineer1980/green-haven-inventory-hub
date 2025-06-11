@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useUnitMatrix } from '@/context/UnitMatrixContext';
 import { useRooms } from '@/context/RoomContext';
@@ -15,7 +16,7 @@ interface AddUnitMatrixDialogProps {
 }
 
 const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) => {
-  const { addUnitMatrix } = useUnitMatrix();
+  const { addUnitMatrix, columns } = useUnitMatrix();
   const { rooms } = useRooms();
   const { toast } = useToast();
   
@@ -27,8 +28,6 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
   const [rows, setRows] = useState<{ label: string; color: string; }[]>([]);
   const [newRowLabel, setNewRowLabel] = useState('');
   const [newRowColor, setNewRowColor] = useState('#FFFFFF');
-  
-  const [columns, setColumns] = useState<{ id: string; name: string; }[]>([]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,6 +64,10 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
   };
   
   const handleSubmit = () => {
+    console.log('Submit clicked - Form data:', formData);
+    console.log('Submit clicked - Rows:', rows);
+    console.log('Submit clicked - Columns:', columns);
+    
     if (!formData.name || !formData.roomId) {
       toast({
         title: "Validation Error",
@@ -83,45 +86,44 @@ const AddUnitMatrixDialog = ({ open, onOpenChange }: AddUnitMatrixDialogProps) =
       return;
     }
     
-    // Add IDs to rows and create cells for each row
-    const timestamp = Date.now();
-    const rowsWithIds = rows.map((row, index) => {
-      const rowId = `row-${timestamp}-${index}`;
-      
-      // Create cells for each column in this row
-      const cellsForRow = columns.map(column => ({
-        id: `${rowId}-${column.id}`,
-        columnId: column.id,
-        value: '',
-        content: ''
-      }));
-      
-      return {
-        id: rowId,
-        name: row.label, // Add the missing name property
+    try {
+      // Create rows with IDs first, without cells
+      const timestamp = Date.now();
+      const rowsWithIds = rows.map((row, index) => ({
+        id: `row-${timestamp}-${index}`,
+        name: row.label,
         label: row.label,
         color: row.color,
-        cells: cellsForRow
-      };
-    });
-    
-    addUnitMatrix({
-      name: formData.name,
-      roomId: formData.roomId,
-      description: '',
-      rows: rowsWithIds,
-    });
-    
-    // Reset form
-    setFormData({ name: '', roomId: '' });
-    setRows([]);
-    onOpenChange(false);
-    
-    toast({
-      title: "Unit Matrix Added",
-      description: "The new unit matrix has been created successfully",
-      variant: "default"
-    });
+        cells: [] // Will be populated by the context
+      }));
+      
+      console.log('Rows with IDs:', rowsWithIds);
+      
+      addUnitMatrix({
+        name: formData.name,
+        roomId: formData.roomId,
+        description: '',
+        rows: rowsWithIds,
+      });
+      
+      // Reset form
+      setFormData({ name: '', roomId: '' });
+      setRows([]);
+      onOpenChange(false);
+      
+      toast({
+        title: "Unit Matrix Added",
+        description: "The new unit matrix has been created successfully",
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('Error adding unit matrix:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add unit matrix. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   
   return (
