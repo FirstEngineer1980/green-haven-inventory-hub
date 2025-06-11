@@ -1,6 +1,7 @@
 
 <?php
 
+use App\Http\Controllers\ShopifyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthApiController;
@@ -130,15 +131,26 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('sellers', SellerController::class);
     Route::apiResource('seller-commissions', SellerCommissionController::class);
-    
+
     // Invoice routes with status update
     Route::apiResource('invoices', InvoiceController::class);
     Route::patch('invoices/{invoice}/status', [InvoiceController::class, 'updateStatus']);
-    
+
     Route::apiResource('client-order-templates', ClientOrderTemplateController::class);
 
     // Stripe payment routes
     Route::post('stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
     Route::post('stripe/confirm-payment', [StripeController::class, 'confirmPayment']);
 
+    // Shopify integration routes
+    Route::prefix('shopify')->group(function () {
+        Route::get('orders', [ShopifyController::class, 'getOrders']);
+        Route::get('orders/{orderId}', [ShopifyController::class, 'getOrder']);
+        Route::get('customers', [ShopifyController::class, 'getCustomers']);
+        Route::get('customers/{customerId}', [ShopifyController::class, 'getCustomer']);
+        Route::get('products', [ShopifyController::class, 'getProducts']);
+        Route::post('sync/orders', [ShopifyController::class, 'syncOrders']);
+    });
 });
+// Shopify webhook routes (public, no auth required)
+Route::post('shopify/webhook', [ShopifyController::class, 'handleWebhook']);
