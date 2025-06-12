@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -25,7 +24,7 @@ class ShopifyController extends Controller
     {
         try {
             $params = $request->only(['status', 'limit', 'page_info', 'created_at_min', 'created_at_max']);
-            
+
             $response = Http::withHeaders([
                 'X-Shopify-Access-Token' => $this->accessToken,
                 'Content-Type' => 'application/json'
@@ -69,7 +68,7 @@ class ShopifyController extends Controller
     {
         try {
             $params = $request->only(['limit', 'page_info', 'created_at_min', 'created_at_max']);
-            
+
             $response = Http::withHeaders([
                 'X-Shopify-Access-Token' => $this->accessToken,
                 'Content-Type' => 'application/json'
@@ -113,7 +112,7 @@ class ShopifyController extends Controller
     {
         try {
             $params = $request->only(['limit', 'page_info', 'vendor', 'product_type']);
-            
+
             $response = Http::withHeaders([
                 'X-Shopify-Access-Token' => $this->accessToken,
                 'Content-Type' => 'application/json'
@@ -145,7 +144,7 @@ class ShopifyController extends Controller
 
             if ($response->successful()) {
                 $orders = $response->json()['orders'];
-                
+
                 // Here you would save orders to your local database
                 // This is a simplified example
                 foreach ($orders as $order) {
@@ -214,9 +213,9 @@ class ShopifyController extends Controller
         $webhookSecret = config('services.shopify.webhook_secret');
         $signature = $request->header('X-Shopify-Hmac-Sha256');
         $body = $request->getContent();
-        
+
         $calculated = base64_encode(hash_hmac('sha256', $body, $webhookSecret, true));
-        
+
         return hash_equals($signature, $calculated);
     }
 
