@@ -24,6 +24,7 @@ return [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
         'http://192.168.1.2:8080',
+        'https://preview--green-haven-inventory-hub-78.lovable.app',
         'https://preview--green-haven-inventory-hub.lovable.app',
         'https://145b2e48-5bdc-472c-911a-bf04de9cdccc.lovableproject.com',
         '*.lovable.app',
