@@ -18,11 +18,28 @@ class ShopifyController extends Controller
     }
 
     /**
+     * Check if Shopify configuration is valid
+     */
+    private function validateShopifyConfig()
+    {
+        if (empty($this->shopifyDomain) || empty($this->accessToken)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Get all orders from Shopify
      */
     public function getOrders(Request $request)
     {
         try {
+            if (!$this->validateShopifyConfig()) {
+                return response()->json([
+                    'error' => 'Shopify configuration missing. Please set SHOPIFY_DOMAIN and SHOPIFY_ACCESS_TOKEN in your .env file.'
+                ], 500);
+            }
+
             $params = $request->only(['status', 'limit', 'page_info', 'created_at_min', 'created_at_max']);
 
             $response = Http::withHeaders([
@@ -46,6 +63,12 @@ class ShopifyController extends Controller
     public function getOrder($orderId)
     {
         try {
+            if (!$this->validateShopifyConfig()) {
+                return response()->json([
+                    'error' => 'Shopify configuration missing. Please set SHOPIFY_DOMAIN and SHOPIFY_ACCESS_TOKEN in your .env file.'
+                ], 500);
+            }
+
             $response = Http::withHeaders([
                 'X-Shopify-Access-Token' => $this->accessToken,
                 'Content-Type' => 'application/json'
@@ -67,6 +90,12 @@ class ShopifyController extends Controller
     public function getCustomers(Request $request)
     {
         try {
+            if (!$this->validateShopifyConfig()) {
+                return response()->json([
+                    'error' => 'Shopify configuration missing. Please set SHOPIFY_DOMAIN and SHOPIFY_ACCESS_TOKEN in your .env file.'
+                ], 500);
+            }
+
             $params = $request->only(['limit', 'page_info', 'created_at_min', 'created_at_max']);
 
             $response = Http::withHeaders([
@@ -90,10 +119,16 @@ class ShopifyController extends Controller
     public function getCustomer($customerId)
     {
         try {
+            if (!$this->validateShopifyConfig()) {
+                return response()->json([
+                    'error' => 'Shopify configuration missing. Please set SHOPIFY_DOMAIN and SHOPIFY_ACCESS_TOKEN in your .env file.'
+                ], 500);
+            }
+
             $response = Http::withHeaders([
                 'X-Shopify-Access-Token' => $this->accessToken,
                 'Content-Type' => 'application/json'
-            ])->get("https://{$this->shopifyDomain}/admin/api/2023-10/customers/{$customerId}.json");
+            ])->get("https://{$this->shopifyDomain}/admin/api/2023-10/customers/{customerId}.json");
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -111,6 +146,12 @@ class ShopifyController extends Controller
     public function getProducts(Request $request)
     {
         try {
+            if (!$this->validateShopifyConfig()) {
+                return response()->json([
+                    'error' => 'Shopify configuration missing. Please set SHOPIFY_DOMAIN and SHOPIFY_ACCESS_TOKEN in your .env file.'
+                ], 500);
+            }
+
             $params = $request->only(['limit', 'page_info', 'vendor', 'product_type']);
 
             $response = Http::withHeaders([

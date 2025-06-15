@@ -104,6 +104,12 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('sku-matrices', SkuMatrixController::class);
     Route::apiResource('sku-matrix-rows', SkuMatrixRowController::class);
     Route::apiResource('sku-matrix-cells', SkuMatrixCellController::class);
+    Route::get('/sku-matrices/products', [SkuMatrixController::class, 'skuProducts']);
+//    Route::get('/sku-matrices', [SkuMatrixController::class, 'index']);
+//    Route::post('/sku-matrices', [SkuMatrixController::class, 'store']);
+    Route::put('/sku-matrices/{skuMatrix}', [SkuMatrixController::class, 'update']);
+//    Route::apiResource('sku-matrix-rows', SkuMatrixRowController::class);
+//    Route::apiResource('sku-matrix-cells', SkuMatrixCellController::class);
 
     // Notifications
     Route::apiResource('notifications', NotificationController::class);
