@@ -42,6 +42,7 @@ Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/register', [AuthApiController::class, 'register']);
 Route::post('/logout', [AuthApiController::class, 'logout'])->middleware('auth:sanctum');
 
+Route::get('/sku-matrices/products', [SkuMatrixController::class, 'skuProducts']);
 // Protected routes
 Route::middleware('auth:api')->group(function () {
     // Dashboard routes
@@ -104,7 +105,6 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('sku-matrices', SkuMatrixController::class);
     Route::apiResource('sku-matrix-rows', SkuMatrixRowController::class);
     Route::apiResource('sku-matrix-cells', SkuMatrixCellController::class);
-    Route::get('/sku-matrices/products', [SkuMatrixController::class, 'skuProducts']);
 //    Route::get('/sku-matrices', [SkuMatrixController::class, 'index']);
 //    Route::post('/sku-matrices', [SkuMatrixController::class, 'store']);
     Route::put('/sku-matrices/{skuMatrix}', [SkuMatrixController::class, 'update']);
