@@ -327,6 +327,69 @@ export const promotionService = {
   },
 };
 
+// Order service
+export const orderService = {
+  getOrders: async () => {
+    try {
+      const response = await api.get('/orders');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      throw error;
+    }
+  },
+
+  getOrder: async (id: string) => {
+    try {
+      const response = await api.get(`/orders/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching order ${id}:`, error);
+      throw error;
+    }
+  },
+
+  addOrder: async (order: any) => {
+    try {
+      const response = await api.post('/orders', order);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating order:', error);
+      throw error;
+    }
+  },
+
+  updateOrder: async (id: string, order: any) => {
+    try {
+      const response = await api.put(`/orders/${id}`, order);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating order ${id}:`, error);
+      throw error;
+    }
+  },
+
+  deleteOrder: async (id: string) => {
+    try {
+      const response = await api.delete(`/orders/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting order ${id}:`, error);
+      throw error;
+    }
+  },
+
+  updateOrderStatus: async (id: string, status: string) => {
+    try {
+      const response = await api.patch(`/orders/${id}/status`, { status });
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating order ${id} status:`, error);
+      throw error;
+    }
+  },
+};
+
 // Combining all services for easier import
 export const apiServices = {
   auth: authService,
@@ -334,6 +397,7 @@ export const apiServices = {
   categories: categoryService,
   customers: customerService,
   promotions: promotionService,
+  orders: orderService,
 };
 
 export default apiServices;

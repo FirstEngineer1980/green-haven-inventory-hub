@@ -1,3 +1,4 @@
+
 export interface User {
   id: number; // Changed from string to number to match backend
   name: string;
@@ -169,6 +170,30 @@ export interface PurchaseOrderItem {
   unitPrice: number;
   totalPrice: number;
   total: number;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  status: 'draft' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  date: string;
+  total: number;
+  items: OrderItem[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  productName?: string;
+  name: string;
+  quantity: number;
+  price: number;
+  total?: number;
 }
 
 export interface Vendor {

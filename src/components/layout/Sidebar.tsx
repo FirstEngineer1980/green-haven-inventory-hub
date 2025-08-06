@@ -1,196 +1,105 @@
 
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-  SidebarFooter,
-} from '@/components/ui/sidebar';
-import {
-  Home,
   Package,
   Users,
   ShoppingCart,
   Truck,
-  BarChart3,
   Settings,
   Bell,
+  BarChart3,
   FileText,
-  Boxes,
-  Building,
-  UserCheck,
-  Layers,
-  Calculator,
-  Briefcase,
-  UserPlus,
-  Receipt,
   Grid3X3,
   Warehouse,
+  Box,
+  Building,
+  Layers,
   TrendingUp,
-  DollarSign,
+  Archive,
+  UserCheck,
+  ExternalLink,
+  Shield,
+  Heart
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
 
-const AppSidebar = () => {
-  const navigate = useNavigate();
+const navigation = [
+  { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+  { name: 'Products', href: '/products', icon: Package },
+  { name: 'Customers', href: '/customers', icon: Users },
+  { name: 'Customer Products', href: '/customer-products', icon: UserCheck },
+  { name: 'Orders', href: '/orders', icon: ShoppingCart },
+  { name: 'Purchase Orders', href: '/purchase-orders', icon: FileText },
+  { name: 'Vendors', href: '/vendors', icon: Truck },
+  { name: 'Categories', href: '/categories', icon: Grid3X3 },
+  { name: 'Inventory', href: '/inventory', icon: Archive },
+  
+  // Warehouse section
+  { name: 'Rooms', href: '/rooms', icon: Building },
+  { name: 'Units', href: '/units', icon: Layers },
+  { name: 'Bins', href: '/bins', icon: Box },
+  { name: 'Stock Movements', href: '/stock-movements', icon: TrendingUp },
+  
+  // Matrix section
+  { name: 'SKU Matrix', href: '/sku-matrix', icon: Grid3X3 },
+  { name: 'Unit Matrix', href: '/unit-matrix', icon: Warehouse },
+  
+  // CRM section
+  { name: 'CRM Dashboard', href: '/crm', icon: Heart },
+  { name: 'Clients', href: '/crm/clients', icon: Users },
+  { name: 'Sellers', href: '/crm/sellers', icon: UserCheck },
+  { name: 'Invoices', href: '/invoices', icon: FileText },
+  
+  // Shopify section
+  { name: 'Shopify Orders', href: '/shopify/orders', icon: ExternalLink },
+  { name: 'Shopify Customers', href: '/shopify/customers', icon: Users },
+  
+  // Settings section
+  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Notifications', href: '/notifications', icon: Bell },
+  { name: 'Reports', href: '/reports', icon: BarChart3 },
+  { name: 'Users', href: '/users', icon: Shield },
+  { name: 'Promotions', href: '/promotions', icon: TrendingUp },
+];
+
+const Sidebar = () => {
   const location = useLocation();
-  const { logout } = useAuth();
-
-  const mainNavItems = [
-    { title: 'Dashboard', url: '/dashboard', icon: Home },
-    { title: 'Products', url: '/products', icon: Package },
-    { title: 'Categories', url: '/categories', icon: Layers },
-    { title: 'Customers', url: '/customers', icon: Users },
-    { title: 'Customer Products', url: '/customer-products', icon: Grid3X3 },
-    { title: 'Purchase Orders', url: '/purchase-orders', icon: ShoppingCart },
-    { title: 'Vendors', url: '/vendors', icon: Truck },
-    { title: 'Inventory', url: '/inventory', icon: Warehouse },
-    { title: 'Invoices', url: '/invoices', icon: Receipt },
-  ];
-
-  const warehouseNavItems = [
-    { title: 'Rooms', url: '/rooms', icon: Building },
-    { title: 'Units', url: '/units', icon: Boxes },
-    { title: 'Bins', url: '/bins', icon: Package },
-    { title: 'SKU Matrix', url: '/sku-matrix', icon: Calculator },
-    { title: 'Unit Matrix', url: '/unit-matrix', icon: Grid3X3 },
-    { title: 'Stock Movements', url: '/stock-movements', icon: BarChart3 },
-  ];
-
-  const crmNavItems = [
-    { title: 'CRM Dashboard', url: '/crm', icon: BarChart3 },
-    { title: 'Clients', url: '/crm/clients', icon: UserPlus },
-    { title: 'Sellers', url: '/crm/sellers', icon: UserCheck },
-    { title: 'Seller Commissions', url: '/crm/seller-commissions', icon: TrendingUp },
-    { title: 'Commission Management', url: '/crm/commission-dashboard', icon: DollarSign },
-  ];
-
-  const systemNavItems = [
-    { title: 'Users', url: '/users', icon: Users },
-    { title: 'Reports', url: '/reports', icon: FileText },
-    { title: 'Notifications', url: '/notifications', icon: Bell },
-    { title: 'Settings', url: '/settings', icon: Settings },
-  ];
-
-  const handleNavigation = (url: string) => {
-    navigate(url);
-  };
-
-  const isActive = (url: string) => {
-    return location.pathname === url;
-  };
 
   return (
-    <Sidebar className="border-r">
-      <SidebarHeader className="p-4">
-        <h2 className="text-lg font-semibold">Inventory System</h2>
-      </SidebarHeader>
-      
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    onClick={() => handleNavigation(item.url)}
+    <div className="flex flex-col w-64 bg-white border-r border-gray-200">
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
+          <nav className="mt-5 flex-1 px-2 space-y-1">
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={cn(
+                    isActive
+                      ? 'bg-blue-100 text-blue-900'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                    'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
+                  )}
+                >
+                  <item.icon
                     className={cn(
-                      "w-full justify-start",
-                      isActive(item.url) && "bg-accent text-accent-foreground"
+                      isActive ? 'text-blue-500' : 'text-gray-400',
+                      'mr-3 flex-shrink-0 h-6 w-6'
                     )}
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Warehouse</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {warehouseNavItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    onClick={() => handleNavigation(item.url)}
-                    className={cn(
-                      "w-full justify-start",
-                      isActive(item.url) && "bg-accent text-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>CRM & Sales</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {crmNavItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    onClick={() => handleNavigation(item.url)}
-                    className={cn(
-                      "w-full justify-start",
-                      isActive(item.url) && "bg-accent text-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>System</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {systemNavItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    onClick={() => handleNavigation(item.url)}
-                    className={cn(
-                      "w-full justify-start",
-                      isActive(item.url) && "bg-accent text-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter className="p-4">
-        <SidebarMenuButton onClick={logout} className="w-full">
-          <span>Logout</span>
-        </SidebarMenuButton>
-      </SidebarFooter>
-    </Sidebar>
+                    aria-hidden="true"
+                  />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default AppSidebar;
+export default Sidebar;

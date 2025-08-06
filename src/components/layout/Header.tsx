@@ -3,9 +3,6 @@ import React, { useState } from 'react';
 import { Bell, Search, Settings, UserRound, LogOut, Heart, BarChart2, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/context/NotificationContext';
-import { useFavorites } from '@/context/FavoritesContext';
-import { useComparison } from '@/context/ComparisonContext';
-import { useCart } from '@/context/CartContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,9 +23,38 @@ const Header = () => {
   const navigate = useNavigate();
   const { notifications = [], unreadCount = 0, markAsRead, markAllAsRead } = useNotifications() || {};
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const { favorites } = useFavorites();
-  const { comparisonList } = useComparison();
-  const { totalItems } = useCart();
+  
+  // Safely handle context values that might not be available
+  let favorites = [];
+  let comparisonList = [];
+  let totalItems = 0;
+
+  try {
+    const favoritesContext = require('@/context/FavoritesContext');
+    const { useFavorites } = favoritesContext;
+    const favoritesData = useFavorites();
+    favorites = favoritesData?.favorites || [];
+  } catch (error) {
+    console.log('FavoritesContext not available');
+  }
+
+  try {
+    const comparisonContext = require('@/context/ComparisonContext');
+    const { useComparison } = comparisonContext;
+    const comparisonData = useComparison();
+    comparisonList = comparisonData?.comparisonList || [];
+  } catch (error) {
+    console.log('ComparisonContext not available');
+  }
+
+  try {
+    const cartContext = require('@/context/CartContext');
+    const { useCart } = cartContext;
+    const cartData = useCart();
+    totalItems = cartData?.totalItems || 0;
+  } catch (error) {
+    console.log('CartContext not available');
+  }
 
   const formatRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -176,7 +202,7 @@ const Header = () => {
                     <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
                   ) : (
                     <AvatarFallback className="bg-gh-blue text-white">
-                      {currentUser?.name.charAt(0)}
+                      {currentUser?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   )}
                 </Avatar>
@@ -185,9 +211,9 @@ const Header = () => {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{currentUser?.name}</p>
+                  <p className="text-sm font-medium leading-none">{currentUser?.name || 'User'}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {currentUser?.email}
+                    {currentUser?.email || 'No email'}
                   </p>
                 </div>
               </DropdownMenuLabel>

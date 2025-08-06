@@ -12,6 +12,7 @@ import Products from '@/pages/Products';
 import Customers from '@/pages/Customers';
 import CustomerProducts from '@/pages/CustomerProducts';
 import PurchaseOrders from '@/pages/PurchaseOrders';
+import OrdersPage from '@/pages/OrdersPage';
 import Vendors from '@/pages/Vendors';
 import Categories from '@/pages/Categories';
 import Inventory from '@/pages/Inventory';
@@ -40,6 +41,11 @@ import SellerCommissionPage from '@/pages/crm/SellerCommissionPage';
 import CommissionDashboard from '@/pages/crm/CommissionDashboard';
 import InvoicesPage from '@/pages/InvoicesPage';
 
+// Shopify Pages
+import ShopifyOrdersPage from '@/pages/shopify/ShopifyOrdersPage';
+import ShopifyCustomersPage from '@/pages/shopify/ShopifyCustomersPage';
+import ShopifyOrderDetailPage from '@/pages/shopify/ShopifyOrderDetailPage';
+
 const AppRoutes = () => {
   const { user } = useAuth();
 
@@ -55,6 +61,7 @@ const AppRoutes = () => {
       <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
       <Route path="/customer-products" element={<ProtectedRoute><CustomerProducts /></ProtectedRoute>} />
       <Route path="/purchase-orders" element={<ProtectedRoute><PurchaseOrders /></ProtectedRoute>} />
+      <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
       <Route path="/vendors" element={<ProtectedRoute><Vendors /></ProtectedRoute>} />
       <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
       <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
@@ -80,6 +87,11 @@ const AppRoutes = () => {
       <Route path="/crm/seller-commissions" element={<ProtectedRoute><SellerCommissionPage /></ProtectedRoute>} />
       <Route path="/crm/commission-dashboard" element={<ProtectedRoute><CommissionDashboard /></ProtectedRoute>} />
       <Route path="/invoices" element={<ProtectedRoute><InvoicesPage /></ProtectedRoute>} />
+      
+      {/* Shopify Routes */}
+      <Route path="/shopify/orders" element={<ProtectedRoute><ShopifyOrdersPage /></ProtectedRoute>} />
+      <Route path="/shopify/customers" element={<ProtectedRoute><ShopifyCustomersPage /></ProtectedRoute>} />
+      <Route path="/shopify/orders/:orderId" element={<ProtectedRoute><ShopifyOrderDetailPage /></ProtectedRoute>} />
       
       {/* Error routes */}
       <Route path="/unauthorized" element={<Unauthorized />} />

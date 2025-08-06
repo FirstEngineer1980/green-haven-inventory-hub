@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Imports\ClientsImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
@@ -14,10 +15,12 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
-        // Get customers based on authenticated user (implement auth check)
-        $customers = Customer::with('user')->get();
-        
-        return response()->json($customers);
+        try {
+            $customers = Customer::with('user')->get();
+            return response()->json($customers);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch customers'], 500);
+        }
     }
 
     /**
@@ -25,17 +28,29 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'user_id' => 'required|exists:users,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string',
+                'company' => 'nullable|string|max:255',
+                'notes' => 'nullable|string',
+            ]);
 
-        $customer = Customer::create($validated);
+            // Use the authenticated user's ID
+            $validated['user_id'] = Auth::id();
+            $validated['status'] = 'active';
 
-        return response()->json($customer, 201);
+            $customer = Customer::create($validated);
+            $customer->load('user');
+
+            return response()->json($customer, 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create customer'], 500);
+        }
     }
 
     /**
@@ -43,10 +58,12 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        // Load relationships if needed
-        $customer->load(['customerProducts', 'rooms']);
-        
-        return response()->json($customer);
+        try {
+            $customer->load(['customerProducts', 'rooms', 'user']);
+            return response()->json($customer);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Customer not found'], 404);
+        }
     }
 
     /**
@@ -54,17 +71,26 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'user_id' => 'sometimes|required|exists:users,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string',
+                'company' => 'nullable|string|max:255',
+                'notes' => 'nullable|string',
+                'status' => 'sometimes|in:active,inactive,paused',
+            ]);
 
-        $customer->update($validated);
+            $customer->update($validated);
+            $customer->load('user');
 
-        return response()->json($customer);
+            return response()->json($customer);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update customer'], 500);
+        }
     }
 
     /**
@@ -72,9 +98,12 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        $customer->delete();
-
-        return response()->json(null, 204);
+        try {
+            $customer->delete();
+            return response()->json(null, 204);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete customer'], 500);
+        }
     }
 
     /**

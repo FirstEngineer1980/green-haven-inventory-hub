@@ -1,99 +1,100 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { NotificationProvider } from '@/context/NotificationContext';
-import { FavoritesProvider } from '@/context/FavoritesContext';
-import { ComparisonProvider } from '@/context/ComparisonContext';
-import { CartProvider } from '@/context/CartContext';
-import { RoomProvider } from '@/context/RoomContext';
-import { UnitProvider } from '@/context/UnitContext';
 import { CustomerProvider } from '@/context/CustomerContext';
-import { ProductProvider } from '@/context/ProductContext';
-import { CategoryProvider } from '@/context/CategoryContext';
-import { SkuMatrixProvider } from '@/context/SkuMatrixContext';
 import { CustomerProductProvider } from '@/context/CustomerProductContext';
-import { POProvider } from '@/context/POContext';
-import { BinProvider } from '@/context/BinContext';
-import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import AppRoutes from '@/routes/AppRoutes';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Login from '@/pages/Login';
-import Index from '@/pages/Index';
-import './App.css';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-// Main App component that handles routing
-const AppContent = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  return (
-    <Routes>
-      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} />
-      {isAuthenticated ? (
-        <Route path="/*" element={<AppRoutes />} />
-      ) : (
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      )}
-    </Routes>
-  );
-};
+import Dashboard from '@/pages/Dashboard';
+import CustomerProducts from '@/pages/CustomerProducts';
+import ManageCustomer from '@/pages/ManageCustomer';
+import OrdersPage from '@/pages/OrdersPage';
+import ManageOrder from '@/pages/ManageOrder';
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-        <Router>
-          <AuthProvider>
-            <NotificationProvider>
-              <FavoritesProvider>
-                <ComparisonProvider>
-                  <CartProvider>
-                    <CustomerProvider>
-                      <RoomProvider>
-                        <UnitProvider>
-                          <ProductProvider>
-                            <CategoryProvider>
-                              <SkuMatrixProvider>
-                                <CustomerProductProvider>
-                                  <POProvider>
-                                    <BinProvider>
-                                      <AppContent />
-                                      <Toaster />
-                                    </BinProvider>
-                                  </POProvider>
-                                </CustomerProductProvider>
-                              </SkuMatrixProvider>
-                            </CategoryProvider>
-                          </ProductProvider>
-                        </UnitProvider>
-                      </RoomProvider>
-                    </CustomerProvider>
-                  </CartProvider>
-                </ComparisonProvider>
-              </FavoritesProvider>
-            </NotificationProvider>
-          </AuthProvider>
-        </Router>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <NotificationProvider>
+        <CustomerProvider>
+          <CustomerProductProvider>
+            <Router>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/customer-products"
+                  element={
+                    <ProtectedRoute>
+                      <CustomerProducts />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/customers"
+                  element={
+                    <ProtectedRoute>
+                      <ManageCustomer />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/customers/manage"
+                  element={
+                    <ProtectedRoute>
+                      <ManageCustomer />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/customers/manage/:customerId"
+                  element={
+                    <ProtectedRoute>
+                      <ManageCustomer />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/orders"
+                  element={
+                    <ProtectedRoute>
+                      <OrdersPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/orders/manage"
+                  element={
+                    <ProtectedRoute>
+                      <ManageOrder />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/orders/manage/:orderId"
+                  element={
+                    <ProtectedRoute>
+                      <ManageOrder />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </Router>
+            <Toaster />
+          </CustomerProductProvider>
+        </CustomerProvider>
+      </NotificationProvider>
+    </AuthProvider>
   );
 }
 

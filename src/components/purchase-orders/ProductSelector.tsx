@@ -33,16 +33,33 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
   const { products, loading } = useProductSelection();
   const [open, setOpen] = useState(false);
 
-  const selectedProduct = products.find(product => product.id === value);
+  // Ensure products is always a valid array to prevent cmdk errors
+  const safeProducts = Array.isArray(products) ? products.filter(p => p && p.id && typeof p.id === 'string') : [];
+
+  const selectedProduct = safeProducts.find(product => product.id === value);
 
   const handleSelect = (productId: string) => {
-    const product = products.find(p => p.id === productId);
+    const product = safeProducts.find(p => p.id === productId);
     onValueChange(productId);
     if (product && onProductSelect) {
       onProductSelect(product);
     }
     setOpen(false);
   };
+
+  // Don't render the command component until we have safe data
+  if (loading && safeProducts.length === 0) {
+    return (
+      <Button
+        variant="outline"
+        disabled
+        className="w-full justify-between"
+      >
+        Loading products...
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+    );
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -72,7 +89,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
             {loading ? "Loading products..." : "No products found."}
           </CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">
-            {products.map((product) => (
+            {safeProducts.map((product) => (
               <CommandItem
                 key={product.id}
                 value={product.id}
@@ -90,7 +107,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                     <span className="font-mono text-sm font-medium">{product.sku}</span>
                     <span className="text-muted-foreground">-</span>
                     <span>{product.name}</span>
-                    <span className="text-sm text-muted-foreground">${product.price}</span>
+                    {product.price && <span className="text-sm text-muted-foreground">${product.price}</span>}
                   </div>
                   {product.description && (
                     <span className="text-xs text-muted-foreground truncate">
