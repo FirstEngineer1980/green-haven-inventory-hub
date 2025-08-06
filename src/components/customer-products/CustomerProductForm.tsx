@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,7 +52,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
   onSubmit,
   title,
 }) => {
-  const { customers } = useCustomers();
+  const { customers, fetchCustomers } = useCustomers();
   const [selectedProductInfo, setSelectedProductInfo] = useState<any>(null);
   
   const form = useForm<FormValues>({
@@ -64,9 +63,16 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
       name: '',
       picture: '',
       description: '',
-      customerId: customers.length > 0 ? customers[0].id : '',
+      customerId: '',
     },
   });
+
+  // Fetch customers when component mounts or dialog opens
+  useEffect(() => {
+    if (open && customers.length === 0) {
+      fetchCustomers();
+    }
+  }, [open, customers.length, fetchCustomers]);
   
   // Reset form when dialog opens/closes or product changes
   useEffect(() => {
@@ -176,18 +182,24 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Customer</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || (customers.length > 0 ? customers[0].id : undefined)}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a customer" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {customers.map((customer) => (
-                          <SelectItem key={customer.id} value={customer.id}>
-                            {customer.name}
+                        {customers.length > 0 ? (
+                          customers.map((customer) => (
+                            <SelectItem key={customer.id} value={customer.id}>
+                              {customer.name} {customer.company ? `(${customer.company})` : ''}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="" disabled>
+                            No customers available
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />

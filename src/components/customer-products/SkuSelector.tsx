@@ -1,112 +1,101 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useProductSelection } from '@/context/ProductSelectionContext';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/components/ui/command';
+import Select from 'react-select';
 import { Button } from '@/components/ui/button';
 import { FormControl } from '@/components/ui/form';
-import { Check, ChevronsUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronsUpDown } from 'lucide-react';
 
 interface SkuSelectorProps {
-  value?: string;
-  onValueChange: (sku: string) => void;
-  onProductSelect?: (product: any) => void;
-  placeholder?: string;
+    value?: string;
+    onValueChange: (sku: string) => void;
+    onProductSelect?: (product: any) => void;
+    placeholder?: string;
 }
 
 const SkuSelector: React.FC<SkuSelectorProps> = ({
-  value,
-  onValueChange,
-  onProductSelect,
-  placeholder = "Select SKU..."
-}) => {
-  const { products, loading } = useProductSelection();
-  const [open, setOpen] = useState(false);
+                                                     value = '',
+                                                     onValueChange,
+                                                     onProductSelect,
+                                                     placeholder = 'Select SKU...',
+                                                 }) => {
+    const { products, loading } = useProductSelection();
+    const [isOpen, setIsOpen] = useState(false);
 
-  const selectedProduct = products.find(product => product.sku === value);
+    // تصفية البيانات
+    const safeProducts = Array.isArray(products)
+        ? products.filter(
+            (p) =>
+                p &&
+                p.id &&
+                typeof p.sku === 'string' &&
+                p.sku.trim() !== '' &&
+                typeof p.name === 'string' &&
+                p.name.trim() !== ''
+        )
+        : [];
 
-  const handleSelect = (sku: string) => {
-    const product = products.find(p => p.sku === sku);
-    onValueChange(sku);
-    if (product && onProductSelect) {
-      onProductSelect(product);
+    const options = safeProducts.map((product) => ({
+        value: product.sku,
+        label: `${product.sku} - ${product.name}`,
+        product,
+    }));
+
+    const selectedOption = options.find((option) => option.value === value);
+
+    const handleChange = (option: any) => {
+        if (option) {
+            onValueChange(option.value);
+            if (onProductSelect) {
+                onProductSelect(option.product);
+            }
+        } else {
+            onValueChange('');
+            if (onProductSelect) {
+                onProductSelect(null);
+            }
+        }
+        setIsOpen(false);
+    };
+
+    if (loading && safeProducts.length === 0) {
+        return (
+            <Button variant="outline" disabled className="w-full justify-between">
+                Loading products...
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+        );
     }
-    setOpen(false);
-  };
 
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+    return (
         <FormControl>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {selectedProduct ? (
-              <span className="flex items-center gap-2">
-                <span className="font-mono text-sm">{selectedProduct.sku}</span>
-                <span className="text-muted-foreground">-</span>
-                <span>{selectedProduct.name}</span>
+            <Select
+                options={options}
+                value={selectedOption}
+                onChange={handleChange}
+                placeholder={placeholder}
+                isSearchable
+                isClearable
+                className="w-full"
+                classNamePrefix="select"
+                onMenuOpen={() => setIsOpen(true)}
+                onMenuClose={() => setIsOpen(false)}
+                formatOptionLabel={(option) => (
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <span className="font-mono text-sm font-medium">{option.value}</span>
+                            <span className="text-muted-foreground">-</span>
+                            <span>{option.product.name}</span>
+                        </div>
+                        {option.product.description && (
+                            <span className="text-xs text-muted-foreground truncate">
+                {option.product.description}
               </span>
-            ) : (
-              placeholder
-            )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
+                        )}
+                    </div>
+                )}
+            />
         </FormControl>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder="Search products..." />
-          <CommandEmpty>
-            {loading ? "Loading products..." : "No products found."}
-          </CommandEmpty>
-          <CommandGroup className="max-h-64 overflow-auto">
-            {products.map((product) => (
-              <CommandItem
-                key={product.id}
-                value={product.sku}
-                onSelect={() => handleSelect(product.sku)}
-                className="flex items-center gap-2"
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === product.sku ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-medium">{product.sku}</span>
-                    <span className="text-muted-foreground">-</span>
-                    <span>{product.name}</span>
-                  </div>
-                  {product.description && (
-                    <span className="text-xs text-muted-foreground truncate">
-                      {product.description}
-                    </span>
-                  )}
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
+    );
 };
 
 export default SkuSelector;

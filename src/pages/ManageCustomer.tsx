@@ -26,15 +26,17 @@ const ManageCustomer = () => {
     notes: ''
   });
   
+  const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
     if (customerId) {
       const customer = customers.find(c => c.id === customerId);
       if (customer) {
         setFormData({
-          name: customer.name,
-          email: customer.email,
-          phone: customer.phone,
-          address: customer.address,
+          name: customer.name || '',
+          email: customer.email || '',
+          phone: customer.phone || '',
+          address: customer.address || '',
           company: customer.company || '',
           notes: customer.notes || ''
         });
@@ -50,7 +52,7 @@ const ManageCustomer = () => {
     }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Ensure required fields are filled
@@ -63,36 +65,39 @@ const ManageCustomer = () => {
       return;
     }
     
-    if (customerId) {
-      // Update existing customer
-      updateCustomer(customerId, formData);
-      toast({
-        title: "Success",
-        description: "Customer updated successfully.",
-        variant: "default"
-      });
-    } else {
-      // Add new customer
-      // Make sure all required fields are filled
-      const newCustomer = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        company: formData.company,
-        notes: formData.notes
-      };
-      
-      addCustomer(newCustomer);
-      toast({
-        title: "Success",
-        description: "New customer added successfully.",
-        variant: "default"
-      });
-    }
+    setLoading(true);
     
-    // Navigate back to customers list
-    navigate('/customers');
+    try {
+      if (customerId) {
+        // Update existing customer
+        await updateCustomer(customerId, formData);
+        toast({
+          title: "Success",
+          description: "Customer updated successfully.",
+          variant: "default"
+        });
+      } else {
+        // Add new customer
+        await addCustomer(formData);
+        toast({
+          title: "Success",
+          description: "New customer added successfully.",
+          variant: "default"
+        });
+      }
+      
+      // Navigate back to customers list
+      navigate('/customers');
+    } catch (error) {
+      console.error('Error saving customer:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save customer. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   
   return (
@@ -192,12 +197,13 @@ const ManageCustomer = () => {
                   type="button" 
                   variant="outline" 
                   onClick={() => navigate('/customers')}
+                  disabled={loading}
                 >
                   Cancel
                 </Button>
-                <Button type="submit">
+                <Button type="submit" disabled={loading}>
                   <Save className="mr-2 h-4 w-4" />
-                  {customerId ? 'Update Customer' : 'Add Customer'}
+                  {loading ? 'Saving...' : (customerId ? 'Update Customer' : 'Add Customer')}
                 </Button>
               </div>
             </form>

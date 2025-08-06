@@ -61,19 +61,23 @@ export const SkuMatrixProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       description: backendData.description || '',
       roomId: backendData.room_id?.toString() || backendData.roomId || '',
       roomName: backendData.room?.name || backendData.roomName || '',
-      rows: Array.isArray(backendData.rows) ? backendData.rows.map((row: any) => ({
-        id: row.id?.toString() || '',
-        skuMatrixId: row.sku_matrix_id?.toString() || row.skuMatrixId || '',
-        label: row.label || '',
-        color: row.color || '#FFFFFF',
-        cells: Array.isArray(row.cells) ? row.cells.map((cell: any) => ({
-          id: cell.id?.toString() || '',
-          skuMatrixRowId: cell.sku_matrix_row_id?.toString() || cell.skuMatrixRowId || '',
-          columnId: cell.column_id || cell.columnId || '',
-          value: cell.value || '',
-          binId: cell.bin_id || cell.binId || ''
-        })) : []
-      })) : [],
+      rows: Array.isArray(backendData.rows)
+        ? backendData.rows.map((row: any) => ({
+            id: row.id?.toString() || '',
+            skuMatrixId: row.sku_matrix_id?.toString() || row.skuMatrixId || '',
+            label: row.label || '',
+            color: row.color || '#FFFFFF',
+            cells: Array.isArray(row.cells)
+              ? row.cells.map((cell: any) => ({
+                  id: cell.id?.toString() || '',
+                  skuMatrixRowId: cell.sku_matrix_row_id?.toString() || cell.skuMatrixRowId || '',
+                  columnId: cell.column_id || cell.columnId || '',
+                  value: cell.value || '',
+                  binId: cell.bin_id || cell.binId || ''
+                }))
+              : []
+          }))
+        : [],
       createdAt: backendData.created_at || backendData.createdAt || new Date().toISOString(),
       updatedAt: backendData.updated_at || backendData.updatedAt || new Date().toISOString()
     };

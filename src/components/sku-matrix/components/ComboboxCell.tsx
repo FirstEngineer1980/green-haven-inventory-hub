@@ -34,8 +34,10 @@ const ComboboxCell = ({
 
   useEffect(() => {
     try {
-      // Ensure options is a valid array before setting it
-      const safeOptions = Array.isArray(options) ? options.filter(Boolean) : [];
+      // Ensure options is a valid array before setting it - filter out any falsy values
+      const safeOptions = Array.isArray(options) 
+        ? options.filter(option => option && typeof option === 'string') 
+        : [];
       setAllOptions(safeOptions);
       console.log("Setting options:", safeOptions);
     } catch (error) {
@@ -80,7 +82,7 @@ const ComboboxCell = ({
 
   // Filter options based on input value - ensure allOptions is an array
   const filteredOptions = allOptions.filter(option => 
-    option && option.toLowerCase().includes((inputValue || '').toLowerCase())
+    option && typeof option === 'string' && option.toLowerCase().includes((inputValue || '').toLowerCase())
   );
 
   return (

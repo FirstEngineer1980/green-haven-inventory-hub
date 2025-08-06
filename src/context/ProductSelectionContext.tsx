@@ -49,13 +49,34 @@ export const ProductSelectionProvider: React.FC<{ children: React.ReactNode }> =
     setLoading(true);
     setError(null);
     try {
+      console.log('ProductSelectionContext: Fetching products...');
       const response = await apiInstance.get('/products/for-selection');
-      const transformedProducts = response.data.map(transformProduct);
+      console.log('ProductSelectionContext: Raw response:', response.data);
+      
+      // Ensure response.data is a valid array
+      const rawProducts = Array.isArray(response.data) ? response.data : [];
+      console.log('ProductSelectionContext: Raw products array:', rawProducts);
+      
+      // Transform and filter valid products
+      const transformedProducts = rawProducts
+        .filter(product => product && typeof product === 'object')
+        .map(product => {
+          try {
+            return transformProduct(product);
+          } catch (err) {
+            console.warn('ProductSelectionContext: Failed to transform product:', product, err);
+            return null;
+          }
+        })
+        .filter((product): product is ProductForSelection => product !== null && typeof product.sku === 'string' && product.sku.trim() !== '');
+      
+      console.log('ProductSelectionContext: Transformed products:', transformedProducts);
       setProducts(transformedProducts);
     } catch (err: any) {
-      console.error('Error fetching products for selection:', err);
+      console.error('ProductSelectionContext: Error fetching products:', err);
       setError('Failed to fetch products');
-      setProducts([]); // Set empty array on error
+      // CRITICAL: Always ensure products remains a valid array, never set to undefined
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -76,12 +97,18 @@ export const ProductSelectionProvider: React.FC<{ children: React.ReactNode }> =
   useEffect(() => {
     if (user) {
       fetchProducts();
+    } else {
+      // Ensure products is always an empty array when no user
+      setProducts([]);
     }
   }, [user]);
 
+  // Double-check that products is always an array before providing context
+  const safeProducts = Array.isArray(products) ? products : [];
+
   return (
     <ProductSelectionContext.Provider value={{ 
-      products, 
+      products: safeProducts, 
       loading,
       error,
       fetchProducts,

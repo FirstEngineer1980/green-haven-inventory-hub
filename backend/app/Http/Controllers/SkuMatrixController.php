@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\SkuMatrix;
 use App\Models\SkuMatrixRow;
 use App\Models\SkuMatrixCell;
@@ -119,7 +118,7 @@ class SkuMatrixController extends Controller
     public function skuProducts()
     {
         // Select id, name, sku for each product/unit
-        $products = Product::select('id', 'name', 'sku')->get();
+        $products = Unit::select('id', 'name', 'sku')->get();
         return response()->json(['products' => $products]);
     }
 
