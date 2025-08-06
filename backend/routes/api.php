@@ -1,12 +1,13 @@
 
 <?php
 
-use App\Http\Controllers\ShopifyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthApiController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerProductController;
+use App\Http\Controllers\CustomerListController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\DashboardController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\SellerCommissionController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ClientOrderTemplateController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\ShopifyController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -42,7 +44,6 @@ Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/register', [AuthApiController::class, 'register']);
 Route::post('/logout', [AuthApiController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('/sku-matrices/products', [SkuMatrixController::class, 'skuProducts']);
 // Protected routes
 Route::middleware('auth:api')->group(function () {
     // Dashboard routes
@@ -63,6 +64,14 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/customer-products/{customerProduct}', [CustomerProductController::class, 'update']);
     Route::delete('/customer-products/{customerProduct}', [CustomerProductController::class, 'destroy']);
     Route::get('/customer-products/customer/{customer}', [CustomerProductController::class, 'getByCustomer']);
+
+    // Customer Lists routes
+    Route::apiResource('customer-lists', CustomerListController::class);
+    Route::get('/customer-lists/customer/{customer}', [CustomerListController::class, 'getByCustomer']);
+
+    // Order routes
+    Route::apiResource('orders', OrderController::class);
+    Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus']);
 
     // Product selection routes for customer products and purchase orders
     Route::get('/products/for-selection', [CustomerProductController::class, 'getProducts']);
@@ -102,14 +111,12 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('stock-movements', StockMovementController::class);
 
     // SKU Matrix management
-    Route::apiResource('sku-matrices', SkuMatrixController::class);
+    Route::get('/sku-matrices/products', [SkuMatrixController::class, 'skuProducts']);
+    Route::get('/sku-matrices', [SkuMatrixController::class, 'index']);
+    Route::post('/sku-matrices', [SkuMatrixController::class, 'store']);
+    Route::put('/sku-matrices/{skuMatrix}', [SkuMatrixController::class, 'update']);
     Route::apiResource('sku-matrix-rows', SkuMatrixRowController::class);
     Route::apiResource('sku-matrix-cells', SkuMatrixCellController::class);
-//    Route::get('/sku-matrices', [SkuMatrixController::class, 'index']);
-//    Route::post('/sku-matrices', [SkuMatrixController::class, 'store']);
-    Route::put('/sku-matrices/{skuMatrix}', [SkuMatrixController::class, 'update']);
-//    Route::apiResource('sku-matrix-rows', SkuMatrixRowController::class);
-//    Route::apiResource('sku-matrix-cells', SkuMatrixCellController::class);
 
     // Notifications
     Route::apiResource('notifications', NotificationController::class);
@@ -137,11 +144,11 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('sellers', SellerController::class);
     Route::apiResource('seller-commissions', SellerCommissionController::class);
-
+    
     // Invoice routes with status update
     Route::apiResource('invoices', InvoiceController::class);
     Route::patch('invoices/{invoice}/status', [InvoiceController::class, 'updateStatus']);
-
+    
     Route::apiResource('client-order-templates', ClientOrderTemplateController::class);
 
     // Stripe payment routes
@@ -158,5 +165,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('sync/orders', [ShopifyController::class, 'syncOrders']);
     });
 });
+
 // Shopify webhook routes (public, no auth required)
 Route::post('shopify/webhook', [ShopifyController::class, 'handleWebhook']);
