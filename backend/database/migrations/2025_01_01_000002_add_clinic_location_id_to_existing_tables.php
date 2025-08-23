@@ -25,7 +25,7 @@ return new class extends Migration
 
         // Add clinic_location_id to bins table
         Schema::table('bins', function (Blueprint $table) {
-            $table->foreignId('clinic_location_id')->nullable()->after('sku_matrix_id')->constrained('clinic_locations')->onDelete('cascade');
+            $table->foreignId('clinic_location_id')->nullable()->after('id')->constrained('clinic_locations')->onDelete('cascade');
             $table->index(['clinic_location_id']);
         });
 
