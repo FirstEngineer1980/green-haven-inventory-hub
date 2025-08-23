@@ -114,6 +114,23 @@ export interface Customer {
   notes?: string;
   createdAt: string;
   updatedAt?: string;
+  clinicLocations?: ClinicLocation[];
+}
+
+export interface ClinicLocation {
+  id: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  contactPerson?: string;
+  timezone?: string;
+  status: 'active' | 'inactive';
+  notes?: string;
+  customerId: string;
+  customerName?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Room {
@@ -122,6 +139,8 @@ export interface Room {
   description: string;
   customerId: string;
   customerName?: string;
+  clinicLocationId: string;
+  clinicLocationName?: string;
   capacity: number;
   unit?: string; // Single unit identifier
   units: Unit[];
@@ -135,6 +154,8 @@ export interface Unit {
   number?: string;
   roomId: string;
   roomName?: string;
+  clinicLocationId: string;
+  clinicLocationName?: string;
   capacity: number;
   currentStock: number;
   size?: number;

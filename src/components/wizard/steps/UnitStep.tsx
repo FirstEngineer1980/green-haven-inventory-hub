@@ -109,6 +109,7 @@ const UnitStep = () => {
         name: form.name,
         number: form.number,
         roomId: form.roomId,
+        clinicLocationId: '1', // Default to first location for now
         capacity: form.size, // Use size as capacity
         currentStock: 0, // Initialize with zero stock
         size: form.size,

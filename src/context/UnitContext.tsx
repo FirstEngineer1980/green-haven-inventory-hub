@@ -9,7 +9,7 @@ interface UnitContextType {
   units: Unit[];
   loading: boolean;
   error: string | null;
-  addUnit: (unit: Omit<Unit, 'id' | 'createdAt' | 'updatedAt' | 'roomName'>) => Promise<void>;
+  addUnit: (unit: Omit<Unit, 'id' | 'createdAt' | 'updatedAt' | 'roomName' | 'clinicLocationName'>) => Promise<void>;
   updateUnit: (id: string, updates: Partial<Unit>) => Promise<void>;
   deleteUnit: (id: string) => Promise<void>;
   getUnitsByRoomId: (roomId: string) => Unit[];
@@ -42,6 +42,8 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: unit.description || '',
         roomId: unit.room_id.toString(),
         roomName: unit.room?.name || 'Unknown Room',
+        clinicLocationId: unit.clinic_location_id?.toString() || '1', // Default location
+        clinicLocationName: unit.clinic_location?.name || 'Main Location',
         number: unit.number || '',
         capacity: 0, // Default capacity
         currentStock: 0, // Default current stock
@@ -70,7 +72,7 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return units.find(unit => unit.id === id);
   };
 
-  const addUnit = async (unit: Omit<Unit, 'id' | 'createdAt' | 'updatedAt' | 'roomName'>) => {
+  const addUnit = async (unit: Omit<Unit, 'id' | 'createdAt' | 'updatedAt' | 'roomName' | 'clinicLocationName'>) => {
     if (!user) return;
     
     setLoading(true);
@@ -79,6 +81,7 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: unit.name,
         description: unit.description,
         room_id: unit.roomId,
+        clinic_location_id: unit.clinicLocationId,
         number: unit.number,
         size: unit.size?.toString(),
         size_unit: unit.sizeUnit,
@@ -91,6 +94,8 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: response.data.description || '',
         roomId: response.data.room_id.toString(),
         roomName: response.data.room?.name || 'Unknown Room',
+        clinicLocationId: response.data.clinic_location_id?.toString() || unit.clinicLocationId,
+        clinicLocationName: response.data.clinic_location?.name || 'Main Location',
         number: response.data.number || '',
         capacity: unit.capacity || 0,
         currentStock: unit.currentStock || 0,
@@ -127,6 +132,7 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: updates.name,
         description: updates.description,
         room_id: updates.roomId,
+        clinic_location_id: updates.clinicLocationId,
         number: updates.number,
         size: updates.size?.toString(),
         size_unit: updates.sizeUnit,
@@ -139,6 +145,8 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: response.data.description || '',
         roomId: response.data.room_id.toString(),
         roomName: response.data.room?.name || 'Unknown Room',
+        clinicLocationId: response.data.clinic_location_id?.toString() || updates.clinicLocationId || '1',
+        clinicLocationName: response.data.clinic_location?.name || 'Main Location',
         number: response.data.number || '',
         capacity: updates.capacity || 0,
         currentStock: updates.currentStock || 0,

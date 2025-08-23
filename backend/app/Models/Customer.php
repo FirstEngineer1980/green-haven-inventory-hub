@@ -58,4 +58,12 @@ class Customer extends Model
     {
         return $this->hasMany(CustomerList::class);
     }
+
+    /**
+     * Get the clinic locations for the customer.
+     */
+    public function clinicLocations()
+    {
+        return $this->hasMany(ClinicLocation::class);
+    }
 }

@@ -9,7 +9,7 @@ interface RoomContextType {
   rooms: Room[];
   loading: boolean;
   error: string | null;
-  addRoom: (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  addRoom: (room: Omit<Room, 'id' | 'customerName' | 'clinicLocationName' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateRoom: (id: string, updates: Partial<Room>) => Promise<void>;
   deleteRoom: (id: string) => Promise<void>;
   getRoomsByCustomerId: (customerId: string) => Room[];
@@ -42,6 +42,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: room.description || '',
         customerId: room.customer_id.toString(),
         customerName: room.customer?.name || 'Unknown Customer',
+        clinicLocationId: room.clinic_location_id?.toString() || '1', // Default location
+        clinicLocationName: room.clinic_location?.name || 'Main Location',
         capacity: 100, // Default capacity
         unit: '', // Default unit
         units: [], // Initialize empty units array
@@ -68,7 +70,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return Array.isArray(rooms) ? rooms.find(room => room.id === id) : undefined;
   };
 
-  const addRoom = async (room: Omit<Room, 'id' | 'customerName' | 'createdAt' | 'updatedAt'>) => {
+  const addRoom = async (room: Omit<Room, 'id' | 'customerName' | 'clinicLocationName' | 'createdAt' | 'updatedAt'>) => {
     if (!user) return;
     
     setLoading(true);
@@ -76,7 +78,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiInstance.post('/rooms', {
         name: room.name,
         description: room.description,
-        customer_id: room.customerId
+        customer_id: room.customerId,
+        clinic_location_id: room.clinicLocationId
       });
       
       const newRoom = {
@@ -85,6 +88,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: response.data.description || '',
         customerId: response.data.customer_id.toString(),
         customerName: response.data.customer?.name || 'Unknown Customer',
+        clinicLocationId: response.data.clinic_location_id?.toString() || room.clinicLocationId,
+        clinicLocationName: response.data.clinic_location?.name || 'Main Location',
         capacity: room.capacity || 100,
         unit: room.unit || '',
         units: [],
@@ -117,7 +122,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiInstance.put(`/rooms/${id}`, {
         name: updates.name,
         description: updates.description,
-        customer_id: updates.customerId
+        customer_id: updates.customerId,
+        clinic_location_id: updates.clinicLocationId
       });
       
       const updatedRoom = {
@@ -126,6 +132,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: response.data.description || '',
         customerId: response.data.customer_id.toString(),
         customerName: response.data.customer?.name || 'Unknown Customer',
+        clinicLocationId: response.data.clinic_location_id?.toString() || updates.clinicLocationId || '1',
+        clinicLocationName: response.data.clinic_location?.name || 'Main Location',
         capacity: updates.capacity || 100,
         unit: updates.unit || '',
         units: updates.units || [],

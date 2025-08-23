@@ -71,6 +71,7 @@ const RoomStep = () => {
       // Add new room with all required properties
       addRoom({
         customerId: selectedCustomer.id,
+        clinicLocationId: '1', // Default to first location for now
         name: form.name,
         description: `Room for ${selectedCustomer.name}`,
         capacity: 100, // Default capacity

@@ -45,6 +45,7 @@ const Units = () => {
         const unit = {
           name: unitData.name || `Unit ${unitData.number}`,
           roomId: unitData.roomId,
+          clinicLocationId: '1', // Default location
           number: unitData.number,
           capacity: unitData.size || 0,
           currentStock: 0,
@@ -85,6 +86,7 @@ const Units = () => {
     addUnit({
       name: formData.name,
       roomId: formData.roomId,
+      clinicLocationId: '1', // Default location
       number: formData.number,
       capacity: formData.size,
       currentStock: 0,

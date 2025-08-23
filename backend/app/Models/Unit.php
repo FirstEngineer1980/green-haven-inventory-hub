@@ -19,6 +19,7 @@ class Unit extends Model
         'name',
         'description',
         'room_id',
+        'clinic_location_id',
         'number',
         'size',
         'size_unit',
@@ -47,5 +48,13 @@ class Unit extends Model
     public function inventoryItems()
     {
         return $this->hasMany(InventoryItem::class);
+    }
+
+    /**
+     * Get the clinic location that owns the unit.
+     */
+    public function clinicLocation()
+    {
+        return $this->belongsTo(ClinicLocation::class);
     }
 }

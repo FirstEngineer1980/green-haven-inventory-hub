@@ -19,6 +19,7 @@ class Room extends Model
         'name',
         'description',
         'customer_id',
+        'clinic_location_id',
     ];
 
     /**
@@ -35,5 +36,13 @@ class Room extends Model
     public function units()
     {
         return $this->hasMany(Unit::class);
+    }
+
+    /**
+     * Get the clinic location that owns the room.
+     */
+    public function clinicLocation()
+    {
+        return $this->belongsTo(ClinicLocation::class);
     }
 }

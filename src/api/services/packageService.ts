@@ -1,13 +1,12 @@
 import { getAuthHeaders } from './authService';
 import { PackagesResponse } from '../types/packageTypes';
 import { API_URL } from './config';
-import i18n from 'i18next';
 
 
 export const fetchPackages = async (): Promise<PackagesResponse> => {
     try {
-        // Get current language from i18next
-        const lang = i18n.language || 'ar'; // Default to 'ar' if not set
+        // Get current language - default to 'ar'
+        const lang = 'ar';
         const response = await fetch(`${API_URL}/packages?lang=${lang}`, {
             method: 'GET',
             headers: getAuthHeaders(),

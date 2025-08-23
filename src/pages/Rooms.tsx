@@ -47,6 +47,7 @@ const Rooms = () => {
         const room = {
           name: roomData.name,
           customerId: roomData.customerId,
+          clinicLocationId: '1', // Default location
           description: roomData.description || `Room for customer`,
           capacity: parseInt(roomData.capacity, 10) || 100,
           unit: roomData.unit || '',
@@ -83,6 +84,7 @@ const Rooms = () => {
     addRoom({
       name: formData.name,
       customerId: formData.customerId,
+      clinicLocationId: '1', // Default location
       unit: formData.unit,
       description: `Room for customer`,
       capacity: 100,
