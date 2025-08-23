@@ -28,7 +28,7 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        try {
+//        try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'nullable|email|max:255',
@@ -46,11 +46,11 @@ class CustomerController extends Controller
             $customer->load('user');
 
             return response()->json($customer, 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to create customer'], 500);
-        }
+//        } catch (\Illuminate\Validation\ValidationException $e) {
+//            return response()->json(['errors' => $e->errors()], 422);
+//        } catch (\Exception $e) {
+//            return response()->json(['error' => 'Failed to create customer'], 500);
+//        }
     }
 
     /**
