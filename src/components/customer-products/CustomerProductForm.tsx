@@ -32,7 +32,7 @@ const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   picture: z.string().optional(),
   description: z.string().optional(),
-  customerId: z.string().min(1, "Customer is required"),
+  customer_id: z.string().min(1, "Customer is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -63,7 +63,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
       name: '',
       picture: '',
       description: '',
-      customerId: '',
+        customer_id: '',
     },
   });
 
@@ -85,7 +85,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
           name: product.name,
           picture: product.picture || '',
           description: product.description || '',
-          customerId: product.customerId,
+          customer_id: product.customer_id,
         });
         setSelectedProductInfo(null);
       } else {
@@ -96,7 +96,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
           name: '',
           picture: '',
           description: '',
-          customerId: customers.length > 0 ? customers[0].id : '',
+            customer_id: customers.length > 0 ? customers[0].id : '',
         });
         setSelectedProductInfo(null);
       }
@@ -178,7 +178,7 @@ const CustomerProductForm: React.FC<CustomerProductFormProps> = ({
               
               <FormField
                 control={form.control}
-                name="customerId"
+                name="customer_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Customer</FormLabel>

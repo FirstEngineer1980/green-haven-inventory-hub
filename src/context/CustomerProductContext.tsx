@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext';
 import { apiInstance } from '../api/services/api';
 
 export interface CustomerProduct {
+  customer_id: string;
   id: string;
   sku: string;
   qty: number;
@@ -23,7 +24,7 @@ interface CustomerProductContextType {
   addCustomerProduct: (product: Omit<CustomerProduct, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateCustomerProduct: (id: string, updates: Partial<CustomerProduct>) => Promise<void>;
   deleteCustomerProduct: (id: string) => Promise<void>;
-  getCustomerProducts: (customerId?: string) => CustomerProduct[];
+  getCustomerProducts: (customer_id?: string) => CustomerProduct[];
   fetchCustomerProducts: () => Promise<void>;
 }
 
@@ -134,9 +135,9 @@ export const CustomerProductProvider: React.FC<{ children: React.ReactNode }> = 
     }
   };
 
-  const getCustomerProducts = (customerId?: string): CustomerProduct[] => {
-    if (customerId) {
-      return customerProducts.filter(product => product.customerId === customerId);
+  const getCustomerProducts = (customer_id?: string): CustomerProduct[] => {
+    if (customer_id) {
+      return customerProducts.filter(product => product.customer_id === customer_id);
     }
     return customerProducts;
   };
