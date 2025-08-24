@@ -20,6 +20,7 @@ class Room extends Model
         'description',
         'customer_id',
         'clinic_location_id',
+        'max_units',
     ];
 
     /**
@@ -44,5 +45,21 @@ class Room extends Model
     public function clinicLocation()
     {
         return $this->belongsTo(ClinicLocation::class);
+    }
+
+    /**
+     * Get the current units count for this room.
+     */
+    public function getCurrentUnitsCountAttribute()
+    {
+        return $this->units()->count();
+    }
+
+    /**
+     * Check if the room has reached its maximum unit capacity.
+     */
+    public function hasReachedMaxCapacity()
+    {
+        return $this->current_units_count >= $this->max_units;
     }
 }

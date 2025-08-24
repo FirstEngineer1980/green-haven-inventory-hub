@@ -142,6 +142,8 @@ export interface Room {
   clinicLocationId: string;
   clinicLocationName?: string;
   capacity: number;
+  maxUnits: number; // Maximum number of units allowed in this room
+  currentUnitsCount?: number; // Current number of units in this room
   unit?: string; // Single unit identifier
   units: Unit[];
   createdAt: string;
@@ -162,6 +164,7 @@ export interface Unit {
   sizeUnit?: string;
   status?: string;
   description?: string;
+  lines?: UnitLine[]; // Multiple lines associated with this unit
   createdAt: string;
   updatedAt: string;
 }
@@ -264,7 +267,20 @@ export interface CustomerProduct {
   qty: number;
   picture?: string;
   description?: string;
-  customerId: string;
+  customerId?: string; // Frontend field name
+  customer_id?: string; // Backend field name
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UnitLine {
+  id: string;
+  unitId: string;
+  name: string;
+  description?: string;
+  capacity?: number;
+  currentStock?: number;
+  position?: number;
   createdAt: string;
   updatedAt: string;
 }

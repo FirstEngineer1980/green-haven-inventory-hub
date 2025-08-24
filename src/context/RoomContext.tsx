@@ -45,6 +45,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clinicLocationId: room.clinic_location_id?.toString() || '1', // Default location
         clinicLocationName: room.clinic_location?.name || 'Main Location',
         capacity: 100, // Default capacity
+        maxUnits: room.max_units || 10, // Default max units
+        currentUnitsCount: room.current_units_count || 0,
         unit: '', // Default unit
         units: [], // Initialize empty units array
         createdAt: room.created_at,
@@ -91,6 +93,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clinicLocationId: response.data.clinic_location_id?.toString() || room.clinicLocationId,
         clinicLocationName: response.data.clinic_location?.name || 'Main Location',
         capacity: room.capacity || 100,
+        maxUnits: response.data.max_units || room.maxUnits || 10,
+        currentUnitsCount: response.data.current_units_count || 0,
         unit: room.unit || '',
         units: [],
         createdAt: response.data.created_at,
@@ -135,6 +139,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clinicLocationId: response.data.clinic_location_id?.toString() || updates.clinicLocationId || '1',
         clinicLocationName: response.data.clinic_location?.name || 'Main Location',
         capacity: updates.capacity || 100,
+        maxUnits: response.data.max_units || updates.maxUnits || 10,
+        currentUnitsCount: response.data.current_units_count || 0,
         unit: updates.unit || '',
         units: updates.units || [],
         createdAt: response.data.created_at,

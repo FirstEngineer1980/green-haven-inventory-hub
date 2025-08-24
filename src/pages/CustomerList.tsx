@@ -58,7 +58,8 @@ const CustomerList = () => {
       name: newProduct.name,
       qty: newProduct.qty || 1,
       description: newProduct.description || '',
-      customerId: customerId || ''
+      customerId: customerId || '',
+      customer_id: customerId || ''
     });
     
     // Reset form

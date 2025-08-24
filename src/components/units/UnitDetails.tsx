@@ -5,6 +5,7 @@ import { Unit } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import UnitLinesManager from './UnitLinesManager';
 
 interface UnitDetailsProps {
   unit: Unit | null;
@@ -69,6 +70,11 @@ const UnitDetails = ({ unit, isOpen, onClose, onEdit, onDelete }: UnitDetailsPro
               <h4 className="text-sm font-medium">Last Updated</h4>
               <p>{format(new Date(unit.updatedAt), 'MMMM d, yyyy')}</p>
             </div>
+          </div>
+
+          {/* Unit Lines Section */}
+          <div className="mt-6">
+            <UnitLinesManager unitId={unit.id} unitName={unit.name} />
           </div>
           
           <div className="space-x-2 pt-4">

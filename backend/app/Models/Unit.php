@@ -57,4 +57,12 @@ class Unit extends Model
     {
         return $this->belongsTo(ClinicLocation::class);
     }
+
+    /**
+     * Get the lines associated with this unit.
+     */
+    public function lines()
+    {
+        return $this->hasMany(UnitLine::class);
+    }
 }

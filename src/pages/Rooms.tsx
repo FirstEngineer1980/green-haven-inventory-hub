@@ -50,6 +50,7 @@ const Rooms = () => {
           clinicLocationId: '1', // Default location
           description: roomData.description || `Room for customer`,
           capacity: parseInt(roomData.capacity, 10) || 100,
+          maxUnits: parseInt(roomData.maxUnits, 10) || 10,
           unit: roomData.unit || '',
           units: []
         };
@@ -88,6 +89,7 @@ const Rooms = () => {
       unit: formData.unit,
       description: `Room for customer`,
       capacity: 100,
+      maxUnits: 10,
       units: []
     });
     setOpenAddDialog(false);

@@ -34,6 +34,8 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'customer_id' => 'required|exists:customers,id',
             'customerId' => 'sometimes|exists:customers,id', // Accept both formats
+            'max_units' => 'sometimes|integer|min:1',
+            'clinic_location_id' => 'sometimes|exists:clinic_locations,id',
         ]);
 
         // Handle both customerId and customer_id field names
@@ -56,6 +58,7 @@ class RoomController extends Controller
     public function show(Room $room)
     {
         $room->load(['customer', 'units']);
+        $room->current_units_count = $room->units->count();
 
         return response()->json($room);
     }
@@ -69,6 +72,8 @@ class RoomController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'customer_id' => 'sometimes|required|exists:customers,id',
+            'max_units' => 'sometimes|integer|min:1',
+            'clinic_location_id' => 'sometimes|exists:clinic_locations,id',
         ]);
 
         $room->update($validated);

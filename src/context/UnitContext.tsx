@@ -50,6 +50,7 @@ export const UnitProvider: React.FC<{ children: React.ReactNode }> = ({ children
         size: parseInt(unit.size) || 0,
         sizeUnit: unit.size_unit || 'sqft',
         status: unit.status || 'available',
+        lines: unit.lines || [], // Unit lines
         createdAt: unit.created_at,
         updatedAt: unit.updated_at
       })) : [];

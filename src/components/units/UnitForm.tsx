@@ -37,11 +37,19 @@ const UnitForm = ({
           </SelectTrigger>
           <SelectContent>
             {rooms.length > 0 ? (
-              rooms.map(room => (
-                <SelectItem key={room.id} value={room.id}>
-                  {room.name} (Unit {room.unit})
-                </SelectItem>
-              ))
+              rooms.map(room => {
+                const isDisabled = room.currentUnitsCount >= room.maxUnits;
+                return (
+                  <SelectItem 
+                    key={room.id} 
+                    value={room.id}
+                    disabled={isDisabled}
+                  >
+                    {room.name} ({room.currentUnitsCount || 0}/{room.maxUnits} units)
+                    {isDisabled && ' - Full'}
+                  </SelectItem>
+                );
+              })
             ) : (
               <SelectItem value="no-rooms" disabled>No rooms available</SelectItem>
             )}

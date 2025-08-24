@@ -75,6 +75,7 @@ const RoomStep = () => {
         name: form.name,
         description: `Room for ${selectedCustomer.name}`,
         capacity: 100, // Default capacity
+        maxUnits: 10, // Default max units
         unit: form.unit,
         units: [] // Initialize empty units array
       });

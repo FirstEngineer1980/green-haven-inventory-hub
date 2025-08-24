@@ -38,7 +38,19 @@ class UnitController extends Controller
             'size' => 'nullable|string',
             'size_unit' => 'nullable|string',
             'status' => 'nullable|string|max:255',
+            'clinic_location_id' => 'sometimes|exists:clinic_locations,id',
         ]);
+
+        // Validate room capacity before creating unit
+        $roomId = $validated['room_id'] ?? $validated['roomId'];
+        $room = \App\Models\Room::find($roomId);
+        
+        if ($room && $room->units()->count() >= $room->max_units) {
+            return response()->json([
+                'error' => 'Room has reached maximum unit capacity',
+                'message' => "Room '{$room->name}' can only have {$room->max_units} units maximum."
+            ], 422);
+        }
 
         // Handle both roomId and room_id field names
         if (isset($validated['roomId']) && !isset($validated['room_id'])) {
