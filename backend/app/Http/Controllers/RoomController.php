@@ -12,7 +12,7 @@ class RoomController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Room::query()->with('customer');
+        $query = Room::query()->with('customer')->withCount('units');
 
         // Filter by customer_id if provided
         if ($request->has('customer_id')) {
@@ -35,7 +35,7 @@ class RoomController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'customerId' => 'sometimes|exists:customers,id', // Accept both formats
             'max_units' => 'sometimes|integer|min:1',
-            'clinic_location_id' => 'sometimes|exists:clinic_locations,id',
+            'clinic_location_id' => 'nullable|exists:clinic_locations,id',
         ]);
 
         // Handle both customerId and customer_id field names
@@ -73,7 +73,7 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'customer_id' => 'sometimes|required|exists:customers,id',
             'max_units' => 'sometimes|integer|min:1',
-            'clinic_location_id' => 'sometimes|exists:clinic_locations,id',
+            'clinic_location_id' => 'nullable|exists:clinic_locations,id',
         ]);
 
         $room->update($validated);
