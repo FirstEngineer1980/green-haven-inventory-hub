@@ -193,7 +193,7 @@ const AppContent = () => {
                 }
             />
             <Route
-                path="/po"
+                path="/purchase-orders"
                 element={
                     <ProtectedRoute>
                         <PurchaseOrders />
