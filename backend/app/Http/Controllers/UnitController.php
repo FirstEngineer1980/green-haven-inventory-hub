@@ -38,7 +38,7 @@ class UnitController extends Controller
             'size' => 'nullable|string',
             'size_unit' => 'nullable|string',
             'status' => 'nullable|string|max:255',
-            'clinic_location_id' => 'sometimes|exists:clinic_locations,id',
+            'clinic_location_id' => 'nullable|exists:clinic_locations,id',
         ]);
 
         // Validate room capacity before creating unit

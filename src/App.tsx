@@ -15,6 +15,8 @@ import { RoomProvider } from '@/context/RoomContext';
 import { UnitProvider } from '@/context/UnitContext';
 import { SkuMatrixProvider } from '@/context/SkuMatrixContext';
 import { BinProvider } from '@/context/BinContext';
+import { PromotionProvider } from '@/context/PromotionContext';
+import { CRMProvider } from '@/context/CRMContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
@@ -369,6 +371,14 @@ const AppContent = () => {
                 }
             />
             <Route
+                path="/crm"
+                element={
+                    <ProtectedRoute>
+                        <CRMDashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
                 path="/crm/dashboard"
                 element={
                     <ProtectedRoute>
@@ -415,10 +425,14 @@ function App() {
                                                             <RoomProvider>
                                                                 <UnitProvider>
                                                                     <SkuMatrixProvider>
-                                                                        <BinProvider>
-                                                                            <AppContent />
-                                                                            <Toaster />
-                                                                        </BinProvider>
+                                                                         <BinProvider>
+                                                                             <PromotionProvider>
+                                                                                 <CRMProvider>
+                                                                                     <AppContent />
+                                                                                     <Toaster />
+                                                                                 </CRMProvider>
+                                                                             </PromotionProvider>
+                                                                         </BinProvider>
                                                                     </SkuMatrixProvider>
                                                                 </UnitProvider>
                                                             </RoomProvider>
