@@ -15,6 +15,7 @@ import { RoomProvider } from '@/context/RoomContext';
 import { UnitProvider } from '@/context/UnitContext';
 import { SkuMatrixProvider } from '@/context/SkuMatrixContext';
 import { BinProvider } from '@/context/BinContext';
+import { PromotionProvider } from '@/context/PromotionContext';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
@@ -415,10 +416,12 @@ function App() {
                                                             <RoomProvider>
                                                                 <UnitProvider>
                                                                     <SkuMatrixProvider>
-                                                                        <BinProvider>
-                                                                            <AppContent />
-                                                                            <Toaster />
-                                                                        </BinProvider>
+                                                                         <BinProvider>
+                                                                             <PromotionProvider>
+                                                                                 <AppContent />
+                                                                                 <Toaster />
+                                                                             </PromotionProvider>
+                                                                         </BinProvider>
                                                                     </SkuMatrixProvider>
                                                                 </UnitProvider>
                                                             </RoomProvider>
