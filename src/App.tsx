@@ -13,6 +13,7 @@ import { FavoritesProvider } from '@/context/FavoritesContext';
 import { ComparisonProvider } from '@/context/ComparisonContext';
 import { RoomProvider } from '@/context/RoomContext';
 import { UnitProvider } from '@/context/UnitContext';
+import { UnitMatrixProvider } from '@/context/UnitMatrixContext';
 import { SkuMatrixProvider } from '@/context/SkuMatrixContext';
 import { BinProvider } from '@/context/BinContext';
 import { PromotionProvider } from '@/context/PromotionContext';
@@ -424,7 +425,8 @@ function App() {
                                                         <ComparisonProvider>
                                                             <RoomProvider>
                                                                 <UnitProvider>
-                                                                    <SkuMatrixProvider>
+                                                                    <UnitMatrixProvider>
+                                                                        <SkuMatrixProvider>
                                                                          <BinProvider>
                                                                              <PromotionProvider>
                                                                                  <CRMProvider>
@@ -433,8 +435,9 @@ function App() {
                                                                                  </CRMProvider>
                                                                              </PromotionProvider>
                                                                          </BinProvider>
-                                                                    </SkuMatrixProvider>
-                                                                </UnitProvider>
+                                                                     </SkuMatrixProvider>
+                                                                    </UnitMatrixProvider>
+                                                                 </UnitProvider>
                                                             </RoomProvider>
                                                         </ComparisonProvider>
                                                     </FavoritesProvider>
