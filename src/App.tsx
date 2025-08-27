@@ -36,6 +36,7 @@ import Vendors from '@/pages/Vendors';
 import StockMovements from '@/pages/StockMovements';
 import Bins from '@/pages/Bins';
 import UnitMatrixPage from '@/pages/UnitMatrixPage';
+import SkuMatrixPage from '@/pages/SkuMatrixPage';
 import Users from '@/pages/Users';
 import ManageCustomer from '@/pages/ManageCustomer';
 import NotFound from '@/pages/NotFound';
@@ -233,9 +234,17 @@ const AppContent = () => {
                     <ProtectedRoute>
                         <UnitMatrixPage />
                     </ProtectedRoute>
-                }
-            />
-            <Route
+                 }
+             />
+             <Route
+                 path="/sku-matrix"
+                 element={
+                     <ProtectedRoute>
+                         <SkuMatrixPage />
+                     </ProtectedRoute>
+                 }
+             />
+             <Route
                 path="/users"
                 element={
                     <ProtectedRoute>
