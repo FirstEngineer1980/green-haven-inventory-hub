@@ -29,6 +29,7 @@ return [
         'https://5020aa74-8fb2-4204-9261-5971408510aa.sandbox.lovable.dev',
         'https://preview--green-haven-inventory-hub.lovable.app',
         'https://145b2e48-5bdc-472c-911a-bf04de9cdccc.lovableproject.com',
+        'https://145b2e48-5bdc-472c-911a-bf04de9cdccc.sandbox.lovable.dev',
         '*.lovable.app',
     ],
 
