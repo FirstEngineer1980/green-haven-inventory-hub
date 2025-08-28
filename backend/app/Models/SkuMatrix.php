@@ -19,6 +19,7 @@ class SkuMatrix extends Model
         'name',
         'description',
         'room_id',
+        'unit_id',
     ];
 
     /**
@@ -34,6 +35,13 @@ class SkuMatrix extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+    /**
+     * Get the unit associated with this SKU matrix.
+     */
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
     }
 
     /**
