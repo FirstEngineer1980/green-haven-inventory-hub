@@ -11,6 +11,7 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         // Create roles
+        $superAdmin = Role::create(['name' => 'super_admin']);
         $admin = Role::create(['name' => 'admin']);
         $manager = Role::create(['name' => 'manager']);
         $staff = Role::create(['name' => 'staff']);
@@ -26,15 +27,47 @@ class RoleSeeder extends Seeder
             'manage_purchase_orders',
             'manage_vendors',
             'view_reports',
-            'manage_settings'
+            'manage_settings',
+            'manage_orders',
+            'manage_shopify_orders',
+            'manage_rooms',
+            'manage_units',
+            'manage_sku_matrix',
+            'manage_sku_units',
+            'manage_bins',
+            'manage_notifications',
+            'manage_support',
+            'manage_categories',
+            'manage_promotions',
+            'manage_crm',
+            'manage_export_import',
+            'manage_wizards'
         ];
 
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
         }
 
-        // Assign all permissions to admin
-        $admin->givePermissionTo(Permission::all());
+        // Assign all permissions to super admin
+        $superAdmin->givePermissionTo(Permission::all());
+
+        // Assign specific permissions to admin (limited access)
+        $admin->givePermissionTo([
+            'view_dashboard',
+            'manage_customers',
+            'manage_products',
+            'manage_orders',
+            'manage_shopify_orders',
+            'manage_rooms',
+            'manage_units',
+            'manage_sku_matrix',
+            'manage_sku_units',
+            'view_reports',
+            'manage_settings',
+            'manage_bins',
+            'manage_notifications',
+            'manage_support'
+        ]);
 
         // Assign specific permissions to manager
         $manager->givePermissionTo([

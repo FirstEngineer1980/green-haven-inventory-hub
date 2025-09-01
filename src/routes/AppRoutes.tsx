@@ -74,7 +74,7 @@ const AppRoutes = () => {
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-      <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+      <Route path="/users" element={<ProtectedRoute requiredPermission="manage_users"><Users /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/export-import" element={<ProtectedRoute><ExportImportManager /></ProtectedRoute>} />
       <Route path="/wizard" element={<ProtectedRoute><WizardPage /></ProtectedRoute>} />

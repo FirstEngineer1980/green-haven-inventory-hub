@@ -3,7 +3,7 @@ export interface User {
   id: number; // Changed from string to number to match backend
   name: string;
   email: string;
-  role?: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer'; // Made optional to match authTypes
+  role?: 'super_admin' | 'admin' | 'manager' | 'employee' | 'staff' | 'viewer'; // Made optional to match authTypes
   avatar?: string;
   phone?: string;
   position?: string;
@@ -66,7 +66,7 @@ export type Permission = string;
 
 export interface Role {
   id: string;
-  name: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
+  name: 'super_admin' | 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
   permissions: Permission[];
 }
 

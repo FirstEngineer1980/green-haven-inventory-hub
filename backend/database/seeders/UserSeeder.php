@@ -10,13 +10,24 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Create super admin user
+        $superAdmin = User::create([
+            'name' => 'Super Admin User',
+            'email' => 'superadmin@example.com',
+            'password' => Hash::make('password'),
+            'phone' => '1234567890',
+            'position' => 'Super Administrator',
+            'status' => 'active'
+        ]);
+        $superAdmin->assignRole('super_admin');
+
         // Create admin user
         $admin = User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
-            'phone' => '1234567890',
-            'position' => 'System Administrator',
+            'phone' => '1234567891',
+            'position' => 'Administrator',
             'status' => 'active'
         ]);
         $admin->assignRole('admin');
@@ -26,7 +37,7 @@ class UserSeeder extends Seeder
             'name' => 'Manager User',
             'email' => 'manager@example.com',
             'password' => Hash::make('password'),
-            'phone' => '1234567891',
+            'phone' => '1234567892',
             'position' => 'Inventory Manager',
             'status' => 'active'
         ]);
@@ -37,7 +48,7 @@ class UserSeeder extends Seeder
             'name' => 'Staff User',
             'email' => 'staff@example.com',
             'password' => Hash::make('password'),
-            'phone' => '1234567892',
+            'phone' => '1234567893',
             'position' => 'Inventory Staff',
             'status' => 'active'
         ]);

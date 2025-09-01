@@ -6,7 +6,7 @@ export interface User {
   email_verified_at?: string | null;
   created_at: string;
   updated_at: string;
-  role?: 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
+  role?: 'super_admin' | 'admin' | 'manager' | 'employee' | 'staff' | 'viewer';
   avatar?: string | null;
   timezone?: string;
   preferences?: Record<string, any> | null;

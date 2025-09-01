@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 import {
   Package,
   Users,
@@ -29,77 +30,109 @@ import {
   CreditCard
 } from 'lucide-react';
 
-const navigationSections = [
-  {
-    title: 'Overview',
-    items: [
-      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    ]
-  },
-  {
-    title: 'Sales & Orders',
-    items: [
-      { name: 'Orders', href: '/orders', icon: ShoppingCart },
-      { name: 'Purchase Orders', href: '/purchase-orders', icon: FileText },
-      { name: 'Customers', href: '/customers', icon: Users },
-      { name: 'Customer Products', href: '/customer-products', icon: UserCheck },
-      { name: 'Invoices', href: '/invoices', icon: CreditCard },
-    ]
-  },
-  {
-    title: 'Inventory Management',
-    items: [
-      { name: 'Products', href: '/products', icon: Package },
-      { name: 'Categories', href: '/categories', icon: Grid3X3 },
-      { name: 'Inventory', href: '/inventory', icon: Archive },
-      { name: 'Vendors', href: '/vendors', icon: Truck },
-    ]
-  },
-  {
-    title: 'Warehouse Operations',
-    items: [
-      { name: 'Rooms', href: '/rooms', icon: Building },
-      { name: 'Units', href: '/units', icon: Layers },
-      { name: 'Bins', href: '/bins', icon: Box },
-      { name: 'Stock Movements', href: '/stock-movements', icon: TrendingUp },
-    ]
-  },
-  {
-    title: 'Advanced Tools',
-    items: [
-      { name: 'SKU Matrix', href: '/sku-matrix', icon: Grid3X3 },
-      { name: 'Unit Matrix', href: '/unit-matrix', icon: Warehouse },
-      { name: 'Promotions', href: '/promotions', icon: Zap },
-    ]
-  },
-  {
-    title: 'CRM & Relations',
-    items: [
-      { name: 'CRM Dashboard', href: '/crm', icon: Heart },
-      { name: 'Clients', href: '/crm/clients', icon: Users },
-      { name: 'Sellers', href: '/crm/sellers', icon: UserCheck },
-    ]
-  },
-  {
-    title: 'E-commerce Integration',
-    items: [
-      { name: 'Shopify Orders', href: '/shopify/orders', icon: ExternalLink },
-      { name: 'Shopify Customers', href: '/shopify/customers', icon: Store },
-    ]
-  },
-  {
-    title: 'System & Analytics',
-    items: [
-      { name: 'Reports', href: '/reports', icon: BarChart3 },
-      { name: 'Users', href: '/users', icon: Shield },
-      { name: 'Notifications', href: '/notifications', icon: Bell },
-      { name: 'Settings', href: '/settings', icon: Settings },
-    ]
+const getNavigationSections = (userRole?: string) => {
+  const adminAllowedItems = [
+    '/dashboard',
+    '/customers',
+    '/products',
+    '/orders',
+    '/shopify/orders',
+    '/shopify/customers',
+    '/rooms',
+    '/units',
+    '/sku-matrix',
+    '/unit-matrix',
+    '/reports',
+    '/settings',
+    '/bins',
+    '/notifications'
+  ];
+
+  const allSections = [
+    {
+      title: 'Overview',
+      items: [
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      ]
+    },
+    {
+      title: 'Sales & Orders',
+      items: [
+        { name: 'Orders', href: '/orders', icon: ShoppingCart },
+        { name: 'Purchase Orders', href: '/purchase-orders', icon: FileText },
+        { name: 'Customers', href: '/customers', icon: Users },
+        { name: 'Customer Products', href: '/customer-products', icon: UserCheck },
+        { name: 'Invoices', href: '/invoices', icon: CreditCard },
+      ]
+    },
+    {
+      title: 'Inventory Management',
+      items: [
+        { name: 'Products', href: '/products', icon: Package },
+        { name: 'Categories', href: '/categories', icon: Grid3X3 },
+        { name: 'Inventory', href: '/inventory', icon: Archive },
+        { name: 'Vendors', href: '/vendors', icon: Truck },
+      ]
+    },
+    {
+      title: 'Warehouse Operations',
+      items: [
+        { name: 'Rooms', href: '/rooms', icon: Building },
+        { name: 'Units', href: '/units', icon: Layers },
+        { name: 'Bins', href: '/bins', icon: Box },
+        { name: 'Stock Movements', href: '/stock-movements', icon: TrendingUp },
+      ]
+    },
+    {
+      title: 'Advanced Tools',
+      items: [
+        { name: 'SKU Matrix', href: '/sku-matrix', icon: Grid3X3 },
+        { name: 'Unit Matrix', href: '/unit-matrix', icon: Warehouse },
+        { name: 'Promotions', href: '/promotions', icon: Zap },
+      ]
+    },
+    {
+      title: 'CRM & Relations',
+      items: [
+        { name: 'CRM Dashboard', href: '/crm', icon: Heart },
+        { name: 'Clients', href: '/crm/clients', icon: Users },
+        { name: 'Sellers', href: '/crm/sellers', icon: UserCheck },
+      ]
+    },
+    {
+      title: 'E-commerce Integration',
+      items: [
+        { name: 'Shopify Orders', href: '/shopify/orders', icon: ExternalLink },
+        { name: 'Shopify Customers', href: '/shopify/customers', icon: Store },
+      ]
+    },
+    {
+      title: 'System & Analytics',
+      items: [
+        { name: 'Reports', href: '/reports', icon: BarChart3 },
+        { name: 'Users', href: '/users', icon: Shield },
+        { name: 'Notifications', href: '/notifications', icon: Bell },
+        { name: 'Settings', href: '/settings', icon: Settings },
+      ]
+    }
+  ];
+
+  // If user is admin (not super_admin), filter sections
+  if (userRole === 'admin') {
+    return allSections.map(section => ({
+      ...section,
+      items: section.items.filter(item => adminAllowedItems.includes(item.href))
+    })).filter(section => section.items.length > 0);
   }
-];
+
+  // For super_admin and other roles, show all sections
+  return allSections;
+};
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user } = useAuth();
+  const navigationSections = getNavigationSections(user?.role);
 
   return (
     <div className="flex flex-col w-64 bg-background border-r border-border">

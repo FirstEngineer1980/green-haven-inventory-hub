@@ -31,7 +31,7 @@ const Users = () => {
         const user = {
           name: userData.name,
           email: userData.email,
-          role: userData.role as "admin" | "manager" | "staff" | "viewer",
+          role: userData.role as "super_admin" | "admin" | "manager" | "staff" | "viewer",
           permissions: userData.permissions || [],
           avatar: userData.avatar
         };
@@ -128,6 +128,7 @@ const Users = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="super_admin">Super Admin</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="manager">Manager</SelectItem>
               <SelectItem value="staff">Staff</SelectItem>
