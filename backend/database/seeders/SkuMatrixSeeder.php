@@ -15,7 +15,8 @@ class SkuMatrixSeeder extends Seeder
         $matrix = SkuMatrix::create([
             'name' => 'Electronics Matrix',
             'description' => 'Matrix for electronic items',
-            'room_id' => 1
+            'room_id' => 1,
+            'unit_id' => 1
         ]);
 
         // Create Matrix Rows
