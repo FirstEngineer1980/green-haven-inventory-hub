@@ -61,7 +61,8 @@ class User extends Authenticatable
         if ($this->roles->isNotEmpty()) {
             return $this->roles->first()->name;
         }
-        
+
         // Fallback to the database role column if it exists
         return $this->attributes['role'] ?? 'user';
     }
+}
