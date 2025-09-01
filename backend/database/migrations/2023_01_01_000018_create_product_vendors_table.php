@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('cost', 10, 2)->nullable();
             $table->integer('lead_time')->nullable();
             $table->boolean('is_preferred')->default(false);
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }

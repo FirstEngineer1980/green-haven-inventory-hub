@@ -28,6 +28,8 @@ return new class extends Migration
             $table->text('terms')->nullable();
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 

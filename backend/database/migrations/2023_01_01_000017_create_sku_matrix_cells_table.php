@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('sku_matrix_row_id')->constrained()->cascadeOnDelete();
             $table->string('column_id');
             $table->string('value')->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }
