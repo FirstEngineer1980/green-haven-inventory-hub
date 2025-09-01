@@ -33,19 +33,20 @@ import {
 const getNavigationSections = (userRole?: string) => {
   const adminAllowedItems = [
     '/dashboard',
-    '/customers',
-    '/products',
-    '/orders',
-    '/shopify/orders',
-    '/shopify/customers',
-    '/rooms',
-    '/units',
-    '/sku-matrix',
-    '/unit-matrix',
-    '/reports',
-    '/settings',
-    '/bins',
-    '/notifications'
+    '/customers', // Customers
+    '/products', // Products  
+    '/orders', // Orders
+    '/shopify/orders', // Orders synced with Shopify
+    '/shopify/customers', // Also allow shopify customers since they mentioned shopify orders
+    '/rooms', // Rooms
+    '/units', // Units
+    '/sku-matrix', // SKU Matrix
+    '/unit-matrix', // SKU Units (this is the Unit Matrix)
+    '/reports', // Reports
+    '/settings', // Settings
+    '/bins', // Bins
+    '/notifications' // Notifications
+    // Note: Support System is not implemented yet
   ];
 
   const allSections = [
