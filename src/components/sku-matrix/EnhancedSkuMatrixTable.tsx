@@ -216,21 +216,19 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
 
   // Save edited matrix (including selected SKU per cell) to API
   const handleSaveMatrix = async () => {
-    if (!onUpdate) return;
     setIsSaving(true);
 
     // Build payload with rows/cells/skus as needed for API
     const payload = {
-      id: skuMatrix.id,
       name: skuMatrix.name,
       description: skuMatrix.description,
       room_id: skuMatrix.roomId,
       rows: (skuMatrix.rows || []).map(row => ({
-        id: row.id,
+        id: isNaN(Number(row.id)) ? undefined : Number(row.id), // Only include numeric IDs for existing rows
         label: row.label,
-        color: row.color,
+        color: row.color || '#FFFFFF',
         cells: (row.cells || []).map(cell => ({
-          id: cell.id,
+          id: isNaN(Number(cell.id)) ? undefined : Number(cell.id), // Only include numeric IDs for existing cells
           column_id: cell.columnId,
           value: cell.value || ''
         }))
@@ -238,18 +236,43 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
     };
 
     try {
+      console.log('Saving matrix with payload:', payload);
       // Save via PUT API request
-      await apiInstance.put(`/sku-matrices/${skuMatrix.id}`, payload);
+      const response = await apiInstance.put(`/sku-matrices/${skuMatrix.id}`, payload);
+      console.log('Save response:', response.data);
+      
       toast({
         title: "Matrix Saved",
         description: "SKU matrix saved successfully.",
         variant: "default"
       });
-      onUpdate({ ...skuMatrix });
+      
+      // Update with the response data if onUpdate is provided
+      if (onUpdate && response.data) {
+        // Transform the response to match our frontend structure
+        const transformedMatrix = {
+          ...skuMatrix,
+          rows: response.data.rows?.map((row: any) => ({
+            id: row.id.toString(),
+            skuMatrixId: row.sku_matrix_id.toString(),
+            label: row.label,
+            color: row.color,
+            cells: row.cells?.map((cell: any) => ({
+              id: cell.id.toString(),
+              skuMatrixRowId: cell.sku_matrix_row_id.toString(),
+              columnId: cell.column_id,
+              value: cell.value || '',
+              binId: cell.bin_id || ''
+            })) || []
+          })) || []
+        };
+        onUpdate(transformedMatrix);
+      }
     } catch (err: any) {
+      console.error('Error saving matrix:', err);
       toast({
         title: "Error",
-        description: "Failed to save SKU matrix.",
+        description: err.response?.data?.message || "Failed to save SKU matrix.",
         variant: "destructive"
       });
     } finally {

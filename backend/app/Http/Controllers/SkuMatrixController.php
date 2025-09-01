@@ -83,30 +83,60 @@ class SkuMatrixController extends Controller
 
         // Update or create rows/cells
         if (!empty($data['rows'])) {
+            // Get existing row IDs to track which ones to keep
+            $existingRowIds = collect($data['rows'])
+                ->pluck('id')
+                ->filter()
+                ->toArray();
+
+            // Delete rows that are no longer in the data
+            $skuMatrix->rows()->whereNotIn('id', $existingRowIds)->delete();
+
             foreach ($data['rows'] as $rowData) {
-                $row = isset($rowData['id'])
-                    ? SkuMatrixRow::find($rowData['id'])
-                    : $skuMatrix->rows()->create([
+                if (isset($rowData['id']) && $rowData['id']) {
+                    // Update existing row
+                    $row = SkuMatrixRow::find($rowData['id']);
+                    if ($row) {
+                        $row->update([
+                            'label' => $rowData['label'],
+                            'color' => $rowData['color'] ?? '#FFFFFF'
+                        ]);
+                    }
+                } else {
+                    // Create new row
+                    $row = $skuMatrix->rows()->create([
                         'label' => $rowData['label'],
                         'color' => $rowData['color'] ?? '#FFFFFF'
                     ]);
-                $row->update([
-                    'label' => $rowData['label'],
-                    'color' => $rowData['color'] ?? '#FFFFFF'
-                ]);
+                }
 
-                if (!empty($rowData['cells'])) {
+                if ($row && !empty($rowData['cells'])) {
+                    // Get existing cell IDs for this row
+                    $existingCellIds = collect($rowData['cells'])
+                        ->pluck('id')
+                        ->filter()
+                        ->toArray();
+
+                    // Delete cells that are no longer in the data
+                    $row->cells()->whereNotIn('id', $existingCellIds)->delete();
+
                     foreach ($rowData['cells'] as $cellData) {
-                        $cell = isset($cellData['id'])
-                            ? SkuMatrixCell::find($cellData['id'])
-                            : $row->cells()->create([
+                        if (isset($cellData['id']) && $cellData['id']) {
+                            // Update existing cell
+                            $cell = SkuMatrixCell::find($cellData['id']);
+                            if ($cell) {
+                                $cell->update([
+                                    'column_id' => $cellData['column_id'],
+                                    'value' => $cellData['value'] ?? null
+                                ]);
+                            }
+                        } else {
+                            // Create new cell
+                            $row->cells()->create([
                                 'column_id' => $cellData['column_id'],
                                 'value' => $cellData['value'] ?? null
                             ]);
-                        $cell->update([
-                            'column_id' => $cellData['column_id'],
-                            'value' => $cellData['value'] ?? null
-                        ]);
+                        }
                     }
                 }
             }
