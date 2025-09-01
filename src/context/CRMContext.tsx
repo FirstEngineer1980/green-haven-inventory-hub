@@ -26,11 +26,13 @@ export const CRMProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const { data: sellers = [], isLoading: sellersLoading, refetch: refetchSellers } = useQuery({
     queryKey: ['sellers'],
     queryFn: crmService.getSellers,
+    enabled: false, // Only enable when explicitly needed
   });
 
   const { data: clients = [], isLoading: clientsLoading, refetch: refetchClients } = useQuery({
     queryKey: ['clients'],
     queryFn: crmService.getClients,
+    enabled: false, // Only enable when explicitly needed
   });
 
   const stats = {
