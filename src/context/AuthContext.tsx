@@ -82,6 +82,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const hasPermission = (permission: string) => {
     if (!user) return false;
+    
+    // Super admin has access to everything
+    if (user.role === 'super_admin') return true;
+    
+    // Admin has access to specific features
+    if (user.role === 'admin') {
+      const adminPermissions = [
+        'view_reports',
+        'manage_inventory', 
+        'manage_products',
+        'manage_customers',
+        'view_orders',
+        'manage_rooms',
+        'manage_units',
+        'manage_bins',
+        'view_notifications'
+      ];
+      if (adminPermissions.includes(permission)) return true;
+    }
+    
     return user.permissions?.includes('all') || user.permissions?.includes(permission) || false;
   };
 
