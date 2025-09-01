@@ -51,4 +51,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-}
+
+    /**
+     * Get the user's primary role name.
+     */
+    public function getRoleAttribute(): string
+    {
+        // If user has roles from Spatie, return the first role name
+        if ($this->roles->isNotEmpty()) {
+            return $this->roles->first()->name;
+        }
+        
+        // Fallback to the database role column if it exists
+        return $this->attributes['role'] ?? 'user';
+    }
