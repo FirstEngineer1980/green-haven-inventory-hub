@@ -99,7 +99,60 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
 
   const handleSelectChange = (cellId: string, value: string) => {
     console.log('Select changed for cell:', cellId, 'new value:', value);
-    // Here you would update the actual matrix data
+    // Here you would update the actual matrix data and save immediately
+  };
+
+  // Auto-save function for immediate cell updates
+  const handleCellValueChange = async (rowId: string, columnId: string, newValue: string) => {
+    try {
+      // Update the in-memory matrix first
+      if (onUpdate) {
+        const newRows = (Array.isArray(skuMatrix.rows) ? skuMatrix.rows : []).map(r =>
+          r.id === rowId ? {
+            ...r,
+            cells: (Array.isArray(r.cells) ? r.cells : []).map(c =>
+              c.columnId === columnId ? { ...c, value: newValue } : c
+            )
+          } : r
+        );
+        const updatedMatrix = { ...skuMatrix, rows: newRows };
+        onUpdate(updatedMatrix);
+
+        // Auto-save to database immediately
+        const payload = {
+          name: updatedMatrix.name,
+          description: updatedMatrix.description,
+          room_id: updatedMatrix.roomId,
+          rows: newRows.map(row => ({
+            id: isNaN(Number(row.id)) ? undefined : Number(row.id),
+            label: row.label,
+            color: row.color || '#FFFFFF',
+            cells: (row.cells || []).map(cell => ({
+              id: isNaN(Number(cell.id)) ? undefined : Number(cell.id),
+              column_id: cell.columnId,
+              value: cell.value || ''
+            }))
+          }))
+        };
+
+        console.log('Auto-saving matrix with payload:', payload);
+        const response = await apiInstance.put(`/sku-matrices/${skuMatrix.id}`, payload);
+        console.log('Auto-save response:', response.data);
+        
+        toast({
+          title: "SKU Updated",
+          description: "SKU selection saved successfully.",
+          variant: "default"
+        });
+      }
+    } catch (err: any) {
+      console.error('Error auto-saving matrix:', err);
+      toast({
+        title: "Auto-save Error",
+        description: err.response?.data?.message || "Failed to save SKU selection.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAddRow = () => {
@@ -327,20 +380,7 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
                     <TableCell key={column.id}>
                       <SkuProductComboboxCell
                         value={skuValue}
-                        onChange={newSku => {
-                          // update cell value in the in-memory matrix
-                          if (onUpdate) {
-                            const newRows = (Array.isArray(skuMatrix.rows) ? skuMatrix.rows : []).map(r =>
-                              r.id === row.id ? {
-                                ...r,
-                                cells: (Array.isArray(r.cells) ? r.cells : []).map(c =>
-                                  c.columnId === column.id ? { ...c, value: newSku } : c
-                                )
-                              } : r
-                            );
-                            onUpdate({ ...skuMatrix, rows: newRows });
-                          }
-                        }}
+                        onChange={newSku => handleCellValueChange(row.id, column.id, newSku)}
                         products={Array.isArray(skuProducts) ? skuProducts : []}
                         placeholder="Select SKU"
                       />
