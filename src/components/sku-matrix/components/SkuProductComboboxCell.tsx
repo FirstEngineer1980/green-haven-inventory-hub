@@ -24,12 +24,16 @@ const SkuProductComboboxCell = ({
 }: SkuProductComboboxCellProps) => {
   const [open, setOpen] = useState(false);
 
-  // Filter out any products that are malformed to prevent errors with `cmdk`.
-  const validProducts = Array.isArray(products) 
-    ? products.filter(p => p && typeof p.sku === 'string') 
-    : [];
+  // Ensure products is always an array and filter out malformed entries
+  const safeProducts = React.useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    return products.filter(p => p && typeof p === 'object' && typeof p.sku === 'string' && typeof p.name === 'string');
+  }, [products]);
 
-  const selected = validProducts.find(p => p.sku === value);
+  const selected = React.useMemo(() => {
+    if (!value || !safeProducts.length) return null;
+    return safeProducts.find(p => p.sku === value) || null;
+  }, [value, safeProducts]);
 
   const handleSelect = (sku: string) => {
     onChange(sku);
@@ -63,9 +67,9 @@ const SkuProductComboboxCell = ({
           <CommandInput placeholder="Search SKU products..." />
           <CommandEmpty>No products found.</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-auto">
-            {validProducts.map((product) => (
+            {safeProducts.length > 0 ? safeProducts.map((product) => (
               <CommandItem
-                key={product.sku}
+                key={`${product.id}-${product.sku}`}
                 value={product.sku}
                 onSelect={() => handleSelect(product.sku)}
                 className="flex items-center gap-2"
@@ -80,7 +84,11 @@ const SkuProductComboboxCell = ({
                 <span className="text-muted-foreground">-</span>
                 <span>{product.name}</span>
               </CommandItem>
-            ))}
+            )) : (
+              <CommandItem disabled>
+                Loading products...
+              </CommandItem>
+            )}
           </CommandGroup>
         </Command>
       </PopoverContent>
