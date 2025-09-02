@@ -79,7 +79,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('customers/{customer}/products', [CustomerProductController::class, 'getByCustomer']);
 
     // Product routes for purchase orders
-    Route::get('/products', [ProductController::class, 'index']);
+    Route::apiResource('/products', ProductController::class);
     // Product management
     Route::get('products/{product}/low-stock', [ProductController::class, 'lowStock']);
     Route::post('products/{product}/adjust-stock', [ProductController::class, 'adjustStock']);
@@ -144,11 +144,11 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('sellers', SellerController::class);
     Route::apiResource('seller-commissions', SellerCommissionController::class);
-    
+
     // Invoice routes with status update
     Route::apiResource('invoices', InvoiceController::class);
     Route::patch('invoices/{invoice}/status', [InvoiceController::class, 'updateStatus']);
-    
+
     Route::apiResource('client-order-templates', ClientOrderTemplateController::class);
 
     // Stripe payment routes
