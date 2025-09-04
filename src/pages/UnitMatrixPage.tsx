@@ -17,7 +17,7 @@ import ImportButton from '@/components/shared/ImportButton';
 import { getTemplateUrl, validateTemplate } from '@/utils/templateGenerator';
 
 const UnitMatrixPage = () => {
-  const { unitMatrices, deleteUnitMatrix, addUnitMatrix } = useUnitMatrix();
+  const { unitMatrices, deleteUnitMatrix, addUnitMatrix, fetchUnitMatrices, loading, error } = useUnitMatrix();
   const { rooms } = useRooms();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -26,17 +26,17 @@ const UnitMatrixPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
-  const handleMatrixImport = (data: any[]) => {
+  const handleMatrixImport = async (data: any[]) => {
     try {
-      data.forEach(matrixData => {
+      for (const matrixData of data) {
         const matrix = {
           roomId: matrixData.roomId,
           name: matrixData.name,
           description: matrixData.description || '',
           rows: matrixData.rows || []
         };
-        addUnitMatrix(matrix);
-      });
+        await addUnitMatrix(matrix);
+      }
       
       toast({
         title: "Unit Matrices imported",
@@ -52,6 +52,11 @@ const UnitMatrixPage = () => {
       });
     }
   };
+
+  // Fetch on mount
+  React.useEffect(() => {
+    fetchUnitMatrices();
+  }, [fetchUnitMatrices]);
 
   // Filter unit matrices based on search and filters - handle undefined case
   const filteredUnitMatrices = (unitMatrices || []).filter(unitMatrix => 
@@ -127,9 +132,14 @@ const UnitMatrixPage = () => {
             <CardTitle>Unit Matrices ({filteredUnitMatrices.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {filteredUnitMatrices.length === 0 ? (
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+                <p className="mt-4 text-muted-foreground">Loading unit matrices...</p>
+              </div>
+            ) : filteredUnitMatrices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No unit matrices found
+                {error ? `Error: ${error}` : 'No unit matrices found'}
               </div>
             ) : (
               filteredUnitMatrices.map(unitMatrix => (

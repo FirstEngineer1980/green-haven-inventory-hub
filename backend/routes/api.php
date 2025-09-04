@@ -122,6 +122,13 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('notifications', NotificationController::class);
     Route::post('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
 
+    // Unit Matrices
+    Route::get('/unit-matrices', [\App\Http\Controllers\UnitMatrixController::class, 'index']);
+    Route::post('/unit-matrices', [\App\Http\Controllers\UnitMatrixController::class, 'store']);
+    Route::get('/unit-matrices/{unitMatrix}', [\App\Http\Controllers\UnitMatrixController::class, 'show']);
+    Route::put('/unit-matrices/{unitMatrix}', [\App\Http\Controllers\UnitMatrixController::class, 'update']);
+    Route::delete('/unit-matrices/{unitMatrix}', [\App\Http\Controllers\UnitMatrixController::class, 'destroy']);
+
     // Settings
     Route::apiResource('settings', SettingController::class);
 
