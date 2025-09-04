@@ -396,6 +396,9 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
                   const cell = cellsArray.find(c => c.columnId === column.id);
                   const cellId = cell?.id || `${row.id}-${column.id}`;
                   const skuValue = cell?.value || '';
+                  console.log('row', row.id, 'col', column.id, 'skuValue', skuValue, typeof skuValue);
+                  console.log('products sample', skuProducts.slice(0,5));
+                  console.log('match', skuProducts.find(p => String(p.id)===String(skuValue) || p.sku===String(skuValue)));
 
                   return (
                     <TableCell key={column.id}>
