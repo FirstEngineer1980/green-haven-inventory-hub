@@ -395,16 +395,19 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
                   const cellsArray = Array.isArray(row.cells) ? row.cells : [];
                   const cell = cellsArray.find(c => c.columnId === column.id);
                   const cellId = cell?.id || `${row.id}-${column.id}`;
-                  const skuValue = cell?.value || '';
-                  console.log('row', row.id, 'col', column.id, 'skuValue', skuValue, typeof skuValue);
-                  console.log('products sample', skuProducts.slice(0,5));
-                  console.log('match', skuProducts.find(p => String(p.id)===String(skuValue) || p.sku===String(skuValue)));
+                  const rawValue = cell?.value ?? '';
+
+                  // Normalize the value to always be a SKU string for the Select component
+                  const matchedProduct = Array.isArray(skuProducts)
+                    ? skuProducts.find(p => String(p.sku) === String(rawValue) || String(p.id) === String(rawValue))
+                    : undefined;
+                  const displayValue = matchedProduct ? matchedProduct.sku : '';
 
                   return (
                     <TableCell key={column.id}>
                       <SkuProductComboboxCell
-                        value={skuValue}
-                        onChange={newSku => handleCellValueChange(row.id, column.id, newSku)}
+                        value={displayValue}
+                        onChange={(newSku) => handleCellValueChange(row.id, column.id, newSku)}
                         products={Array.isArray(skuProducts) ? skuProducts : []}
                         placeholder="Select SKU"
                       />
