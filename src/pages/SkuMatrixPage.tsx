@@ -190,9 +190,8 @@ const SkuMatrixPage = () => {
                     </div>
                     <EnhancedSkuMatrixTable 
                       skuMatrix={skuMatrix}
-                      onUpdate={async () => {
-                        // Refresh data so selections appear immediately after save
-                        await fetchSkuMatrices();
+                      onUpdate={(updatedMatrix) => {
+                        console.log('Matrix updated:', updatedMatrix);
                       }}
                     />
                   </div>
