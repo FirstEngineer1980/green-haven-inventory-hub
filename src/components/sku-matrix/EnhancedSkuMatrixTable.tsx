@@ -139,6 +139,27 @@ const EnhancedSkuMatrixTable = ({ skuMatrix, onUpdate }: EnhancedSkuMatrixTableP
         const response = await apiInstance.put(`/sku-matrices/${skuMatrix.id}`, payload);
         console.log('Auto-save response:', response.data);
         
+        // Update with the response data to ensure frontend reflects saved state
+        if (response.data) {
+          const transformedMatrix = {
+            ...skuMatrix,
+            rows: response.data.rows?.map((row: any) => ({
+              id: row.id.toString(),
+              skuMatrixId: row.sku_matrix_id.toString(),
+              label: row.label,
+              color: row.color,
+              cells: row.cells?.map((cell: any) => ({
+                id: cell.id.toString(),
+                skuMatrixRowId: cell.sku_matrix_row_id.toString(),
+                columnId: cell.column_id,
+                value: cell.value || '',
+                binId: cell.bin_id || ''
+              })) || []
+            })) || []
+          };
+          onUpdate(transformedMatrix);
+        }
+        
         toast({
           title: "SKU Updated",
           description: "SKU selection saved successfully.",
